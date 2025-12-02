@@ -45,7 +45,7 @@ struct AccountsView: View {
                         } label: {
                             AccountCard(
                                 title: "Resurs Family",
-                                accountType: "Joint Credit Account",
+                                accountType: nil,
                                 accountNumber: "**** 1234",
                                 balance: "56 005 SEK",
                                 icon: "heart.fill",
@@ -87,7 +87,7 @@ struct AccountsView: View {
                             CompactDiscoverRow(
                                 title: "Start Saving for a Goal",
                                 subtitle: "Open an account in 2 min",
-                                icon: "piggy.bank.fill",
+                                icon: "chart.line.uptrend.xyaxis",
                                 color: .green,
                                 trailingIcon: "plus"
                             )
@@ -138,20 +138,13 @@ struct AccountCard: View {
                     .frame(width: 44, height: 44)
                     .background(color.opacity(0.2))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                
-                if let accountType = accountType {
-                    Text(accountType)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                
+
+                Text(title)
+                    .font(.title2)
+                    .fontWeight(.bold)
+
                 Spacer()
             }
-            
-            // Title
-            Text(title)
-                        .font(.title2)
-                        .fontWeight(.bold)
             
             Spacer()
                 .frame(height: 2)
