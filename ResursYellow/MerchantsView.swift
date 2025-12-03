@@ -92,13 +92,6 @@ struct MerchantsView: View {
                                             titleColor: .primary
                                         )
                                     }
-                                    .contextMenu {
-                                        Button(role: .destructive) {
-                                            remove(merchant)
-                                        } label: {
-                                            Label("Remove", systemImage: "trash")
-                                        }
-                                    }
                                 } else {
                                     MerchantCard(
                                         title: merchant,
@@ -193,3 +186,4 @@ struct MerchantsView: View {
     MerchantsView()
         .preferredColorScheme(.dark)
 }
+
