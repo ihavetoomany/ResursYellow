@@ -20,7 +20,7 @@ struct MerchantCard: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.headline)
+                    .font(.title3)
                     .fontWeight(.semibold)
                     .foregroundColor(titleColor)
                 if let subtitle {
@@ -89,7 +89,7 @@ struct MerchantsView: View {
                                             amount: "Available amount: 14 500 kr",
                                             icon: "link.circle.fill",
                                             color: .orange,
-                                            titleColor: .black
+                                            titleColor: .primary
                                         )
                                     }
                                     .contextMenu {
