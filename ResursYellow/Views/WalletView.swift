@@ -877,12 +877,9 @@ struct CreditInfoBox: View {
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Available Credit")
+                Text("My Cards")
                     .font(.headline)
                     .fontWeight(.semibold)
-                Text("Across your credit accounts")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
             Spacer()
             Image(systemName: "creditcard.circle.fill")
