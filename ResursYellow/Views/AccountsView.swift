@@ -45,7 +45,7 @@ struct AccountsView: View {
                         } label: {
                             AccountCard(
                                 title: "Resurs Family",
-                                accountType: nil,
+                                accountType: "Joint Credit Account",
                                 accountNumber: "**** 1234",
                                 balance: "56 005 SEK",
                                 icon: "heart.fill",
@@ -129,21 +129,30 @@ struct AccountCard: View {
     let balanceLabel: String
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Icon with account type
-            HStack(alignment: .center, spacing: 10) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(color)
-                    .frame(width: 44, height: 44)
-                    .background(color.opacity(0.2))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-
+        VStack(alignment: .leading, spacing: 12) {
+            // Keep hierarchy icon + account type on one row per HIG Typography
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .center, spacing: 10) {
+                    Image(systemName: icon)
+                        .font(.title2)
+                        .foregroundColor(color)
+                        .frame(width: 44, height: 44)
+                        .background(color.opacity(0.2))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    if let accountType {
+                        Text(accountType)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer(minLength: 0)
+                }
+                
                 Text(title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-
-                Spacer()
+                    .font(.title)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             
             Spacer()

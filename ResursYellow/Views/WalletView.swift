@@ -354,15 +354,87 @@ struct PurchaseItem: Identifiable {
     let transaction: TransactionData?
     
     static let sampleData: [PurchaseItem] = [
-        PurchaseItem(title: "Coffee Shop", subtitle: "Today, 2:30 PM", amount: "45 SEK", icon: "creditcard.fill", color: .brown, category: .recent, transaction: nil),
-        PurchaseItem(title: "IKEA", subtitle: "Yesterday, 5:15 PM", amount: "23 000 SEK", icon: "heart.fill", color: .blue, category: .large, transaction: TransactionData(merchant: "IKEA", amount: "23 000 SEK", date: "Nov 2, 2025", time: "5:15 PM")),
-        PurchaseItem(title: "Gas Station", subtitle: "Yesterday, 8:30 AM", amount: "452 SEK", icon: "creditcard.fill", color: .brown, category: .recent, transaction: nil),
-        PurchaseItem(title: "Online Purchase", subtitle: "2 days ago, 7:45 PM", amount: "900 SEK", icon: "heart.fill", color: .blue, category: .online, transaction: nil),
-        PurchaseItem(title: "Restaurant", subtitle: "3 days ago, 7:00 PM", amount: "322 SEK", icon: "heart.fill", color: .blue, category: .dining, transaction: nil),
-        PurchaseItem(title: "Bauhaus", subtitle: "4 days ago, 11:20 AM", amount: "4 356 kr", icon: "diamond.fill", color: .orange, category: .large, transaction: TransactionData(merchant: "Bauhaus", amount: "4 356 kr", date: "4 days ago", time: "11:20 AM")),
-        PurchaseItem(title: "Bookstore", subtitle: "5 days ago, 3:15 PM", amount: "190 SEK", icon: "creditcard.fill", color: .brown, category: .recent, transaction: nil),
-        PurchaseItem(title: "Movie Theater", subtitle: "6 days ago, 8:45 PM", amount: "245 SEK", icon: "creditcard.fill", color: .brown, category: .entertainment, transaction: nil),
-        PurchaseItem(title: "Clothing Store", subtitle: "1 week ago, 2:30 PM", amount: "1 568 SEK", icon: "creditcard.fill", color: .brown, category: .shopping, transaction: nil)
+        PurchaseItem(
+            title: "Bauhaus Megastore",
+            subtitle: "Today, 11:20 AM - Goteborg",
+            amount: "4 356 kr",
+            icon: "hammer.fill",
+            color: .orange,
+            category: .large,
+            transaction: TransactionData(merchant: "Bauhaus", amount: "4 356 kr", date: "Today", time: "11:20 AM")
+        ),
+        PurchaseItem(
+            title: "NetOnNet Warehouse",
+            subtitle: "Yesterday, 5:45 PM - Stockholm",
+            amount: "12 499 kr",
+            icon: "bolt.fill",
+            color: .blue,
+            category: .large,
+            transaction: TransactionData(merchant: "NetOnNet", amount: "12 499 kr", date: "Yesterday", time: "5:45 PM")
+        ),
+        PurchaseItem(
+            title: "Jula Kungens Kurva",
+            subtitle: "Yesterday, 9:05 AM - Stockholm",
+            amount: "2 145 kr",
+            icon: "wrench.and.screwdriver",
+            color: .red,
+            category: .shopping,
+            transaction: TransactionData(merchant: "Jula", amount: "2 145 kr", date: "Yesterday", time: "9:05 AM")
+        ),
+        PurchaseItem(
+            title: "Clas Ohlson",
+            subtitle: "2 days ago, 6:40 PM - Malmo",
+            amount: "890 kr",
+            icon: "lightbulb.fill",
+            color: .yellow,
+            category: .shopping,
+            transaction: nil
+        ),
+        PurchaseItem(
+            title: "Elgiganten",
+            subtitle: "3 days ago, 7:10 PM - Uppsala",
+            amount: "5 699 kr",
+            icon: "display.2",
+            color: .green,
+            category: .large,
+            transaction: nil
+        ),
+        PurchaseItem(
+            title: "Lyko Beauty",
+            subtitle: "4 days ago, 3:25 PM - Boras",
+            amount: "640 kr",
+            icon: "drop.fill",
+            color: .pink,
+            category: .shopping,
+            transaction: nil
+        ),
+        PurchaseItem(
+            title: "ICA Maxi",
+            subtitle: "5 days ago, 5:15 PM - Lund",
+            amount: "1 245 kr",
+            icon: "cart.fill",
+            color: .brown,
+            category: .recent,
+            transaction: nil
+        ),
+        PurchaseItem(
+            title: "Willys Hemma",
+            subtitle: "6 days ago, 1:05 PM - Vasteras",
+            amount: "925 kr",
+            icon: "cart.circle.fill",
+            color: .teal,
+            category: .recent,
+            transaction: nil
+        ),
+        PurchaseItem(
+            title: "Stadium Outlet",
+            subtitle: "1 week ago, 4:30 PM - Orebro",
+            amount: "1 080 kr",
+            icon: "sportscourt.fill",
+            color: .purple,
+            category: .shopping,
+            transaction: nil
+        )
     ]
 }
 
@@ -404,7 +476,7 @@ struct PurchasesList: View {
             
             HStack {
                 filterControl
-                Spacer()
+                Spacer(minLength: 12)
             }
             
             VStack(spacing: 12) {
@@ -500,7 +572,7 @@ struct ActionsList: View {
                     .foregroundColor(.secondary)
                     .textCase(.uppercase)
                     .tracking(0.5)
-                Spacer()
+                Spacer(minLength: 12)
             }
             .padding(.horizontal, 4)
             .padding(.top, 12)
@@ -606,7 +678,7 @@ struct InvoicesList: View {
                     .foregroundColor(.secondary)
                     .textCase(.uppercase)
                     .tracking(0.5)
-                Spacer()
+                Spacer(minLength: 12)
             }
             .padding(.horizontal, 4)
             .padding(.top, 4)
@@ -858,7 +930,7 @@ struct CreditInfoBox: View {
         .accessibilityHint("Opens detailed view with credit account PIN information")
         .sheet(isPresented: $showDetails) {
             CreditDetailsSheet()
-                .presentationDetents([.medium])
+                .presentationDetents([.fraction(0.33)])
                 .presentationDragIndicator(.visible)
         }
     }
@@ -895,10 +967,10 @@ struct CreditDetailsSheet: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
+            VStack(spacing: 10) {
                 // PIN Code Section
-                VStack(spacing: 12) {
-                    Text("Credit Account PIN")
+                VStack(spacing: 14) {
+                    Text("Credit Card PIN")
                         .font(.title2)
                         .fontWeight(.bold)
                     
@@ -923,34 +995,35 @@ struct CreditDetailsSheet: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                 }
-                .padding(.top, 24)
+                .padding(.top, 8)
                 
-                Spacer()
-                    .frame(height: 40)
+                Spacer(minLength: 6)
                 
-                // Show PIN Button
-                Button(action: {
-                    withAnimation {
-                        showPIN.toggle()
-                    }
-                }) {
+                // Show PIN Button (press and hold to reveal)
+                Button(action: {}) {
                     HStack {
-                        Image(systemName: showPIN ? "eye.slash.fill" : "eye.fill")
+                        Image(systemName: showPIN ? "eye.fill" : "eye.slash.fill")
                             .font(.title3)
-                        Text(showPIN ? "Hide PIN" : "Show PIN")
+                        Text("Hold to show PIN")
                             .font(.headline)
                             .fontWeight(.semibold)
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                    .padding(.vertical, 16)
                     .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(Capsule())
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 24)
+                .padding(.horizontal, 12)
+                .padding(.bottom, 12)
+                .onLongPressGesture(minimumDuration: .infinity, maximumDistance: 44, pressing: { isPressing in
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        showPIN = isPressing
+                    }
+                }, perform: {})
+                .accessibilityHint("Press and hold to temporarily reveal your PIN")
             }
-            .background(Color(UIColor.systemBackground))
+            .background(.ultraThinMaterial)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
@@ -987,7 +1060,7 @@ struct CreditAccountRow: View {
                     Image(systemName: "lock.fill")
                         .font(.caption2)
                         .foregroundColor(accentColor)
-                    Text("PIN protected")
+                    Text("View PIN")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

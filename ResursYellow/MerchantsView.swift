@@ -48,7 +48,7 @@ struct MerchantsView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showProfile = false
     
-    @State private var connected: [String] = ["Bauhaus"]
+    @State private var connected: [String] = ["Bauhaus", "NetOnNet", "Jula"]
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -79,33 +79,26 @@ struct MerchantsView: View {
 
                         VStack(spacing: 10) {
                             ForEach(connected, id: \.self) { merchant in
-                                if merchant == "Bauhaus" {
-                                    NavigationLink {
-                                        BauhausDetailView()
-                                    } label: {
-                                        MerchantCard(
-                                            title: merchant,
-                                            subtitle: "Easy checkout enabled",
-                                            amount: "Available amount: 14 500 kr",
-                                            icon: "link.circle.fill",
-                                            color: .orange,
-                                            titleColor: .primary
-                                        )
-                                    }
-                                } else {
+                                let card = cardConfig(for: merchant)
+                                
+                                NavigationLink {
+                                    merchantDetailView(for: merchant)
+                                } label: {
                                     MerchantCard(
                                         title: merchant,
-                                        subtitle: "Payment options and offers enabled",
-                                        amount: nil,
-                                        icon: "link.circle.fill",
-                                        color: .green
+                                        subtitle: card.subtitle,
+                                        amount: card.amount,
+                                        icon: card.icon,
+                                        color: card.color,
+                                        titleColor: card.titleColor
                                     )
-                                    .contextMenu {
-                                        Button(role: .destructive) {
-                                            remove(merchant)
-                                        } label: {
-                                            Label("Remove", systemImage: "trash")
-                                        }
+                                }
+                                .buttonStyle(.plain)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        remove(merchant)
+                                    } label: {
+                                        Label("Remove", systemImage: "trash")
                                     }
                                 }
                             }
@@ -178,6 +171,68 @@ struct MerchantsView: View {
     private func remove(_ merchant: String) {
         if let idx = connected.firstIndex(of: merchant) {
             connected.remove(at: idx)
+        }
+    }
+}
+
+private extension MerchantsView {
+    struct MerchantCardConfig {
+        let subtitle: String
+        let amount: String?
+        let icon: String
+        let color: Color
+        let titleColor: Color
+    }
+    
+    func cardConfig(for merchant: String) -> MerchantCardConfig {
+        switch merchant {
+        case "Bauhaus":
+            return MerchantCardConfig(
+                subtitle: "Easy checkout enabled",
+                amount: "Available amount: 14 500 kr",
+                icon: "house.lodge.fill",
+                color: .orange,
+                titleColor: .primary
+            )
+        case "NetOnNet":
+            return MerchantCardConfig(
+                subtitle: "Linked to NetOnNet Warehouse",
+                amount: "Available amount: 18 300 kr",
+                icon: "shippingbox.fill",
+                color: .blue,
+                titleColor: .primary
+            )
+        case "Jula":
+            return MerchantCardConfig(
+                subtitle: "Pay later active in-store",
+                amount: "Available amount: 9 200 kr",
+                icon: "hammer.circle.fill",
+                color: .red,
+                titleColor: .primary
+            )
+        default:
+            return MerchantCardConfig(
+                subtitle: "Payment options and offers enabled",
+                amount: nil,
+                icon: "link.circle.fill",
+                color: .green,
+                titleColor: .primary
+            )
+        }
+    }
+    
+    @ViewBuilder
+    func merchantDetailView(for merchant: String) -> some View {
+        switch merchant {
+        case "Bauhaus":
+            BauhausDetailView()
+        case "NetOnNet":
+            NetOnNetDetailView()
+        case "Jula":
+            JulaDetailView()
+        default:
+            Text("Details for \(merchant)")
+                .padding()
         }
     }
 }
