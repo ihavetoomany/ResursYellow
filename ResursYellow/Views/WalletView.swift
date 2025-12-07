@@ -2263,7 +2263,7 @@ struct WalletSummaryBento: View {
     var body: some View {
         LazyVGrid(columns: gridColumns, spacing: 12) {
             WalletSummaryCard(
-                title: "Invoices to pay",
+                title: "To Pay",
                 headline: outstandingTotal,
                 hint: "View all invoices",
                 icon: "doc.text.fill",
@@ -2290,7 +2290,7 @@ struct WalletSummaryBento: View {
             )
             
             WalletSummaryCard(
-                title: "Part Pay",
+                title: "To pay later",
                 headline: merchantPurchaseTotal,
                 hint: "View Payment Plans",
                 icon: "chart.pie.fill",
