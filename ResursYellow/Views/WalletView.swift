@@ -550,7 +550,7 @@ struct WalletView: View {
     /// Purchases that are large enough and not already tied to a merchant part-pay account.
     private var eligiblePartPayPurchases: [PurchaseItem] {
         PurchaseItem.sampleData
-            .filter { !$0.paymentMethod.isMerchantAccount && $0.numericAmount >= 1_000 }
+            .filter { $0.isEligibleForPartPay }
             .sorted { $0.numericAmount > $1.numericAmount }
     }
     
@@ -586,9 +586,7 @@ struct WalletView: View {
                     )
                     .padding(.horizontal)
                     
-                    invoicesSection
-                    purchasesSection
-                    savingsSection
+                    
                     actionsSection
                 }
             }
@@ -637,93 +635,27 @@ struct WalletView: View {
         }
     }
     
-    private var invoicesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            WalletSectionHeader(
-                title: "Upcoming invoices",
-                actionTitle: "View all",
-                action: { navigationPath.append(WalletDestination.invoices) }
-            )
-            
-            VStack(spacing: 12) {
-                if invoicePreview.isEmpty {
-                    EmptyStateRow(
-                        title: "No unpaid invoices",
-                        subtitle: "We'll let you know when something is due"
-                    )
-                } else {
-                    ForEach(invoicePreview) { invoice in
-                        Button {
-                            navigationPath.append(invoice.detail)
-                        } label: {
-                            InvoiceRow(
-                                title: invoice.merchant,
-                                subtitle: invoice.subtitle,
-                                amount: invoice.amount,
-                                icon: invoice.icon,
-                                color: invoice.color,
-                                isOverdue: invoice.isOverdue,
-                                statusOverride: invoice.statusOverride
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
-        }
-        .padding(.horizontal)
-    }
-    
-    private var purchasesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            WalletSectionHeader(
-                title: "Latest purchases",
-                actionTitle: "View all",
-                action: { navigationPath.append(WalletDestination.purchases(filter: .all)) }
-            )
-            
-            VStack(spacing: 12) {
-                ForEach(purchasesPreview) { purchase in
-                    if let transaction = purchase.transaction {
-                        Button {
-                            navigationPath.append(transaction)
-                        } label: {
-                            PurchaseRow(
-                                title: purchase.title,
-                                subtitle: purchase.subtitleWithoutTime,
-                                amount: purchase.amount,
-                                icon: purchase.icon,
-                                color: purchase.color,
-                                paymentMethod: purchase.paymentMethod
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    } else {
-                        PurchaseRow(
-                            title: purchase.title,
-                            subtitle: purchase.subtitleWithoutTime,
-                            amount: purchase.amount,
-                            icon: purchase.icon,
-                            color: purchase.color,
-                            paymentMethod: purchase.paymentMethod
-                        )
-                    }
-                }
-            }
-        }
-        .padding(.horizontal)
-    }
-    
     private var actionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            WalletSectionHeader(
-                title: "Priority actions",
-                actionTitle: "View all",
-                action: { navigationPath.append(WalletDestination.actions) }
-            )
+            Text("To Do")
+                .font(.title3)
+                .fontWeight(.semibold)
+                .padding(.horizontal)
             
             VStack(spacing: 12) {
-                ForEach(actionsPreview) { action in
+                Button {
+                    navigationPath.append(WalletDestination.invoices)
+                } label: {
+                    ActionRow(
+                        title: "Pay invoices",
+                        subtitle: "Review what's due and pay them together",
+                        icon: "doc.text.fill",
+                        color: .orange
+                    )
+                }
+                .buttonStyle(.plain)
+                
+                ForEach(ActionItem.allItems) { action in
                     ActionRow(
                         title: action.title,
                         subtitle: action.subtitle,
@@ -732,33 +664,10 @@ struct WalletView: View {
                     )
                 }
             }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
     
-    private var savingsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            WalletSectionHeader(
-                title: "Savings goals",
-                actionTitle: "View all",
-                action: { navigationPath.append(WalletDestination.savings) }
-            )
-            
-            VStack(spacing: 12) {
-                if savingsPreview.isEmpty {
-                    EmptyStateRow(
-                        title: "No savings goals yet",
-                        subtitle: "Create your first goal to start building momentum"
-                    )
-                } else {
-                    ForEach(savingsPreview) { goal in
-                        SavingsGoalRow(goal: goal)
-                    }
-                }
-            }
-        }
-        .padding(.horizontal)
-    }
 }
 
 struct PurchaseItem: Identifiable {
@@ -978,6 +887,10 @@ extension PurchaseItem {
             paymentMethod: paymentMethod
         )
     }
+    
+    var isEligibleForPartPay: Bool {
+        !paymentMethod.isMerchantAccount && numericAmount >= 1_000
+    }
 }
 
 enum PurchaseCategory: String, CaseIterable, Identifiable {
@@ -998,6 +911,7 @@ enum PurchaseCategory: String, CaseIterable, Identifiable {
 
 enum PurchaseFilter: String, CaseIterable, Identifiable {
     case all
+    case partPay
     case mastercard
     case merchants
     case swish
@@ -1014,6 +928,8 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
             return "Merchants"
         case .swish:
             return "Swish"
+        case .partPay:
+            return "Part Pay"
         }
     }
     
@@ -1027,6 +943,8 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
             return "Connected merchants"
         case .swish:
             return "Swish payments"
+        case .partPay:
+            return "Eligible for Part Pay"
         }
     }
     
@@ -1040,6 +958,8 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
             return "Shows purchases paid with merchant accounts"
         case .swish:
             return "Shows purchases paid with Swish"
+        case .partPay:
+            return "Shows purchases that can be moved into Part Pay"
         }
     }
     
@@ -1053,6 +973,8 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
             return purchase.paymentMethod.isMerchantAccount
         case .swish:
             return purchase.paymentMethod == .swish
+        case .partPay:
+            return purchase.isEligibleForPartPay
         }
     }
 }
@@ -1141,30 +1063,20 @@ struct PurchasesList: View {
     
     @ViewBuilder
     private func purchaseRow(for purchase: PurchaseItem) -> some View {
-        if let transaction = purchase.transaction {
-            Button {
-                navigationPath.append(transaction)
-            } label: {
-                PurchaseRow(
-                    title: purchase.title,
-                    subtitle: purchase.subtitleWithoutTime,
-                    amount: purchase.amount,
-                    icon: purchase.icon,
-                    color: purchase.color,
-                    paymentMethod: purchase.paymentMethod
-                )
-            }
-            .buttonStyle(.plain)
-        } else {
+        Button {
+            navigationPath.append(purchase.transactionDetailData)
+        } label: {
             PurchaseRow(
                 title: purchase.title,
                 subtitle: purchase.subtitleWithoutTime,
                 amount: purchase.amount,
                 icon: purchase.icon,
                 color: purchase.color,
-                paymentMethod: purchase.paymentMethod
+                paymentMethod: purchase.paymentMethod,
+                showsPartPayBadge: purchase.isEligibleForPartPay
             )
         }
+        .buttonStyle(.plain)
     }
     
     private var filterControl: some View {
@@ -1458,10 +1370,9 @@ struct PaymentPlansList: View {
     @Binding var navigationPath: NavigationPath
     @Environment(\.dismiss) private var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
-    @State private var showEligibleOverlay = false
     
     private var summaryText: String {
-        "Merchant purchases not fully paid yet"
+        "Ongoing part payments"
     }
     
     var body: some View {
@@ -1523,15 +1434,6 @@ struct PaymentPlansList: View {
             }
         }
         .navigationBarHidden(true)
-        .sheet(isPresented: $showEligibleOverlay) {
-            PartPayEligibleOverlay(
-                purchases: eligiblePurchases,
-                onSelect: { purchase in
-                    showEligibleOverlay = false
-                    navigationPath.append(purchase.transactionDetailData)
-                }
-            )
-        }
     }
     
     private func paymentPlansHeader(scrollProgress: CGFloat) -> some View {
@@ -1547,20 +1449,6 @@ struct PaymentPlansList: View {
                             .clipShape(Circle())
                     }
                     Spacer()
-                    if !eligiblePurchases.isEmpty {
-                        Button(action: {
-                            showEligibleOverlay = true
-                        }) {
-                            Image(systemName: "plus")
-                                .font(.title3.weight(.semibold))
-                                .foregroundColor(.blue)
-                                .frame(width: 32, height: 32)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                        }
-                        .accessibilityLabel("Pick purchase to Part Pay")
-                        .accessibilityHint("Opens a list of purchases you can convert to Part Pay")
-                    }
                 }
                 
                 if scrollProgress > 0.5 {
@@ -1701,60 +1589,6 @@ struct PartPayCandidateRow: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityLabel("\(purchase.title) \(purchase.amount). Convert to Part Pay.")
-    }
-}
-
-struct PartPayEligibleOverlay: View {
-    let purchases: [PurchaseItem]
-    let onSelect: (PurchaseItem) -> Void
-    @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Part Pay")
-                        .font(.title2.weight(.semibold))
-                    Text("Pick a purchase you want to part pay")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                if purchases.isEmpty {
-                    EmptyStateRow(
-                        title: "No eligible purchases",
-                        subtitle: "Use a Resurs or Swish payment over 1 000 SEK to move it into Part Pay."
-                    )
-                } else {
-                    ScrollView {
-                        VStack(spacing: 12) {
-                            ForEach(purchases) { purchase in
-                                Button {
-                                    dismiss()
-                                    onSelect(purchase)
-                                } label: {
-                                    PartPayCandidateRow(purchase: purchase)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-            }
-            .padding()
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .font(.headline)
-                    }
-                    .accessibilityLabel("Close Part Pay picker")
-                }
-            }
-        }
-        .presentationDetents([.medium, .large])
     }
 }
 
@@ -1938,6 +1772,7 @@ struct PurchaseRow: View {
     let icon: String
     let color: Color
     let paymentMethod: PaymentMethod
+    let showsPartPayBadge: Bool
     
     var body: some View {
         HStack(spacing: 16) {
@@ -1962,10 +1797,23 @@ struct PurchaseRow: View {
             
             Spacer()
             
-            Text(amount)
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
+            VStack(alignment: .trailing, spacing: 6) {
+                Text(amount)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                
+                if showsPartPayBadge {
+                    Text("Part Pay")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundColor(.accentColor)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.accentColor.opacity(0.15))
+                        .clipShape(Capsule())
+                        .accessibilityLabel("Eligible for Part Pay")
+                }
+            }
         }
         .padding(16)
         .background(.ultraThinMaterial)
@@ -2506,5 +2354,7 @@ struct WalletSummaryCard: View {
 
 #Preview {
     WalletView()
+        .environmentObject(PaymentPlansManager())
         .preferredColorScheme(.dark)
 }
+
