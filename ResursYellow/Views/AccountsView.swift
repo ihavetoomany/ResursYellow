@@ -9,19 +9,19 @@ import SwiftUI
 
 struct AccountsView: View {
     @State private var navigationPath = NavigationPath()
-    @State private var showProfile = false
+    @State private var showAddAccount = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
                 title: "Accounts",
                 subtitle: "Your engagements",
-                trailingButton: "person.fill",
+                trailingButton: "plus",
                 trailingButtonTint: .black,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
                 trailingButtonAction: {
-                    showProfile = true
+                    showAddAccount = true
                 }
             ) {
                 VStack(spacing: 16) {
@@ -112,8 +112,8 @@ struct AccountsView: View {
                 }
                 // If at root, the StickyHeaderView will handle scrolling to top
             }
-            .sheet(isPresented: $showProfile) {
-                ProfileView()
+            .sheet(isPresented: $showAddAccount) {
+                AddAccountView()
             }
         }
     }
@@ -217,3 +217,49 @@ struct CompactDiscoverRow: View {
         .preferredColorScheme(.dark)
 }
 
+struct AddAccountView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var accountName: String = ""
+    @State private var accountType: String = "Credit"
+    @State private var initialLimit: String = ""
+
+    private let accountTypes = ["Credit", "Savings", "Loan", "Checking"]
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(header: Text("Account Details")) {
+                    TextField("Account name", text: $accountName)
+                    Picker("Type", selection: $accountType) {
+                        ForEach(accountTypes, id: \.self) { type in
+                            Text(type).tag(type)
+                        }
+                    }
+                    TextField("Initial limit (optional)", text: $initialLimit)
+                        .keyboardType(.numberPad)
+                }
+
+                Section(footer: Text("You can edit these details later in account settings.")) {
+                    Button {
+                        // TODO: Persist new account in data model
+                        dismiss()
+                    } label: {
+                        Text("Create Account")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .disabled(accountName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            .navigationTitle("Add Account")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    AddAccountView()
+}

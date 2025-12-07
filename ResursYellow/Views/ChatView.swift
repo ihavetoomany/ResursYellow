@@ -9,19 +9,19 @@ import SwiftUI
 
 struct ChatView: View {
     @State private var navigationPath = NavigationPath()
-    @State private var showProfile = false
+    @State private var showCallSupport = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
                 title: "Support",
                 subtitle: "Get help anytime",
-                trailingButton: "person.fill",
+                trailingButton: "phone.fill",
                 trailingButtonTint: .black,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
                 trailingButtonAction: {
-                    showProfile = true
+                    showCallSupport = true
                 }
             ) {
                 VStack(spacing: 16) {
@@ -76,8 +76,8 @@ struct ChatView: View {
                 }
                 // If at root, the StickyHeaderView will handle scrolling to top
             }
-            .sheet(isPresented: $showProfile) {
-                ProfileView()
+            .sheet(isPresented: $showCallSupport) {
+                CallSupportView()
             }
         }
     }
@@ -122,4 +122,92 @@ struct ContactMethodRow: View {
 #Preview {
     ChatView()
         .preferredColorScheme(.dark)
+}
+
+struct CallSupportView: View {
+    @Environment(\.dismiss) private var dismiss
+    private let supportNumber = "+46 771 11 22 33" // Example number
+    private let telURL = URL(string: "tel://+46771112233")
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                Image(systemName: "phone.fill")
+                    .font(.system(size: 56))
+                    .foregroundColor(.green)
+                    .padding(.top, 24)
+
+                VStack(spacing: 6) {
+                    Text("Customer Support")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    Text("We’re here to help")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("Phone")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(supportNumber)
+                            .font(.headline)
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    HStack(alignment: .top) {
+                        Text("Hours")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("Mon–Fri: 08:00–18:00")
+                            Text("Sat: 10:00–14:00")
+                            Text("Sun: Closed")
+                        }
+                        .font(.subheadline)
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(.horizontal)
+
+                Spacer()
+
+                Button {
+                    if let telURL, UIApplication.shared.canOpenURL(telURL) {
+                        UIApplication.shared.open(telURL)
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: "phone.fill")
+                        Text("Call Now")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green)
+                    .clipShape(Capsule())
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+            .navigationTitle("Call Support")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    CallSupportView()
 }

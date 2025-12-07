@@ -42,9 +42,87 @@ struct BauhausDetailView: View {
     
     // Example part payments for the new section
     let partPayments: [PartPaymentItem] = [
-        PartPaymentItem(title: "Paint Project Split", subtitle: "2 of 6 payments completed", amount: "726 kr / 4 356 kr", progress: 2.0/6.0),
-        PartPaymentItem(title: "Kitchen Remodel", subtitle: "1 of 4 payments completed", amount: "1 200 kr / 4 800 kr", progress: 1.0/4.0),
-        PartPaymentItem(title: "Garden Supplies", subtitle: "3 of 5 payments completed", amount: "900 kr / 1 500 kr", progress: 3.0/5.0)
+        PartPaymentItem(
+            title: "Paint Project Split",
+            subtitle: "2 of 6 payments completed",
+            amount: "726 kr / 4 356 kr",
+            progress: 2.0/6.0,
+            installmentAmount: "726 kr",
+            totalAmount: "4 356 kr",
+            completedPayments: 2,
+            totalPayments: 6,
+            nextDueDate: "Dec 15, 2025",
+            autopaySource: "Bauhaus Invoice"
+        ),
+        PartPaymentItem(
+            title: "Kitchen Remodel",
+            subtitle: "1 of 4 payments completed",
+            amount: "1 200 kr / 4 800 kr",
+            progress: 1.0/4.0,
+            installmentAmount: "1 200 kr",
+            totalAmount: "4 800 kr",
+            completedPayments: 1,
+            totalPayments: 4,
+            nextDueDate: "Nov 28, 2025",
+            autopaySource: "Resurs Family"
+        ),
+        PartPaymentItem(
+            title: "Garden Supplies",
+            subtitle: "3 of 5 payments completed",
+            amount: "900 kr / 1 500 kr",
+            progress: 3.0/5.0,
+            installmentAmount: "300 kr",
+            totalAmount: "1 500 kr",
+            completedPayments: 3,
+            totalPayments: 5,
+            nextDueDate: "Nov 30, 2025",
+            autopaySource: "Swish"
+        )
+    ]
+    
+    let paintProjectInvoices: [PartPaymentInvoice] = [
+        PartPaymentInvoice(
+            installment: 1,
+            dueDate: "Oct 15, 2025",
+            amount: "726 kr",
+            reference: "PP-2025-10-001",
+            status: .paid
+        ),
+        PartPaymentInvoice(
+            installment: 2,
+            dueDate: "Nov 15, 2025",
+            amount: "726 kr",
+            reference: "PP-2025-11-001",
+            status: .paid
+        ),
+        PartPaymentInvoice(
+            installment: 3,
+            dueDate: "Dec 15, 2025",
+            amount: "726 kr",
+            reference: "PP-2025-12-001",
+            status: .upcoming
+        ),
+        PartPaymentInvoice(
+            installment: 4,
+            dueDate: "Jan 15, 2026",
+            amount: "726 kr",
+            reference: "PP-2026-01-001",
+            status: .upcoming
+        ),
+        PartPaymentInvoice(
+            installment: 5,
+            dueDate: "Feb 15, 2026",
+            amount: "726 kr",
+            reference: "PP-2026-02-001",
+            status: .upcoming
+        ),
+        PartPaymentInvoice(
+            installment: 6,
+            dueDate: "Mar 15, 2026",
+            amount: "726 kr",
+            reference: "PP-2026-03-001",
+            status: .upcoming
+        )
     ]
     
     var body: some View {
@@ -150,29 +228,16 @@ struct BauhausDetailView: View {
                         .padding(.horizontal, 4)
                     VStack(spacing: 12) {
                         ForEach(partPayments, id: \.title) { payment in
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(payment.title)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                Text(payment.subtitle)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                Text(payment.amount)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                
-                                GeometryReader { geo in
-                                    Rectangle()
-                                        .fill(Color.orange)
-                                        .frame(width: geo.size.width * CGFloat(payment.progress), height: 8)
-                                        .cornerRadius(4)
-                                        .animation(.easeInOut, value: payment.progress)
+                            if payment.title == "Paint Project Split" {
+                                NavigationLink {
+                                    PaintProjectSplitDetailView(plan: payment, invoices: paintProjectInvoices)
+                                } label: {
+                                    PartPaymentRow(payment: payment, showsDisclosure: true)
                                 }
-                                .frame(height: 8)
+                                .buttonStyle(.plain)
+                            } else {
+                                PartPaymentRow(payment: payment, showsDisclosure: false)
                             }
-                            .padding(16)
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                     }
                 }
@@ -219,12 +284,194 @@ struct BauhausDetailView: View {
     }
 }
 
+private struct PartPaymentRow: View {
+    let payment: PartPaymentItem
+    let showsDisclosure: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(payment.title)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text(payment.subtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                if showsDisclosure {
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            Text(payment.amount)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            
+            ProgressView(value: payment.progress)
+                .tint(.orange)
+            
+            HStack {
+                Text("\(payment.completedPayments) of \(payment.totalPayments) payments")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(payment.nextDueDate)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+struct PaintProjectSplitDetailView: View {
+    let plan: PartPaymentItem
+    let invoices: [PartPaymentInvoice]
+    
+    private var progressPercentage: String {
+        let percent = plan.progress * 100
+        return String(format: "%.0f%%", percent)
+    }
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                summaryCard
+                nextPaymentCard
+                PartPaymentsExplanationCard()
+                    .padding(.horizontal, 4)
+                InvoiceHistorySection()
+            }
+            .padding()
+        }
+        .navigationTitle(plan.title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(plan.totalAmount)
+                .font(.system(size: 34, weight: .bold, design: .rounded))
+            Text("\(plan.installmentAmount) per month")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            ProgressView(value: plan.progress)
+                .tint(.orange)
+            
+            HStack {
+                Text("\(plan.completedPayments) of \(plan.totalPayments) payments completed")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(progressPercentage)
+                    .font(.footnote)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+            }
+        }
+        .padding(20)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+    
+    private var nextPaymentCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label {
+                Text("Next payment")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+            } icon: {
+                Image(systemName: "calendar.badge.clock")
+                    .foregroundColor(.orange)
+            }
+            
+            Divider()
+            
+            HStack {
+                Text("Due date")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(plan.nextDueDate)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+            
+            HStack {
+                Text("Payment method")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(plan.autopaySource)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+        }
+        .padding(20)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+    
+}
+
 // Supporting structs for example data models to avoid errors
 struct PartPaymentItem {
     var title: String
     var subtitle: String
     var amount: String
     var progress: Double
+    var installmentAmount: String = ""
+    var totalAmount: String = ""
+    var completedPayments: Int = 0
+    var totalPayments: Int = 0
+    var nextDueDate: String = ""
+    var autopaySource: String = ""
+    
+    var hasDetailedSchedule: Bool {
+        !installmentAmount.isEmpty &&
+        !totalAmount.isEmpty &&
+        totalPayments > 0 &&
+        !nextDueDate.isEmpty
+    }
+}
+
+struct PartPaymentInvoice: Identifiable {
+    enum Status {
+        case paid
+        case upcoming
+        
+        var label: String {
+            switch self {
+            case .paid:
+                return "Paid"
+            case .upcoming:
+                return "Upcoming"
+            }
+        }
+        
+        var color: Color {
+            switch self {
+            case .paid:
+                return .green
+            case .upcoming:
+                return .orange
+            }
+        }
+    }
+    
+    let id = UUID()
+    let installment: Int
+    let dueDate: String
+    let amount: String
+    let reference: String
+    let status: Status
 }
 
 #Preview {

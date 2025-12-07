@@ -80,8 +80,6 @@ struct InvoiceDetailView: View {
                                     showPaymentSheet = true
                                 }, onPartPayment: {
                                     showPaymentSheet = true
-                                }, onEndPayment: {
-                                    showPaymentSheet = true
                                 }, onSnooze: {
                                     // Handle snooze action
                                     // Could show a date picker sheet or similar
@@ -503,7 +501,6 @@ struct InvoiceItemRow: View {
 struct PaymentOptionsCard: View {
     let onPayInFull: () -> Void
     let onPartPayment: () -> Void
-    let onEndPayment: () -> Void
     let onSnooze: () -> Void
     
     var body: some View {
@@ -528,14 +525,6 @@ struct PaymentOptionsCard: View {
                     description: "Change plan, or pay custom amount",
                     color: .purple,
                     action: onPartPayment
-                )
-                
-                PaymentOptionRow(
-                    icon: "creditcard.circle.fill",
-                    title: "Make End Payment",
-                    description: "Pay the full, remaining debt",
-                    color: .orange,
-                    action: onEndPayment
                 )
                 
                 PaymentOptionRow(

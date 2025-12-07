@@ -46,7 +46,7 @@ struct MerchantCard: View {
 
 struct MerchantsView: View {
     @State private var navigationPath = NavigationPath()
-    @State private var showProfile = false
+    @State private var showAddMerchant = false
     
     @State private var connected: [String] = ["Bauhaus", "NetOnNet", "Jula"]
 
@@ -55,12 +55,12 @@ struct MerchantsView: View {
             StickyHeaderView(
                 title: "Merchants",
                 subtitle: "Connect stores you shop at",
-                trailingButton: "person.fill",
+                trailingButton: "plus",
                 trailingButtonTint: .black,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
                 trailingButtonAction: {
-                    showProfile = true
+                    showAddMerchant = true
                 }
             ) {
                 VStack(spacing: 16) {
@@ -162,8 +162,8 @@ struct MerchantsView: View {
                     navigationPath.removeLast(navigationPath.count)
                 }
             }
-            .sheet(isPresented: $showProfile) {
-                ProfileView()
+            .sheet(isPresented: $showAddMerchant) {
+                AddMerchantView()
             }
         }
     }
@@ -242,3 +242,48 @@ private extension MerchantsView {
         .preferredColorScheme(.dark)
 }
 
+struct AddMerchantView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var merchantName: String = ""
+    @State private var category: String = "Retail"
+    @State private var notes: String = ""
+
+    private let categories = ["Retail", "Electronics", "Home Improvement", "Groceries", "Online", "Other"]
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(header: Text("Merchant Details")) {
+                    TextField("Merchant name", text: $merchantName)
+                    Picker("Category", selection: $category) {
+                        ForEach(categories, id: \.self) { cat in
+                            Text(cat).tag(cat)
+                        }
+                    }
+                    TextField("Notes (optional)", text: $notes)
+                }
+
+                Section(footer: Text("You can manage connected merchants from the Merchants list.")) {
+                    Button {
+                        // TODO: Persist new merchant and update list
+                        dismiss()
+                    } label: {
+                        Text("Add Merchant")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .disabled(merchantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+            .navigationTitle("Add Merchant")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    AddMerchantView()
+}

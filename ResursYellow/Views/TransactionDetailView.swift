@@ -19,6 +19,35 @@ struct TransactionDetailView: View {
     let amount: String
     let date: String
     let time: String
+    let paymentMethod: PaymentMethod
+    
+    private var usesSplitPaymentFlow: Bool {
+        let normalized = merchant.lowercased()
+        return normalized.contains("netonnet") || normalized.contains("jula")
+    }
+    
+    private var splitPaymentOptions: [SplitPaymentOption] {
+        [
+            SplitPaymentOption(
+                title: "3 months interest free",
+                subtitle: "Split into 3 equal payments with 0% fees",
+                icon: "3.circle.fill",
+                color: .blue
+            ),
+            SplitPaymentOption(
+                title: "6 months interest free",
+                subtitle: "Lower monthly cost, still no interest",
+                icon: "6.circle.fill",
+                color: .indigo
+            ),
+            SplitPaymentOption(
+                title: "12 months, 6% interest",
+                subtitle: "Smallest monthly cost with fixed 6% interest",
+                icon: "12.circle.fill",
+                color: .purple
+            )
+        ]
+    }
     
     var body: some View {
         let scrollProgress = min(scrollObserver.offset / 100, 1.0)
@@ -48,7 +77,8 @@ struct TransactionDetailView: View {
                                 merchant: merchant,
                                 amount: amount,
                                 date: date,
-                                time: time
+                                time: time,
+                                paymentMethod: paymentMethod
                             )
                             .padding(.horizontal)
                             .padding(.top, 36)
@@ -68,25 +98,12 @@ struct TransactionDetailView: View {
                             )
                             .padding(.horizontal)
                             .frame(width: geometry.size.width)
-                            
-                            // About Part Payments Section
-                            PartPaymentsExplanationCard()
-                                .padding(.horizontal)
-                                .frame(width: geometry.size.width)
-                            
-                            // Invoice History Section
-                            InvoiceHistorySection()
-                                .padding(.horizontal)
-                                .frame(width: geometry.size.width)
                         } else {
-                            // Payment Plans Explanation Section (for non-Bauhaus)
-                            PaymentPlansExplanationCard()
-                                .padding(.horizontal)
-                                .frame(width: geometry.size.width)
-                            
                             // Add to Payment Plan Section
                             VStack(alignment: .leading, spacing: 12) {
-                                Text(selectedPaymentPlan == nil ? "Add to Payment Plan" : "Added to Payment Plan")
+                                Text(selectedPaymentPlan == nil
+                                     ? (usesSplitPaymentFlow ? "Pay Over Time" : "Add to Payment Plan")
+                                     : "Added to Payment Plan")
                                     .font(.title2)
                                     .fontWeight(.semibold)
                                     .padding(.horizontal)
@@ -123,53 +140,66 @@ struct TransactionDetailView: View {
                                 } else {
                                     // Default State - Select Payment Plan
                                     VStack(spacing: 12) {
-                                        // Existing Payment Plans (excluding paid off)
-                                        ForEach(paymentPlansManager.paymentPlans.filter { 
-                                            $0.progress < 1.0
-                                        }) { paymentPlan in
-                                            Button(action: {
-                                                withAnimation {
-                                                    selectedPaymentPlan = paymentPlan.name
+                                        if usesSplitPaymentFlow {
+                                            ForEach(splitPaymentOptions) { option in
+                                                Button {
+                                                    withAnimation {
+                                                        selectedPaymentPlan = option.title
+                                                    }
+                                                } label: {
+                                                    SplitPaymentOptionRow(option: option)
                                                 }
-                                            }) {
-                                                ExistingPaymentPlanRow(
-                                                    title: paymentPlan.name,
-                                                    amount: paymentPlan.totalAmount,
-                                                    icon: paymentPlan.icon,
-                                                    color: paymentPlan.color
-                                                )
+                                                .buttonStyle(.plain)
                                             }
-                                        }
-                                        
-                                        // Create New Payment Plan Button
-                                        Button(action: {
-                                            showNewPlanSheet = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "plus.circle.fill")
-                                                    .font(.title3)
-                                                    .foregroundColor(.blue)
-                                                    .frame(width: 36, height: 36)
-                                                
-                                                VStack(alignment: .leading, spacing: 4) {
-                                                    Text("Create New Payment Plan")
-                                                        .font(.subheadline)
-                                                        .fontWeight(.medium)
-                                                        .foregroundColor(.primary)
-                                                    Text("Start a new payment plan")
+                                        } else {
+                                            // Existing Payment Plans (excluding paid off)
+                                            ForEach(paymentPlansManager.paymentPlans.filter {
+                                                $0.progress < 1.0
+                                            }) { paymentPlan in
+                                                Button(action: {
+                                                    withAnimation {
+                                                        selectedPaymentPlan = paymentPlan.name
+                                                    }
+                                                }) {
+                                                    ExistingPaymentPlanRow(
+                                                        title: paymentPlan.name,
+                                                        amount: paymentPlan.totalAmount,
+                                                        icon: paymentPlan.icon,
+                                                        color: paymentPlan.color
+                                                    )
+                                                }
+                                            }
+                                            
+                                            // Create New Payment Plan Button
+                                            Button(action: {
+                                                showNewPlanSheet = true
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "plus.circle.fill")
+                                                        .font(.title3)
+                                                        .foregroundColor(.blue)
+                                                        .frame(width: 36, height: 36)
+                                                    
+                                                    VStack(alignment: .leading, spacing: 4) {
+                                                        Text("Create Payment Plan")
+                                                            .font(.subheadline)
+                                                            .fontWeight(.medium)
+                                                            .foregroundColor(.primary)
+                                                        Text("Start a new payment plan")
+                                                            .font(.caption)
+                                                            .foregroundColor(.secondary)
+                                                    }
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Image(systemName: "chevron.right")
                                                         .font(.caption)
                                                         .foregroundColor(.secondary)
                                                 }
-                                                
-                                                Spacer()
-                                                
-                                                Image(systemName: "chevron.right")
-                                                    .font(.caption)
-                                                    .foregroundColor(.secondary)
+                                                .padding(16)
+                                                .background(.ultraThinMaterial)
+                                                .clipShape(RoundedRectangle(cornerRadius: 12))
                                             }
-                                            .padding(16)
-                                            .background(.ultraThinMaterial)
-                                            .clipShape(RoundedRectangle(cornerRadius: 12))
                                         }
                                     }
                                     .padding(.horizontal)
@@ -177,6 +207,11 @@ struct TransactionDetailView: View {
                             }
                             .padding(.bottom, 16)
                             .frame(width: geometry.size.width)
+                            
+                            // Payment Plans Explanation Section (for non-Bauhaus)
+                            PaymentPlansExplanationCard()
+                                .padding(.horizontal)
+                                .frame(width: geometry.size.width)
                         }
                     }
                     .padding(.top, 20)
@@ -270,14 +305,7 @@ struct TransactionDetailsCard: View {
     let amount: String
     let date: String
     let time: String
-    
-    private var isBauhaus: Bool {
-        merchant == "Bauhaus"
-    }
-    
-    private var paymentMethodText: String {
-        isBauhaus ? "Resurs Invoice" : "Resurs Family"
-    }
+    let paymentMethod: PaymentMethod
     
     private func generateTransactionID(merchant: String, date: String) -> String {
         let merchantPrefix = String(merchant.prefix(3)).uppercased()
@@ -293,10 +321,10 @@ struct TransactionDetailsCard: View {
                     .font(.system(size: 48, weight: .bold))
                 
                 HStack(spacing: 8) {
-                    Image(systemName: isBauhaus ? "doc.text.fill" : "heart.fill")
+                    Image(systemName: paymentMethod.iconName)
                         .font(.caption)
-                        .foregroundColor(isBauhaus ? .orange : .blue)
-                    Text("Paid with \(paymentMethodText)")
+                        .foregroundColor(paymentMethod.accentColor)
+                    Text("Paid with \(paymentMethod.displayName)")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -310,7 +338,7 @@ struct TransactionDetailsCard: View {
                 DetailRow(label: "Date", value: date)
                 DetailRow(label: "Time", value: time)
                 DetailRow(label: "Transaction ID", value: generateTransactionID(merchant: merchant, date: date))
-                DetailRow(label: "Payment Method", value: paymentMethodText)
+                DetailRow(label: "Payment Method", value: paymentMethod.displayName)
                 DetailRow(label: "Status", value: "Completed")
             }
         }
@@ -360,6 +388,48 @@ struct PaymentPlansExplanationCard: View {
         .background(Color.blue.opacity(0.1))
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+struct SplitPaymentOption: Identifiable {
+    let id = UUID()
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+}
+
+private struct SplitPaymentOptionRow: View {
+    let option: SplitPaymentOption
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: option.icon)
+                .font(.title3)
+                .foregroundColor(option.color)
+                .frame(width: 36, height: 36)
+                .background(option.color.opacity(0.15))
+                .clipShape(Circle())
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(option.title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
+                Text(option.subtitle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
@@ -614,7 +684,41 @@ struct InvoiceHistorySection: View {
         let isPaid: Bool
     }
     
-    private let invoices: [InvoiceHistoryItem] = [
+    var title: String
+    var invoices: [InvoiceHistoryItem]
+    
+    init(
+        title: String = "Invoice History",
+        invoices: [InvoiceHistoryItem] = InvoiceHistorySection.sampleInvoices
+    ) {
+        self.title = title
+        self.invoices = invoices
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(title)
+                .font(.title2)
+                .fontWeight(.semibold)
+            
+            VStack(spacing: 12) {
+                ForEach(invoices) { invoice in
+                    InvoiceHistoryRow(
+                        invoiceNumber: invoice.invoiceNumber,
+                        date: invoice.date,
+                        amount: invoice.amount,
+                        status: invoice.status,
+                        isPaid: invoice.isPaid
+                    )
+                }
+            }
+        }
+        .padding(20)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+    
+    private static let sampleInvoices: [InvoiceHistoryItem] = [
         InvoiceHistoryItem(
             invoiceNumber: "INV-2025-11-001",
             date: "Nov 7, 2025",
@@ -637,29 +741,6 @@ struct InvoiceHistorySection: View {
             isPaid: true
         )
     ]
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Invoice History")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            VStack(spacing: 12) {
-                ForEach(invoices) { invoice in
-                    InvoiceHistoryRow(
-                        invoiceNumber: invoice.invoiceNumber,
-                        date: invoice.date,
-                        amount: invoice.amount,
-                        status: invoice.status,
-                        isPaid: invoice.isPaid
-                    )
-                }
-            }
-        }
-        .padding(20)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
 }
 
 struct InvoiceHistoryRow: View {
@@ -788,7 +869,8 @@ struct NewPaymentPlanSheet: View {
         merchant: "IKEA",
         amount: "23 000 SEK",
         date: "Nov 2, 2025",
-        time: "5:15 PM"
+        time: "5:15 PM",
+        paymentMethod: .swish
     )
     .environmentObject(PaymentPlansManager())
     .preferredColorScheme(.dark)
