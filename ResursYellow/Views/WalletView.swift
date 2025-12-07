@@ -463,6 +463,7 @@ enum WalletDestination: Hashable {
     case purchases(filter: PurchaseFilter = .all)
     case actions
     case savings
+    case paymentPlans
 }
 
 struct WalletView: View {
@@ -546,6 +547,13 @@ struct WalletView: View {
         formattedSEK(merchantSummaries.reduce(0) { $0 + $1.totalAmount })
     }
     
+    /// Purchases that are large enough and not already tied to a merchant part-pay account.
+    private var eligiblePartPayPurchases: [PurchaseItem] {
+        PurchaseItem.sampleData
+            .filter { !$0.paymentMethod.isMerchantAccount && $0.numericAmount >= 1_000 }
+            .sorted { $0.numericAmount > $1.numericAmount }
+    }
+    
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
@@ -561,9 +569,9 @@ struct WalletView: View {
             ) {
                 VStack(spacing: 28) {
                     let invoicesTap: () -> Void = { navigationPath.append(WalletDestination.invoices) }
-                    let creditTap: () -> Void = { navigationPath.append(WalletDestination.purchases(filter: PurchaseFilter.mastercard)) }
+                    let creditTap: () -> Void = { navigationPath.append(WalletDestination.purchases(filter: PurchaseFilter.all)) }
                     let savingsTap: () -> Void = { navigationPath.append(WalletDestination.savings) }
-                    let merchantPurchasesTap: () -> Void = { navigationPath.append(WalletDestination.purchases(filter: PurchaseFilter.merchants)) }
+                    let paymentPlansTap: () -> Void = { navigationPath.append(WalletDestination.paymentPlans) }
                     
                     WalletSummaryBento(
                         unpaidCount: unpaidInvoicesCount,
@@ -574,7 +582,7 @@ struct WalletView: View {
                         onInvoicesTap: invoicesTap,
                         onCreditTap: creditTap,
                         onSavingsTap: savingsTap,
-                        onMerchantPurchasesTap: merchantPurchasesTap
+                        onPaymentPlansTap: paymentPlansTap
                     )
                     .padding(.horizontal)
                     
@@ -598,6 +606,12 @@ struct WalletView: View {
                     SavingsList(goals: savingsGoals)
                 case .actions:
                     ActionsList(actionItems: ActionItem.allItems)
+                case .paymentPlans:
+                    PaymentPlansList(
+                        paymentPlans: paymentPlans,
+                        eligiblePurchases: eligiblePartPayPurchases,
+                        navigationPath: $navigationPath
+                    )
                 }
             }
             .navigationDestination(for: TransactionData.self) { transaction in
@@ -942,6 +956,28 @@ struct PurchaseItem: Identifiable {
             transaction: nil
         )
     ]
+}
+
+extension PurchaseItem {
+    /// Provides enough structured data to drive TransactionDetailView even when we only have a subtitle string.
+    var transactionDetailData: TransactionData {
+        if let transaction {
+            return transaction
+        }
+        
+        let components = subtitle.components(separatedBy: ",")
+        let dateText = components.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Recent purchase"
+        let timeAndLocation = components.dropFirst().first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let timeText = timeAndLocation.components(separatedBy: "-").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Time unavailable"
+        
+        return TransactionData(
+            merchant: merchant,
+            amount: amount,
+            date: dateText,
+            time: timeText.isEmpty ? "Time unavailable" : timeText,
+            paymentMethod: paymentMethod
+        )
+    }
 }
 
 enum PurchaseCategory: String, CaseIterable, Identifiable {
@@ -1353,6 +1389,7 @@ struct SavingsList: View {
                                 }
                             }
                             .padding(.horizontal)
+                            .padding(.top, 8)
                             .padding(.bottom, 32)
                         }
                     }
@@ -1399,6 +1436,146 @@ struct SavingsList: View {
             if scrollProgress <= 0.5 {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Savings")
+                        .font(.largeTitle.weight(.bold))
+                    Text(summaryText)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                .padding(.bottom, 16)
+            }
+        }
+        .background(Color(uiColor: .systemBackground).opacity(0.95))
+        .background(.ultraThinMaterial)
+        .animation(.easeInOut(duration: 0.2), value: scrollProgress)
+    }
+}
+
+struct PaymentPlansList: View {
+    let paymentPlans: [PaymentPlan]
+    let eligiblePurchases: [PurchaseItem]
+    @Binding var navigationPath: NavigationPath
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @State private var showEligibleOverlay = false
+    
+    private var summaryText: String {
+        "Merchant purchases not fully paid yet"
+    }
+    
+    var body: some View {
+        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
+        
+        GeometryReader { geometry in
+            ZStack(alignment: .top) {
+                ScrollViewReader { proxy in
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 0) {
+                            GeometryReader { geo in
+                                Color.clear
+                                    .onChange(of: geo.frame(in: .named("paymentPlansScroll")).minY) { _, newValue in
+                                        scrollObserver.offset = max(0, -newValue)
+                                    }
+                            }
+                            .frame(height: 0)
+                            .id("paymentPlansTop")
+                            
+                            Color.clear.frame(height: 120)
+                            
+                            VStack(spacing: 16) {
+                                if paymentPlans.isEmpty {
+                                    EmptyStateRow(
+                                        title: "No payment plans yet",
+                                        subtitle: "Create a plan from a merchant checkout or add purchases to an existing plan"
+                                    )
+                                } else {
+                                    ForEach(paymentPlans) { plan in
+                                        PaymentPlanCard(
+                                            title: plan.name,
+                                            store: plan.store,
+                                            totalAmount: plan.totalAmount,
+                                            paidAmount: plan.paidAmount,
+                                            progress: plan.progress,
+                                            dueDate: plan.dueDate,
+                                            monthlyAmount: plan.monthlyAmount,
+                                            icon: plan.icon,
+                                            color: plan.color
+                                        )
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                            .padding(.bottom, 32)
+                        }
+                    }
+                    .coordinateSpace(name: "paymentPlansScroll")
+                    .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                            proxy.scrollTo("paymentPlansTop", anchor: .top)
+                        }
+                    }
+                }
+                
+                paymentPlansHeader(scrollProgress: scrollProgress)
+                    .frame(width: geometry.size.width)
+            }
+        }
+        .navigationBarHidden(true)
+        .sheet(isPresented: $showEligibleOverlay) {
+            PartPayEligibleOverlay(
+                purchases: eligiblePurchases,
+                onSelect: { purchase in
+                    showEligibleOverlay = false
+                    navigationPath.append(purchase.transactionDetailData)
+                }
+            )
+        }
+    }
+    
+    private func paymentPlansHeader(scrollProgress: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            ZStack {
+                HStack {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "chevron.left")
+                            .font(.title3)
+                            .foregroundColor(.blue)
+                            .frame(width: 32, height: 32)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                    }
+                    Spacer()
+                    if !eligiblePurchases.isEmpty {
+                        Button(action: {
+                            showEligibleOverlay = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.title3.weight(.semibold))
+                                .foregroundColor(.blue)
+                                .frame(width: 32, height: 32)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                        .accessibilityLabel("Pick purchase to Part Pay")
+                        .accessibilityHint("Opens a list of purchases you can convert to Part Pay")
+                    }
+                }
+                
+                if scrollProgress > 0.5 {
+                    Text("Payment Plans")
+                        .font(.title2.weight(.bold))
+                        .foregroundColor(.primary)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
+            
+            if scrollProgress <= 0.5 {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Payment Plans")
                         .font(.largeTitle.weight(.bold))
                     Text(summaryText)
                         .font(.subheadline)
@@ -1481,6 +1658,106 @@ struct SavingsGoalRow: View {
     }
 }
 
+struct PartPayCandidateRow: View {
+    let purchase: PurchaseItem
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: purchase.icon)
+                .font(.title3)
+                .foregroundColor(purchase.color)
+                .frame(width: 44, height: 44)
+                .background(purchase.color.opacity(0.15))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(purchase.title)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Text(purchase.subtitleWithoutTime)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(purchase.paymentMethod.displayName)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            VStack(alignment: .trailing, spacing: 6) {
+                Text(purchase.amount)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Text("Convert")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.accentColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.accentColor.opacity(0.15))
+                    .clipShape(Capsule())
+            }
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .accessibilityLabel("\(purchase.title) \(purchase.amount). Convert to Part Pay.")
+    }
+}
+
+struct PartPayEligibleOverlay: View {
+    let purchases: [PurchaseItem]
+    let onSelect: (PurchaseItem) -> Void
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Part Pay")
+                        .font(.title2.weight(.semibold))
+                    Text("Pick a purchase you want to part pay")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                if purchases.isEmpty {
+                    EmptyStateRow(
+                        title: "No eligible purchases",
+                        subtitle: "Use a Resurs or Swish payment over 1 000 SEK to move it into Part Pay."
+                    )
+                } else {
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(purchases) { purchase in
+                                Button {
+                                    dismiss()
+                                    onSelect(purchase)
+                                } label: {
+                                    PartPayCandidateRow(purchase: purchase)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+            .padding()
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark")
+                            .font(.headline)
+                    }
+                    .accessibilityLabel("Close Part Pay picker")
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+}
+
 struct InvoicesList: View {
     @Binding var navigationPath: NavigationPath
     @Environment(\.dismiss) private var dismiss
@@ -1542,6 +1819,7 @@ struct InvoicesList: View {
                                 }
                             }
                             .padding(.horizontal)
+                            .padding(.top, 8)
                             .padding(.bottom, 40)
                         }
                     }
@@ -2126,7 +2404,7 @@ struct WalletSummaryBento: View {
     let onInvoicesTap: () -> Void
     let onCreditTap: () -> Void
     let onSavingsTap: () -> Void
-    let onMerchantPurchasesTap: () -> Void
+    let onPaymentPlansTap: () -> Void
     
     private var gridColumns: [GridItem] {
         [
@@ -2164,12 +2442,12 @@ struct WalletSummaryBento: View {
             )
             
             WalletSummaryCard(
-                title: "Merchants",
+                title: "Part Pay",
                 headline: merchantPurchaseTotal,
-                hint: "View all purchases",
-                icon: "bag.fill",
+                hint: "View Payment Plans",
+                icon: "chart.pie.fill",
                 tint: .indigo,
-                action: onMerchantPurchasesTap
+                action: onPaymentPlansTap
             )
         }
     }

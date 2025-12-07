@@ -288,7 +288,11 @@ struct TransactionDetailView: View {
                 transactionAmount: amount,
                 merchant: merchant,
                 onPaymentPlanCreated: { paymentPlanName in
-                    paymentPlansManager.addPaymentPlan(name: paymentPlanName, startingAmount: amount)
+                    paymentPlansManager.addPaymentPlan(
+                        name: paymentPlanName,
+                        startingAmount: amount,
+                        store: merchant
+                    )
                     withAnimation {
                         selectedPaymentPlan = paymentPlanName
                     }

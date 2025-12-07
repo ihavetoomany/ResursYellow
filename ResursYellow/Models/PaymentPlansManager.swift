@@ -11,6 +11,7 @@ import Combine
 struct PaymentPlan: Identifiable {
     let id = UUID()
     let name: String
+    let store: String
     let totalAmount: String
     let paidAmount: String
     let progress: Double
@@ -23,7 +24,19 @@ struct PaymentPlan: Identifiable {
 class PaymentPlansManager: ObservableObject {
     @Published var paymentPlans: [PaymentPlan] = [
         PaymentPlan(
+            name: "Smart Home Bundle",
+            store: "NetOnNet Warehouse",
+            totalAmount: "12 400 SEK",
+            paidAmount: "0 SEK",
+            progress: 0.0,
+            dueDate: "First payment pending",
+            monthlyAmount: nil,
+            icon: "hourglass",
+            color: .orange
+        ),
+        PaymentPlan(
             name: "Home Office Setup",
+            store: "Bauhaus",
             totalAmount: "18 200 SEK",
             paidAmount: "6 000 SEK",
             progress: 0.33,
@@ -34,6 +47,7 @@ class PaymentPlansManager: ObservableObject {
         ),
         PaymentPlan(
             name: "New Kitchen Appliances",
+            store: "Jula",
             totalAmount: "28 500 SEK",
             paidAmount: "25 650 SEK",
             progress: 0.9,
@@ -44,9 +58,10 @@ class PaymentPlansManager: ObservableObject {
         )
     ]
     
-    func addPaymentPlan(name: String, startingAmount: String) {
+    func addPaymentPlan(name: String, startingAmount: String, store: String) {
         let newPaymentPlan = PaymentPlan(
             name: name,
+            store: store,
             totalAmount: startingAmount,
             paidAmount: "0 SEK",
             progress: 0.0,

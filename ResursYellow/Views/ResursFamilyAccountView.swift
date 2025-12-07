@@ -99,6 +99,7 @@ struct ResursFamilyAccountView: View {
                             ForEach(paymentPlansManager.paymentPlans) { paymentPlan in
                                 PaymentPlanCard(
                                     title: paymentPlan.name,
+                                    store: paymentPlan.store,
                                     totalAmount: paymentPlan.totalAmount,
                                     paidAmount: paymentPlan.paidAmount,
                                     progress: paymentPlan.progress,
@@ -328,6 +329,7 @@ struct CreditCardMini: View {
 
 struct PaymentPlanCard: View {
     let title: String
+    let store: String
     let totalAmount: String
     let paidAmount: String
     let progress: Double
@@ -350,8 +352,14 @@ struct PaymentPlanCard: View {
                     Text(title)
                         .font(.headline)
                         .fontWeight(.semibold)
+                    
+                    Text(store)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.secondary)
+                    
                     if let monthly = monthlyAmount {
-                        Text("\(dueDate) (\(monthly))")
+                        Text("\(dueDate) · \(monthly)")
                             .font(.caption)
                             .foregroundColor(progress == 1.0 ? .green : .secondary)
                     } else {
