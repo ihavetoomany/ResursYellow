@@ -66,17 +66,6 @@ struct MerchantsView: View {
                 VStack(spacing: 16) {
                     // Connected section
                     VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Text("Connected")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.secondary)
-                                .textCase(.uppercase)
-                                .tracking(0.5)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 4)
-
                         VStack(spacing: 10) {
                             ForEach(connected, id: \.self) { merchant in
                                 let card = cardConfig(for: merchant)
@@ -105,54 +94,6 @@ struct MerchantsView: View {
                         }
                     }
                     .padding(.top, 24)
-                    
-                    // Discover section
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Text("Discover")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.secondary)
-                                .textCase(.uppercase)
-                                .tracking(0.5)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 4)
-                        
-                        Button {
-                            // TODO: Add merchant action
-                        } label: {
-                            HStack(spacing: 12) {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.blue.opacity(0.8))
-                                        .frame(width: 36, height: 36)
-                                    Image(systemName: "plus")
-                                        .font(.title3)
-                                        .foregroundColor(.white)
-                                }
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Add Merchant")
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.primary)
-                                    Text("Look for stores you shop at, enable quick checkout, part payment options and offers")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                
-                                Spacer()
-                                
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        }
-                        .buttonStyle(.plain)
-                    }
                 }
                 .padding(.horizontal)
             }

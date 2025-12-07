@@ -27,18 +27,6 @@ struct AccountsView: View {
                 VStack(spacing: 16) {
                     // Account Cards
                     VStack(spacing: 16) {
-                        // My Accounts Section Header
-                        HStack {
-                            Text("My Accounts")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.secondary)
-                                .textCase(.uppercase)
-                                .tracking(0.5)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 4)
-
                         // My Accounts Items
                         Button {
                             navigationPath.append("ResursFamily")
@@ -51,45 +39,6 @@ struct AccountsView: View {
                                 icon: "heart.fill",
                                 color: .blue,
                                 balanceLabel: "Available Balance"
-                            )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-
-                        // Discover Section Header
-                        HStack {
-                            Text("Discover")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.secondary)
-                                .textCase(.uppercase)
-                                .tracking(0.5)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 4)
-
-                        // Discover Items
-                        Button(action: {
-                            // TODO: Navigate to loan info/calculator/apply flow
-                        }) {
-                            CompactDiscoverRow(
-                                title: "Apply for a Loan",
-                                subtitle: "Read more, calculate and apply",
-                                icon: "car.fill",
-                                color: .blue,
-                                trailingIcon: "plus"
-                            )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        
-                        Button(action: {
-                            // TODO: Navigate to savings goal creation flow
-                        }) {
-                            CompactDiscoverRow(
-                                title: "Start Saving for a Goal",
-                                subtitle: "Open an account in 2 min",
-                                icon: "chart.line.uptrend.xyaxis",
-                                color: .green,
-                                trailingIcon: "plus"
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -171,44 +120,6 @@ struct AccountCard: View {
         .padding(18)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20))
-    }
-}
-
-struct CompactDiscoverRow: View {
-    let title: String
-    let subtitle: String
-    let icon: String
-    let color: Color
-    var trailingIcon: String? = nil
-
-    var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundColor(color)
-                .frame(width: 36, height: 36)
-                .background(color.opacity(0.2))
-                .clipShape(Circle())
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            Spacer()
-
-            if let trailingIcon {
-                Image(systemName: trailingIcon)
-                    .foregroundColor(.blue)
-            }
-        }
-        .padding(16)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
