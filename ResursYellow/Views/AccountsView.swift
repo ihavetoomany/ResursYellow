@@ -14,10 +14,10 @@ struct AccountsView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
-                title: "Accounts",
+                title: "Banking",
                 subtitle: "Your engagements",
                 trailingButton: "plus",
-                trailingButtonTint: .black,
+                trailingButtonTint: .blue,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
                 trailingButtonAction: {
@@ -76,6 +76,16 @@ struct AccountsView: View {
                     SavingsAccountDetailView()
                 default:
                     EmptyView()
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .switchToBanking)) { notification in
+                if let destination = notification.userInfo?["destination"] as? String,
+                   destination == "ResursFamilyAccountView" {
+                    // Ensure we are at root, then navigate to Resurs Family detail
+                    if !navigationPath.isEmpty {
+                        navigationPath.removeLast(navigationPath.count)
+                    }
+                    navigationPath.append("ResursFamily")
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
@@ -354,3 +364,4 @@ struct AddAccountView: View {
 #Preview {
     AddAccountView()
 }
+

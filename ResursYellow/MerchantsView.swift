@@ -56,7 +56,7 @@ struct MerchantsView: View {
                 title: "Merchants",
                 subtitle: "Connect stores you shop at",
                 trailingButton: "plus",
-                trailingButtonTint: .black,
+                trailingButtonTint: .blue,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
                 trailingButtonAction: {
@@ -228,3 +228,4 @@ struct AddMerchantView: View {
 #Preview {
     AddMerchantView()
 }
+

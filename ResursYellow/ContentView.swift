@@ -10,6 +10,8 @@ import SwiftUI
 // Notification for scroll to top
 extension Notification.Name {
     static let scrollToTop = Notification.Name("scrollToTop")
+    static let switchToBanking = Notification.Name("switchToBanking")
+    static let switchToMerchants = Notification.Name("switchToMerchants")
 }
 
 struct ContentView: View {
@@ -76,7 +78,7 @@ struct ContentView: View {
                         }
                     }
                     .tabItem {
-                        Label("Accounts", systemImage: selectedTab == 1 ? "building.columns.fill" : "building.columns")
+                        Label("Banking", systemImage: selectedTab == 1 ? "building.columns.fill" : "building.columns")
                     }
                     .tag(1)
                     
@@ -133,6 +135,13 @@ struct ContentView: View {
             if oldValue == newValue {
                 NotificationCenter.default.post(name: .scrollToTop, object: nil)
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .switchToBanking)) { notification in
+            selectedTab = 1
+            // In the future, you can forward notification.userInfo to AccountsView via another mechanism for deep linking.
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .switchToMerchants)) { _ in
+            selectedTab = 2
         }
     }
 }

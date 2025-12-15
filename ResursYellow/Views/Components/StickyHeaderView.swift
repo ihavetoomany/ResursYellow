@@ -16,6 +16,7 @@ class ScrollOffsetObserver: ObservableObject {
 struct StickyHeaderView<Content: View, StickyContent: View>: View {
     let title: String
     let subtitle: String
+    let minimizedTitle: String?
     let trailingButton: String
     let trailingButtonTint: Color
     let trailingButtonSize: CGFloat
@@ -28,6 +29,7 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
     init(
         title: String,
         subtitle: String,
+        minimizedTitle: String? = nil,
         trailingButton: String = "person.circle.fill",
         trailingButtonTint: Color = Color(UIColor.systemBlue),
         trailingButtonSize: CGFloat = 44,
@@ -37,6 +39,7 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
     ) where StickyContent == EmptyView {
         self.title = title
         self.subtitle = subtitle
+        self.minimizedTitle = minimizedTitle
         self.trailingButton = trailingButton
         self.trailingButtonTint = trailingButtonTint
         self.trailingButtonSize = trailingButtonSize
@@ -49,6 +52,7 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
     init(
         title: String,
         subtitle: String,
+        minimizedTitle: String? = nil,
         trailingButton: String = "person.circle.fill",
         trailingButtonTint: Color = Color(UIColor.systemBlue),
         trailingButtonSize: CGFloat = 44,
@@ -59,6 +63,7 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
     ) {
         self.title = title
         self.subtitle = subtitle
+        self.minimizedTitle = minimizedTitle
         self.trailingButton = trailingButton
         self.trailingButtonTint = trailingButtonTint
         self.trailingButtonSize = trailingButtonSize
@@ -122,11 +127,18 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
                                 .frame(height: scrollProgress > 0.5 ? 0 : nil)
                                 .clipped()
                             
-                            // Title - shrinks and centers
-                            Text(title)
-                                .font(scrollProgress > 0.5 ? .title2 : .largeTitle)
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
+                            // Title - shrinks and centers with minimizedTitle support
+                            if scrollProgress > 0.5 {
+                                Text(minimizedTitle ?? title)
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                            } else {
+                                Text(title)
+                                    .font(.largeTitle)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                            }
                         }
                         
                         // Icon - fades out

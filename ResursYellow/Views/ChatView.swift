@@ -17,7 +17,7 @@ struct ChatView: View {
                 title: "Support",
                 subtitle: "Get help anytime",
                 trailingButton: "phone.fill",
-                trailingButtonTint: .black,
+                trailingButtonTint: .blue,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
                 trailingButtonAction: {
@@ -211,3 +211,4 @@ struct CallSupportView: View {
 #Preview {
     CallSupportView()
 }
+

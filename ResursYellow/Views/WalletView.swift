@@ -90,71 +90,6 @@ struct ActionItem: Identifiable {
     static let priorityItems: [ActionItem] = Array(allItems.prefix(5))
 }
 
-struct MerchantPurchaseSummary: Identifiable {
-    let id = UUID()
-    let merchant: String
-    let totalAmount: Double
-    let displayAmount: String
-    let transactionCount: Int
-    let icon: String
-    let color: Color
-}
-
-struct SavingsGoal: Identifiable {
-    let id = UUID()
-    let name: String
-    let contributed: Double
-    let target: Double
-    let deadline: String
-    let color: Color
-    
-    var contributedLabel: String {
-        formattedSEK(contributed)
-    }
-    
-    var targetLabel: String {
-        formattedSEK(target)
-    }
-    
-    var progress: Double {
-        guard target > 0 else { return 0 }
-        return min(contributed / target, 1)
-    }
-}
-
-extension SavingsGoal {
-    static let sampleData: [SavingsGoal] = [
-        SavingsGoal(
-            name: "Emergency fund",
-            contributed: 12_500,
-            target: 20_000,
-            deadline: "Dec 31",
-            color: .mint
-        ),
-        SavingsGoal(
-            name: "Winter vacation",
-            contributed: 8_200,
-            target: 15_000,
-            deadline: "Feb 15",
-            color: .cyan
-        ),
-        SavingsGoal(
-            name: "Home upgrade",
-            contributed: 5_600,
-            target: 25_000,
-            deadline: "Jun 1",
-            color: .purple
-        ),
-        SavingsGoal(
-            name: "Electric bike",
-            contributed: 3_300,
-            target: 12_000,
-            deadline: "Apr 20",
-            color: .orange
-        )
-    ]
-}
-
 struct TransactionData: Hashable {
     let merchant: String
     let amount: String
@@ -250,6 +185,15 @@ extension PaymentMethod {
             return true
         default:
             return false
+        }
+    }
+    
+    var supportsPartPayConversion: Bool {
+        switch self {
+        case .swish:
+            return false
+        default:
+            return true
         }
     }
 }
@@ -462,133 +406,184 @@ enum WalletDestination: Hashable {
     case invoices
     case purchases(filter: PurchaseFilter = .all)
     case actions
-    case savings
-    case paymentPlans
 }
 
 struct WalletView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showProfile = false
-    
-    private let creditAccounts = CreditAccount.sampleAccounts
-    private let paymentPlans = PaymentPlansManager().paymentPlans
-    private let savingsGoals = SavingsGoal.sampleData
-    
+
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
-        case 5..<11:
-            return "Good morning"
-        case 11..<16:
-            return "Good day"
-        case 16..<23:
-            return "Good evening"
-        default:
-            return "Good night"
+        case 5..<11: return "Good morning"
+        case 11..<16: return "Good day"
+        case 16..<23: return "Good evening"
+        default: return "Good night"
         }
     }
-    
-    private var outstandingInvoices: [InvoiceItem] {
+
+    // Data sources for sections
+    private var toPayInvoices: [InvoiceItem] {
         InvoiceItem.overdueSamples + InvoiceItem.dueSoonSamples
     }
-    
-    private var invoicePreview: [InvoiceItem] {
-        Array(outstandingInvoices.prefix(3))
+    private var recentPurchases: [PurchaseItem] {
+        Array(PurchaseItem.sampleData.prefix(5))
+    }
+    private var suggestedActions: [ActionItem] {
+        Array(ActionItem.priorityItems.prefix(5))
     }
     
-    private var purchasesPreview: [PurchaseItem] {
-        Array(PurchaseItem.sampleData.prefix(3))
-    }
+    private var unpaidCount: Int { toPayInvoices.count }
     
-    private var actionsPreview: [ActionItem] {
-        Array(ActionItem.priorityItems.prefix(3))
+    private var totalUnpaidAmountLabel: String {
+        let total = toPayInvoices.reduce(0.0) { $0 + $1.numericAmount }
+        return formattedSEK(total)
     }
-    
-    private var savingsPreview: [SavingsGoal] {
-        Array(savingsGoals.prefix(3))
+
+    private var availableFamilyCreditLabel: String {
+        // Use CreditAccount.sampleAccounts and show available from the Resurs Family account if present
+        let accounts = CreditAccount.sampleAccounts
+        let family = accounts.first { $0.name.lowercased().contains("family") }
+        let available = family?.available ?? accounts.first?.available ?? 0
+        return formattedSEK(available)
     }
-    
-    private var merchantSummaries: [MerchantPurchaseSummary] {
-        let grouped = Dictionary(grouping: PurchaseItem.sampleData, by: { $0.merchant })
-        return grouped.map { merchant, purchases in
-            let total = purchases.reduce(0) { $0 + $1.numericAmount }
-            return MerchantPurchaseSummary(
-                merchant: merchant,
-                totalAmount: total,
-                displayAmount: formattedSEK(total),
-                transactionCount: purchases.count,
-                icon: purchases.first?.icon ?? "cart.fill",
-                color: purchases.first?.color ?? .blue
-            )
-        }
-        .sorted { $0.totalAmount > $1.totalAmount }
-    }
-    
-    private var unpaidInvoicesCount: Int {
-        outstandingInvoices.count
-    }
-    
-    private var outstandingAmountLabel: String {
-        formattedSEK(outstandingInvoices.reduce(0) { $0 + $1.numericAmount })
-    }
-    
-    private var usedCreditLabel: String {
-        let usedCredit = creditAccounts.reduce(0) { total, account in
-            total + max(0, account.limit - account.available)
-        }
-        return formattedSEK(usedCredit)
-    }
-    
-    private var savingsBalanceLabel: String {
-        formattedSEK(savingsGoals.reduce(0) { $0 + $1.contributed })
-    }
-    
-    private var merchantPurchaseTotalLabel: String {
-        formattedSEK(merchantSummaries.reduce(0) { $0 + $1.totalAmount })
-    }
-    
-    /// Purchases that are large enough and not already tied to a merchant part-pay account.
-    private var eligiblePartPayPurchases: [PurchaseItem] {
-        PurchaseItem.sampleData
-            .filter { $0.isEligibleForPartPay }
-            .sorted { $0.numericAmount > $1.numericAmount }
-    }
-    
+
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
                 title: "John",
                 subtitle: greeting,
+                minimizedTitle: "Wallet",
                 trailingButton: "person.fill",
-                trailingButtonTint: .black,
+                trailingButtonTint: .blue,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
-                trailingButtonAction: {
-                    showProfile = true
-                }
+                trailingButtonAction: { showProfile = true }
             ) {
-                VStack(spacing: 28) {
-                    let invoicesTap: () -> Void = { navigationPath.append(WalletDestination.invoices) }
-                    let creditTap: () -> Void = { navigationPath.append(WalletDestination.purchases(filter: PurchaseFilter.all)) }
-                    let savingsTap: () -> Void = { navigationPath.append(WalletDestination.savings) }
-                    let paymentPlansTap: () -> Void = { navigationPath.append(WalletDestination.paymentPlans) }
-                    
-                    WalletSummaryBento(
-                        unpaidCount: unpaidInvoicesCount,
-                        outstandingTotal: outstandingAmountLabel,
-                        usedCredit: usedCreditLabel,
-                        savingsBalance: savingsBalanceLabel,
-                        merchantPurchaseTotal: merchantPurchaseTotalLabel,
-                        onInvoicesTap: invoicesTap,
-                        onCreditTap: creditTap,
-                        onSavingsTap: savingsTap,
-                        onPaymentPlansTap: paymentPlansTap
-                    )
-                    .padding(.horizontal)
-                    
-                    
-                    actionsSection
+                // Content: keep existing sections in order
+                VStack(spacing: 24) {
+                    // Horizontal summary boxes
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            Button {
+                                navigationPath.append(WalletDestination.invoices)
+                            } label: {
+                                SummaryBox(title: "Invoices", headline: totalUnpaidAmountLabel, subtitle: "Options available", icon: "doc.text.fill", tint: .orange)
+                            }
+                            .buttonStyle(.plain)
+
+                            Button {
+                                // Switch to Banking tab and request deep link to Resurs Family account view
+                                NotificationCenter.default.post(name: .switchToBanking, object: nil, userInfo: ["destination": "ResursFamilyAccountView"])
+                            } label: {
+                                SummaryBox(title: "Resurs Family", headline: availableFamilyCreditLabel, subtitle: "Avaliable credit", icon: "creditcard.fill", tint: .green)
+                            }
+                            .buttonStyle(.plain)
+                            
+                            Button {
+                                // Navigate to Merchants tab to add merchant
+                                NotificationCenter.default.post(name: .switchToMerchants, object: nil)
+                            } label: {
+                                SummaryBox(
+                                    title: "Connect",
+                                    headline: "Add Merchant",
+                                    subtitle: "Enable express checkout",
+                                    icon: "plus",
+                                    tint: .blue
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    // To Pay Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        WalletSectionHeader(title: "To Pay", actionTitle: "See all") {
+                            navigationPath.append(WalletDestination.invoices)
+                        }
+                        .padding(.horizontal)
+
+                        VStack(spacing: 12) {
+                            if toPayInvoices.isEmpty {
+                                EmptyStateRow(title: "No unpaid invoices", subtitle: "You're all caught up for now")
+                            } else {
+                                ForEach(toPayInvoices) { invoice in
+                                    Button {
+                                        navigationPath.append(invoice.detail)
+                                    } label: {
+                                        InvoiceRow(
+                                            title: invoice.merchant,
+                                            subtitle: invoice.subtitle,
+                                            amount: invoice.amount,
+                                            icon: invoice.icon,
+                                            color: invoice.color,
+                                            isOverdue: invoice.isOverdue,
+                                            statusOverride: invoice.statusOverride
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    // Recent Purchases Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        WalletSectionHeader(title: "Recent Purchases", actionTitle: "See all") {
+                            navigationPath.append(WalletDestination.purchases(filter: .all))
+                        }
+                        .padding(.horizontal)
+
+                        VStack(spacing: 12) {
+                            if recentPurchases.isEmpty {
+                                EmptyStateRow(title: "No recent purchases", subtitle: "Your recent activity will appear here")
+                            } else {
+                                ForEach(recentPurchases) { purchase in
+                                    Button {
+                                        navigationPath.append(purchase.transactionDetailData)
+                                    } label: {
+                                        PurchaseRow(
+                                            title: purchase.title,
+                                            subtitle: purchase.subtitleWithoutTime,
+                                            amount: purchase.amount,
+                                            icon: purchase.icon,
+                                            color: purchase.color,
+                                            paymentMethod: purchase.paymentMethod,
+                                            showsPartPayBadge: purchase.isEligibleForPartPay
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    // Suggested Actions Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        WalletSectionHeader(title: "Suggested Actions", actionTitle: "See all") {
+                            navigationPath.append(WalletDestination.actions)
+                        }
+                        .padding(.horizontal)
+
+                        VStack(spacing: 12) {
+                            ForEach(suggestedActions) { action in
+                                ActionRow(
+                                    title: action.title,
+                                    subtitle: action.subtitle,
+                                    icon: action.icon,
+                                    color: action.color
+                                )
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    Spacer(minLength: 24)
                 }
+                .padding(.horizontal, 0)
             }
             .navigationBarHidden(true)
             .navigationDestination(for: WalletDestination.self) { destination in
@@ -596,20 +591,9 @@ struct WalletView: View {
                 case .invoices:
                     InvoicesList(navigationPath: $navigationPath)
                 case .purchases(let filter):
-                    PurchasesList(
-                        navigationPath: $navigationPath,
-                        initialFilter: filter
-                    )
-                case .savings:
-                    SavingsList(goals: savingsGoals)
+                    PurchasesList(navigationPath: $navigationPath, initialFilter: filter)
                 case .actions:
                     ActionsList(actionItems: ActionItem.allItems)
-                case .paymentPlans:
-                    PaymentPlansList(
-                        paymentPlans: paymentPlans,
-                        eligiblePurchases: eligiblePartPayPurchases,
-                        navigationPath: $navigationPath
-                    )
                 }
             }
             .navigationDestination(for: TransactionData.self) { transaction in
@@ -624,50 +608,11 @@ struct WalletView: View {
             .navigationDestination(for: InvoiceData.self) { invoice in
                 InvoiceDetailView(invoice: invoice)
             }
-            .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
-                if !navigationPath.isEmpty {
-                    navigationPath.removeLast(navigationPath.count)
-                }
-            }
             .sheet(isPresented: $showProfile) {
                 ProfileView()
             }
         }
     }
-    
-    private var actionsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("To Do")
-                .font(.title3)
-                .fontWeight(.semibold)
-                .padding(.horizontal)
-            
-            VStack(spacing: 12) {
-                Button {
-                    navigationPath.append(WalletDestination.invoices)
-                } label: {
-                    ActionRow(
-                        title: "Pay invoices",
-                        subtitle: "Review what's due and pay them together",
-                        icon: "doc.text.fill",
-                        color: .orange
-                    )
-                }
-                .buttonStyle(.plain)
-                
-                ForEach(ActionItem.allItems) { action in
-                    ActionRow(
-                        title: action.title,
-                        subtitle: action.subtitle,
-                        icon: action.icon,
-                        color: action.color
-                    )
-                }
-            }
-            .padding(.horizontal)
-        }
-    }
-    
 }
 
 struct PurchaseItem: Identifiable {
@@ -868,6 +813,8 @@ struct PurchaseItem: Identifiable {
 }
 
 extension PurchaseItem {
+    private static let merchantsWithPartPaySupport: Set<String> = ["jula", "netonnet"]
+    
     /// Provides enough structured data to drive TransactionDetailView even when we only have a subtitle string.
     var transactionDetailData: TransactionData {
         if let transaction {
@@ -889,7 +836,13 @@ extension PurchaseItem {
     }
     
     var isEligibleForPartPay: Bool {
-        !paymentMethod.isMerchantAccount && numericAmount >= 1_000
+        let merchantKey = merchant.lowercased()
+        if PurchaseItem.merchantsWithPartPaySupport.contains(merchantKey) {
+            return true
+        }
+        return paymentMethod.supportsPartPayConversion &&
+        !paymentMethod.isMerchantAccount &&
+        numericAmount >= 1_000
     }
 }
 
@@ -923,7 +876,7 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
         case .all:
             return "All"
         case .mastercard:
-            return "Mastercard"
+            return "Family"
         case .merchants:
             return "Merchants"
         case .swish:
@@ -938,7 +891,7 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
         case .all:
             return "All activity"
         case .mastercard:
-            return "Resurs Mastercard"
+            return "Resurs Family card"
         case .merchants:
             return "Connected merchants"
         case .swish:
@@ -953,7 +906,7 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
         case .all:
             return "Shows every purchase"
         case .mastercard:
-            return "Shows purchases paid with Resurs Family Mastercard"
+            return "Shows purchases paid with the Resurs Family card"
         case .merchants:
             return "Shows purchases paid with merchant accounts"
         case .swish:
@@ -1266,220 +1219,6 @@ struct ActionsList: View {
     }
 }
 
-struct SavingsList: View {
-    let goals: [SavingsGoal]
-    @Environment(\.dismiss) private var dismiss
-    @StateObject private var scrollObserver = ScrollOffsetObserver()
-    
-    private var summaryText: String {
-        let totalSaved = goals.reduce(0) { $0 + $1.contributed }
-        return "\(goals.count) goal\(goals.count == 1 ? "" : "s") · \(formattedSEK(totalSaved)) saved"
-    }
-    
-    var body: some View {
-        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
-        
-        GeometryReader { geometry in
-            ZStack(alignment: .top) {
-                ScrollViewReader { proxy in
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 0) {
-                            GeometryReader { geo in
-                                Color.clear
-                                    .onChange(of: geo.frame(in: .named("savingsScroll")).minY) { _, newValue in
-                                        scrollObserver.offset = max(0, -newValue)
-                                    }
-                            }
-                            .frame(height: 0)
-                            .id("savingsTop")
-                            
-                            Color.clear.frame(height: 120)
-                            
-                            VStack(spacing: 16) {
-                                ForEach(goals) { goal in
-                                    SavingsGoalRow(goal: goal)
-                                }
-                            }
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                            .padding(.bottom, 32)
-                        }
-                    }
-                    .coordinateSpace(name: "savingsScroll")
-                    .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                            proxy.scrollTo("savingsTop", anchor: .top)
-                        }
-                    }
-                }
-                
-                savingsHeader(scrollProgress: scrollProgress)
-                    .frame(width: geometry.size.width)
-            }
-        }
-        .navigationBarHidden(true)
-    }
-    
-    private func savingsHeader(scrollProgress: CGFloat) -> some View {
-        VStack(spacing: 0) {
-            ZStack {
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(.title3)
-                            .foregroundColor(.blue)
-                            .frame(width: 32, height: 32)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Circle())
-                    }
-                    Spacer()
-                }
-                
-                if scrollProgress > 0.5 {
-                    Text("Savings")
-                        .font(.title2.weight(.bold))
-                        .foregroundColor(.primary)
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top, 8)
-            .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-            
-            if scrollProgress <= 0.5 {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Savings")
-                        .font(.largeTitle.weight(.bold))
-                    Text(summaryText)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-                .padding(.bottom, 16)
-            }
-        }
-        .background(Color(uiColor: .systemBackground).opacity(0.95))
-        .background(.ultraThinMaterial)
-        .animation(.easeInOut(duration: 0.2), value: scrollProgress)
-    }
-}
-
-struct PaymentPlansList: View {
-    let paymentPlans: [PaymentPlan]
-    let eligiblePurchases: [PurchaseItem]
-    @Binding var navigationPath: NavigationPath
-    @Environment(\.dismiss) private var dismiss
-    @StateObject private var scrollObserver = ScrollOffsetObserver()
-    
-    private var summaryText: String {
-        "Ongoing part payments"
-    }
-    
-    var body: some View {
-        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
-        
-        GeometryReader { geometry in
-            ZStack(alignment: .top) {
-                ScrollViewReader { proxy in
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 0) {
-                            GeometryReader { geo in
-                                Color.clear
-                                    .onChange(of: geo.frame(in: .named("paymentPlansScroll")).minY) { _, newValue in
-                                        scrollObserver.offset = max(0, -newValue)
-                                    }
-                            }
-                            .frame(height: 0)
-                            .id("paymentPlansTop")
-                            
-                            Color.clear.frame(height: 120)
-                            
-                            VStack(spacing: 16) {
-                                if paymentPlans.isEmpty {
-                                    EmptyStateRow(
-                                        title: "No payment plans yet",
-                                        subtitle: "Create a plan from a merchant checkout or add purchases to an existing plan"
-                                    )
-                                } else {
-                                    ForEach(paymentPlans) { plan in
-                                        PaymentPlanCard(
-                                            title: plan.name,
-                                            store: plan.store,
-                                            totalAmount: plan.totalAmount,
-                                            paidAmount: plan.paidAmount,
-                                            progress: plan.progress,
-                                            dueDate: plan.dueDate,
-                                            monthlyAmount: plan.monthlyAmount,
-                                            icon: plan.icon,
-                                            color: plan.color
-                                        )
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                            .padding(.bottom, 32)
-                        }
-                    }
-                    .coordinateSpace(name: "paymentPlansScroll")
-                    .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                            proxy.scrollTo("paymentPlansTop", anchor: .top)
-                        }
-                    }
-                }
-                
-                paymentPlansHeader(scrollProgress: scrollProgress)
-                    .frame(width: geometry.size.width)
-            }
-        }
-        .navigationBarHidden(true)
-    }
-    
-    private func paymentPlansHeader(scrollProgress: CGFloat) -> some View {
-        VStack(spacing: 0) {
-            ZStack {
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(.title3)
-                            .foregroundColor(.blue)
-                            .frame(width: 32, height: 32)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Circle())
-                    }
-                    Spacer()
-                }
-                
-                if scrollProgress > 0.5 {
-                    Text("Payment Plans")
-                        .font(.title2.weight(.bold))
-                        .foregroundColor(.primary)
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top, 8)
-            .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-            
-            if scrollProgress <= 0.5 {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Payment Plans")
-                        .font(.largeTitle.weight(.bold))
-                    Text(summaryText)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-                .padding(.bottom, 16)
-            }
-        }
-        .background(Color(uiColor: .systemBackground).opacity(0.95))
-        .background(.ultraThinMaterial)
-        .animation(.easeInOut(duration: 0.2), value: scrollProgress)
-    }
-}
-
 struct ActionRow: View {
     let title: String
     let subtitle: String
@@ -1491,9 +1230,11 @@ struct ActionRow: View {
             Image(systemName: icon)
                 .font(.title3)
                 .foregroundColor(color)
-                .frame(width: 36, height: 36)
-                .background(color.opacity(0.2))
-                .clipShape(Circle())
+                .frame(width: 40, height: 40)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(color.opacity(0.2))
+                )
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
@@ -1513,82 +1254,6 @@ struct ActionRow: View {
         .padding(16)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
-
-struct SavingsGoalRow: View {
-    let goal: SavingsGoal
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(goal.name)
-                        .font(.subheadline.weight(.semibold))
-                    Text("Target \(goal.targetLabel) · by \(goal.deadline)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                Text(goal.contributedLabel)
-                    .font(.headline.weight(.semibold))
-            }
-            
-            ProgressView(value: goal.progress)
-            .progressViewStyle(.linear)
-            .tint(goal.color)
-        }
-        .padding(16)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(goal.name) savings goal. \(goal.contributedLabel) of \(goal.targetLabel) saved, due \(goal.deadline)")
-    }
-}
-
-struct PartPayCandidateRow: View {
-    let purchase: PurchaseItem
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: purchase.icon)
-                .font(.title3)
-                .foregroundColor(purchase.color)
-                .frame(width: 44, height: 44)
-                .background(purchase.color.opacity(0.15))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(purchase.title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                Text(purchase.subtitleWithoutTime)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                Text(purchase.paymentMethod.displayName)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 6) {
-                Text(purchase.amount)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                Text("Convert")
-                    .font(.caption.weight(.semibold))
-                    .foregroundColor(.accentColor)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color.accentColor.opacity(0.15))
-                    .clipShape(Capsule())
-            }
-        }
-        .padding(16)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .accessibilityLabel("\(purchase.title) \(purchase.amount). Convert to Part Pay.")
     }
 }
 
@@ -1779,9 +1444,11 @@ struct PurchaseRow: View {
             Image(systemName: icon)
                 .font(.title3)
                 .foregroundColor(color)
-                .frame(width: 36, height: 36)
-                .background(color.opacity(0.2))
-                .clipShape(Circle())
+                .frame(width: 40, height: 40)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(color.opacity(0.2))
+                )
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
@@ -1888,309 +1555,30 @@ struct InvoiceRow: View {
     
     @ViewBuilder
     private var statusIndicator: some View {
-        let circle = Circle()
-            .fill(isSelected ? Color.accentColor : color)
+        let baseColor = color
+        let iconName: String = {
+            if isOverdue { return "doc.text.fill" } // same icon, color conveys state
+            if baseColor == .green { return "doc.text.fill" }
+            if baseColor == .cyan { return "doc.text.fill" }
+            return "doc.text.fill"
+        }()
+        let indicator = RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .fill(baseColor.opacity(0.2))
             .frame(width: 44, height: 44)
-            .overlay {
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.headline.weight(.bold))
-                        .foregroundColor(.white)
-                } else if let icon {
-                    Image(systemName: icon)
-                        .font(.title3)
-                        .foregroundColor(.white)
-                }
-            }
-        
+            .overlay(
+                Image(systemName: iconName)
+                    .font(.title3)
+                    .foregroundColor(baseColor)
+            )
         if let onStatusTap {
             Button(action: onStatusTap) {
-                circle
+                indicator
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Select \(title) for batch payment")
         } else {
-            circle
+            indicator
         }
-    }
-}
-
-struct CreditInfoBox: View {
-    let accounts: [CreditAccount]
-    @Binding var showDetails: Bool
-    
-    var body: some View {
-        Button {
-            showDetails = true
-        } label: {
-            VStack(alignment: .leading, spacing: 16) {
-                header
-                
-                Divider()
-                    .background(Color.primary.opacity(0.1))
-                
-                VStack(spacing: 12) {
-                    ForEach(Array(accounts.enumerated()), id: \.element.id) { index, account in
-                        CreditAccountRow(account: account)
-                        if index < accounts.count - 1 {
-                            Divider()
-                                .background(Color.primary.opacity(0.05))
-                        }
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(20)
-        }
-        .buttonStyle(.plain)
-        .background(.ultraThinMaterial)
-        .background(Color(uiColor: .systemGreen).opacity(0.08))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
-        )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Available credit overview")
-        .accessibilityValue(accessibilitySummary)
-        .accessibilityHint("Opens detailed view with credit account PIN information")
-        .sheet(isPresented: $showDetails) {
-            CreditDetailsSheet()
-                .presentationDetents([.fraction(0.33)])
-                .presentationDragIndicator(.visible)
-        }
-    }
-    private var accessibilitySummary: String {
-        accounts
-            .map { "\($0.name): \($0.availableLabel) available" }
-            .joined(separator: ", ")
-    }
-    
-    private var header: some View {
-        HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("My Cards")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-            }
-            Spacer()
-            Image(systemName: "creditcard.circle.fill")
-                .font(.title3)
-                .foregroundColor(.secondary)
-        }
-    }
-}
-
-struct CreditDetailsSheet: View {
-    @Environment(\.dismiss) var dismiss
-    @State private var showPIN = false
-    
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 10) {
-                pinSection
-                Spacer(minLength: 6)
-                holdToRevealButton
-            }
-            .background(.ultraThinMaterial)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .foregroundColor(.blue)
-                }
-            }
-        }
-    }
-    
-    private var pinSection: some View {
-        VStack(spacing: 14) {
-            Text("Credit Card PIN")
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            pinDisplay
-            
-            Text("Use this PIN for credit account purchases")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding(.top, 8)
-    }
-    
-    private var pinDisplay: some View {
-        HStack(spacing: 12) {
-            ForEach(currentDigits, id: \.self) { digit in
-                pinDigitBox(for: digit)
-            }
-        }
-    }
-    
-    private var holdToRevealButton: some View {
-        Button(action: {}) {
-            HStack {
-                Image(systemName: showPIN ? "eye.fill" : "eye.slash.fill")
-                    .font(.title3)
-                Text("Hold to show PIN")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-            }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(Color.blue)
-            .clipShape(Capsule())
-        }
-        .padding(.horizontal, 12)
-        .padding(.bottom, 12)
-        .onLongPressGesture(minimumDuration: .infinity, maximumDistance: 44, pressing: { isPressing in
-            withAnimation(.easeInOut(duration: 0.15)) {
-                showPIN = isPressing
-            }
-        }, perform: {})
-        .accessibilityHint("Press and hold to temporarily reveal your PIN")
-    }
-    
-    private var currentDigits: [String] {
-        showPIN ? ["1", "2", "3", "4"] : ["*", "*", "*", "*"]
-    }
-    
-    private func pinDigitBox(for digit: String) -> some View {
-        Text(digit)
-            .font(.system(size: 32, weight: .bold))
-            .foregroundColor(.blue)
-            .frame(width: 55, height: 65)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-            )
-    }
-}
-
-struct CreditAccountRow: View {
-    let account: CreditAccount
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(accentColor.opacity(0.2))
-                .frame(width: 48, height: 48)
-                .overlay(
-                    Image(systemName: "creditcard.fill")
-                        .font(.title3)
-                        .foregroundColor(accentColor)
-                )
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(account.name)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                HStack(spacing: 4) {
-                    Image(systemName: "lock.fill")
-                        .font(.caption2)
-                        .foregroundColor(accentColor)
-                    Text("View PIN")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 2) {
-                Text(account.availableLabel)
-                    .font(.headline)
-                    .fontWeight(.bold)
-                Text("available")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(account.name) has \(account.availableLabel) available")
-    }
-    
-    private let accentColor = Color(uiColor: .systemGreen)
-}
-
-struct WalletInfoBox: View {
-    let outstandingInvoices: [InvoiceItem]
-    let batchInvoices: [InvoiceItem]
-    
-    private var outstandingTotal: String {
-        formattedSEK(outstandingInvoices.filter { !$0.isSelected }.reduce(0) { $0 + $1.numericAmount })
-    }
-    
-    private var batchTotal: String {
-        formattedSEK(batchInvoices.reduce(0) { $0 + $1.numericAmount })
-    }
-    
-    private var overdueCount: Int {
-        outstandingInvoices.filter { $0.isOverdue && !$0.isSelected }.count
-    }
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Amount to Pay")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Text(outstandingTotal)
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.primary)
-                
-                if overdueCount > 0 {
-                    HStack(spacing: 4) {
-                        Image(systemName: "exclamationmark.circle.fill")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                        Text("\(overdueCount) overdue invoice\(overdueCount == 1 ? "" : "s")")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Divider()
-            
-            HStack(spacing: 8) {
-                Image(systemName: "square.grid.2x2.fill")
-                    .foregroundColor(.blue)
-                Text("Part payment options available")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            if !batchInvoices.isEmpty {
-                Divider()
-                
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("\(batchInvoices.count) selected")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                        Text("Ready for batch payment")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Text(batchTotal)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                }
-            }
-        }
-        .padding(20)
-        .background(Color.orange.opacity(0.1))
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -2243,112 +1631,40 @@ struct EmptyStateRow: View {
     }
 }
 
-struct WalletSummaryBento: View {
-    let unpaidCount: Int
-    let outstandingTotal: String
-    let usedCredit: String
-    let savingsBalance: String
-    let merchantPurchaseTotal: String
-    let onInvoicesTap: () -> Void
-    let onCreditTap: () -> Void
-    let onSavingsTap: () -> Void
-    let onPaymentPlansTap: () -> Void
-    
-    private var gridColumns: [GridItem] {
-        [
-            GridItem(.adaptive(minimum: 160), spacing: 12, alignment: .top)
-        ]
-    }
-    
-    var body: some View {
-        LazyVGrid(columns: gridColumns, spacing: 12) {
-            WalletSummaryCard(
-                title: "To Pay",
-                headline: outstandingTotal,
-                hint: "View all invoices",
-                icon: "doc.text.fill",
-                tint: .orange,
-                action: onInvoicesTap
-            )
-            
-            WalletSummaryCard(
-                title: "Used Credit",
-                headline: usedCredit,
-                hint: "View all purchases",
-                icon: "creditcard.fill",
-                tint: .green,
-                action: onCreditTap
-            )
-            
-            WalletSummaryCard(
-                title: "Savings",
-                headline: savingsBalance,
-                hint: "View all savings",
-                icon: "shield.fill",
-                tint: .mint,
-                action: onSavingsTap
-            )
-            
-            WalletSummaryCard(
-                title: "To pay later",
-                headline: merchantPurchaseTotal,
-                hint: "View Payment Plans",
-                icon: "chart.pie.fill",
-                tint: .indigo,
-                action: onPaymentPlansTap
-            )
-        }
-    }
-}
-
-struct WalletSummaryCard: View {
+private struct SummaryBox: View {
     let title: String
     let headline: String
-    let hint: String
+    let subtitle: String
     let icon: String
     let tint: Color
-    let action: () -> Void
-    
     var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(tint)
-                    .frame(width: 44, height: 44)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(tint.opacity(0.15))
-                    )
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title.uppercased())
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .tracking(0.6)
-                    Text(headline)
-                        .font(.system(.title2, design: .rounded).weight(.bold))
-                        .foregroundColor(.primary)
-                }
-                
-                Text(hint)
+        VStack(alignment: .leading, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(tint)
+                .frame(width: 40, height: 40)
+                .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(tint.opacity(0.15)))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title.uppercased())
                     .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(tint)
+                    .foregroundColor(.secondary)
+                    .tracking(0.6)
+                Text(headline)
+                    .font(.system(.title3, design: .rounded).weight(.bold))
+                    .foregroundColor(.primary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(20)
         }
-        .buttonStyle(.plain)
+        .frame(width: 200, alignment: .leading)
+        .padding(16)
         .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Color.white.opacity(0.08), lineWidth: 1)
         )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(title). \(headline)")
-        .accessibilityHint(hint)
     }
 }
 
