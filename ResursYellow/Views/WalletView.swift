@@ -6,6 +6,14 @@
 //
 
 import SwiftUI
+import UIKit
+
+private func availableSymbol(_ preferred: String, fallback: String) -> String {
+    if UIImage(systemName: preferred) != nil {
+        return preferred
+    }
+    return fallback
+}
 
 private let sekNumberFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
@@ -454,7 +462,7 @@ struct WalletView: View {
                 title: "John",
                 subtitle: greeting,
                 minimizedTitle: "Wallet",
-                trailingButton: "person.fill",
+                trailingButton: availableSymbol("person.badge.gearshape", fallback: "person.fill"),
                 trailingButtonTint: .blue,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
@@ -468,7 +476,7 @@ struct WalletView: View {
                             Button {
                                 navigationPath.append(WalletDestination.invoices)
                             } label: {
-                                SummaryBox(title: "Invoices", headline: totalUnpaidAmountLabel, subtitle: "Options available", icon: "doc.text.fill", tint: .orange)
+                                SummaryBox(title: "To Pay", headline: totalUnpaidAmountLabel, subtitle: "2 invoices overdue", icon: "doc.text.fill", tint: .orange)
                             }
                             .buttonStyle(.plain)
 
@@ -499,7 +507,7 @@ struct WalletView: View {
 
                     // To Pay Section
                     VStack(alignment: .leading, spacing: 12) {
-                        WalletSectionHeader(title: "To Pay", actionTitle: "See all") {
+                        WalletSectionHeader(title: "Invoices", actionTitle: "See all") {
                             navigationPath.append(WalletDestination.invoices)
                         }
                         .padding(.horizontal)
@@ -531,7 +539,7 @@ struct WalletView: View {
 
                     // Recent Purchases Section
                     VStack(alignment: .leading, spacing: 12) {
-                        WalletSectionHeader(title: "Recent Purchases", actionTitle: "See all") {
+                        WalletSectionHeader(title: "Purchases", actionTitle: "See all") {
                             navigationPath.append(WalletDestination.purchases(filter: .all))
                         }
                         .padding(.horizontal)
@@ -1654,7 +1662,7 @@ private struct SummaryBox: View {
                     .foregroundColor(.primary)
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(title == "To Pay" && subtitle == "2 invoices overdue" ? .orange : .secondary)
             }
         }
         .frame(width: 200, alignment: .leading)

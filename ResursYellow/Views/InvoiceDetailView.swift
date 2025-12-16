@@ -62,7 +62,9 @@ struct InvoiceDetailView: View {
                         
                         VStack(spacing: 16) {
                             // Invoice Details Card
-                            InvoiceDetailsCard(invoice: invoice, isPaid: isPaid || isInvoicePaid)
+                            InvoiceDetailsCard(invoice: invoice, isPaid: isPaid || isInvoicePaid, onPayTapped: {
+                                showPaymentSheet = true
+                            })
                                 .padding(.horizontal)
                                 .padding(.top, 36)
                                 .frame(width: geometry.size.width)
@@ -173,6 +175,7 @@ struct InvoiceDetailView: View {
 struct InvoiceDetailsCard: View {
     let invoice: InvoiceData
     let isPaid: Bool
+    var onPayTapped: (() -> Void)? = nil
     
     var body: some View {
         VStack(spacing: 16) {
@@ -207,6 +210,28 @@ struct InvoiceDetailsCard: View {
                         .font(.subheadline)
                         .foregroundColor(isPaid ? .green : invoice.color)
                 }
+            }
+            
+            if !isPaid {
+                Button(action: {
+                    onPayTapped?()
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "creditcard")
+                            .font(.headline)
+                        Text("Pay Invoice")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.blue)
+                    .clipShape(Capsule())
+                    .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 6)
+                }
+                .buttonStyle(.plain)
+                .padding(.vertical, 8)
             }
             
             Divider()
