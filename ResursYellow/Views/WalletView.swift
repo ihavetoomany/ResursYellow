@@ -8,6 +8,18 @@
 import SwiftUI
 import UIKit
 
+private struct VisibleCardInfo: Equatable {
+    let index: Int
+    let minX: CGFloat
+}
+
+private struct VisibleCardPreferenceKey: PreferenceKey {
+    static var defaultValue: [VisibleCardInfo] = []
+    static func reduce(value: inout [VisibleCardInfo], nextValue: () -> [VisibleCardInfo]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
 private func availableSymbol(_ preferred: String, fallback: String) -> String {
     if UIImage(systemName: preferred) != nil {
         return preferred
@@ -419,6 +431,8 @@ enum WalletDestination: Hashable {
 struct WalletView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showProfile = false
+    
+    @State private var currentSummaryIndex: Int = 0
 
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -476,33 +490,88 @@ struct WalletView: View {
                             Button {
                                 navigationPath.append(WalletDestination.invoices)
                             } label: {
-                                SummaryBox(title: "To Pay", headline: totalUnpaidAmountLabel, subtitle: "2 invoices overdue", icon: "doc.text.fill", tint: .orange)
+                                ZStack(alignment: .leading) {
+                                    SummaryBox(title: "To Pay", headline: totalUnpaidAmountLabel, subtitle: "2 invoices overdue", icon: "doc.text.fill", tint: .orange)
+                                    Color.clear.frame(width: 1)
+                                        .accessibilityHidden(true)
+                                        .id("summaryAnchor0")
+                                }
                             }
                             .buttonStyle(.plain)
-
+                            .background(
+                                GeometryReader { geo in
+                                    Color.clear
+                                        .preference(
+                                            key: VisibleCardPreferenceKey.self,
+                                            value: [VisibleCardInfo(index: 0, minX: geo.frame(in: .named("summaryScroll")).minX)]
+                                        )
+                                }
+                            )
+                            
                             Button {
                                 // Switch to Banking tab and request deep link to Resurs Family account view
                                 NotificationCenter.default.post(name: .switchToBanking, object: nil, userInfo: ["destination": "ResursFamilyAccountView"])
                             } label: {
-                                SummaryBox(title: "Resurs Family", headline: availableFamilyCreditLabel, subtitle: "Avaliable credit", icon: "creditcard.fill", tint: .green)
+                                ZStack(alignment: .leading) {
+                                    SummaryBox(title: "Resurs Family", headline: availableFamilyCreditLabel, subtitle: "Avaliable credit", icon: "creditcard.fill", tint: .green)
+                                    Color.clear.frame(width: 1)
+                                        .accessibilityHidden(true)
+                                        .id("summaryAnchor1")
+                                }
                             }
                             .buttonStyle(.plain)
+                            .background(
+                                GeometryReader { geo in
+                                    Color.clear
+                                        .preference(
+                                            key: VisibleCardPreferenceKey.self,
+                                            value: [VisibleCardInfo(index: 1, minX: geo.frame(in: .named("summaryScroll")).minX)]
+                                        )
+                                }
+                            )
                             
                             Button {
                                 // Navigate to Merchants tab to add merchant
                                 NotificationCenter.default.post(name: .switchToMerchants, object: nil)
                             } label: {
-                                SummaryBox(
-                                    title: "Connect",
-                                    headline: "Add Merchant",
-                                    subtitle: "Enable express checkout",
-                                    icon: "plus",
-                                    tint: .blue
-                                )
+                                ZStack(alignment: .leading) {
+                                    SummaryBox(
+                                        title: "Connect",
+                                        headline: "Add Merchant",
+                                        subtitle: "Enable express checkout",
+                                        icon: "plus",
+                                        tint: .blue
+                                    )
+                                    Color.clear.frame(width: 1)
+                                        .accessibilityHidden(true)
+                                        .id("summaryAnchor2")
+                                }
                             }
                             .buttonStyle(.plain)
+                            .background(
+                                GeometryReader { geo in
+                                    Color.clear
+                                        .preference(
+                                            key: VisibleCardPreferenceKey.self,
+                                            value: [VisibleCardInfo(index: 2, minX: geo.frame(in: .named("summaryScroll")).minX)]
+                                        )
+                                }
+                            )
                         }
+                        .scrollTargetLayout()
                         .padding(.horizontal)
+                    }
+                    .scrollTargetBehavior(.viewAligned)
+                    .coordinateSpace(name: "summaryScroll")
+                    .onPreferenceChange(VisibleCardPreferenceKey.self) { infos in
+                        guard !infos.isEmpty else { return }
+                        // Find the card with minX closest to the ScrollView's leading edge (0)
+                        let newIndex = infos.min(by: { abs($0.minX) < abs($1.minX) })?.index ?? currentSummaryIndex
+                        if newIndex != currentSummaryIndex {
+                            currentSummaryIndex = newIndex
+                            let impact = UIImpactFeedbackGenerator(style: .light)
+                            impact.impactOccurred()
+                        }
                     }
 
                     // To Pay Section
