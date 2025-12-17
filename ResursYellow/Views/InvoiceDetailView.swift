@@ -17,30 +17,47 @@ struct InvoiceData: Hashable {
     let color: Color
 }
 
+struct InstallmentPlan: Identifiable, Equatable {
+    let id = UUID()
+    let months: Int
+    let interestRate: Double // e.g., 0.0 for 0%
+    let fee: Double // fixed fee in SEK
+    let monthlyCost: Double
+    let totalCost: Double
+    var title: String { "\(months) months" }
+    var subtitle: String {
+        let interest = Int(interestRate * 100)
+        return "Interest \(interest)% · Fee \(Int(fee)) kr"
+    }
+}
+
 struct InvoiceDetailView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @State private var showPaymentSheet = false
     @State private var isPaying = false
     @State private var isPaid = false
-    
+    @State private var paymentSheetHeight: CGFloat = 0
+    @State private var paidAmount: Double? = nil
+    @State private var planSheetHeight: CGFloat = 0
+
     let invoice: InvoiceData
-    
+
     private var isInvoicePaid: Bool {
         invoice.status.contains("Paid on")
     }
-    
+
     private var isInvoiceScheduled: Bool {
         invoice.status.contains("Scheduled")
     }
-    
+
     private var shouldShowPayButton: Bool {
         !isInvoicePaid && !isPaid && !isInvoiceScheduled
     }
-    
+
     var body: some View {
         let scrollProgress = min(scrollObserver.offset / 100, 1.0)
-        
+
         GeometryReader { geometry in
             ZStack(alignment: .top) {
                 // Scrollable Content
@@ -56,117 +73,119 @@ struct InvoiceDetailView: View {
                             }
                             .frame(height: 0)
                             .id("scrollTop")
-                            
+
                             // Account for header height
                             Color.clear.frame(height: 80)
-                        
-                        VStack(spacing: 16) {
-                            // Invoice Details Card
-                            InvoiceDetailsCard(invoice: invoice, isPaid: isPaid || isInvoicePaid, onPayTapped: {
-                                showPaymentSheet = true
-                            })
+
+                            VStack(spacing: 16) {
+                                // Invoice Details Card
+                                InvoiceDetailsCard(invoice: invoice, isPaid: isPaid || isInvoicePaid, paidAmount: paidAmount)
                                 .padding(.horizontal)
                                 .padding(.top, 36)
                                 .frame(width: geometry.size.width)
-                        
-                            // Payment Information Card
-                            if !isInvoicePaid {
-                                PaymentInformationCard(isScheduled: isInvoiceScheduled, merchant: invoice.merchant, amount: invoice.amount)
+
+                                // Payment Information Card
+                                if !isInvoicePaid {
+                                    PaymentInformationCard(isScheduled: isInvoiceScheduled, merchant: invoice.merchant, amount: invoice.amount)
+                                        .padding(.horizontal)
+                                        .frame(width: geometry.size.width)
+                                }
+
+                                // Payment Options
+                                if shouldShowPayButton {
+                                    PaymentOptionsCard(
+                                        onPayInFull: {
+                                            showPaymentSheet = true
+                                        },
+                                        onSnooze: {
+                                            // Handle snooze action
+                                            // Could show a date picker sheet or similar
+                                        }
+                                    )
                                     .padding(.horizontal)
                                     .frame(width: geometry.size.width)
+                                }
                             }
-                            
-                            // Payment Options
-                            if shouldShowPayButton {
-                                PaymentOptionsCard(onPayInFull: {
-                                    showPaymentSheet = true
-                                }, onPartPayment: {
-                                    showPaymentSheet = true
-                                }, onSnooze: {
-                                    // Handle snooze action
-                                    // Could show a date picker sheet or similar
-                                })
-                                    .padding(.horizontal)
-                                    .frame(width: geometry.size.width)
-                            }
+                            .padding(.top, 20)
+                            .padding(.bottom, 40)
+                            .frame(width: geometry.size.width)
                         }
-                        .padding(.top, 20)
-                        .padding(.bottom, 40)
                         .frame(width: geometry.size.width)
                     }
                     .frame(width: geometry.size.width)
-                        .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                proxy.scrollTo("scrollTop", anchor: .top)
-                            }
+                    .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                            proxy.scrollTo("scrollTop", anchor: .top)
                         }
                     }
                 }
-                .coordinateSpace(name: "scroll")
-            
-                // Sticky Header
-                VStack(spacing: 0) {
-                    ZStack {
-                        // Back button
-                        HStack {
-                            Button(action: { dismiss() }) {
-                                Image(systemName: "chevron.left")
-                                    .font(.title3)
-                                    .foregroundColor(.blue)
-                                    .frame(width: 32, height: 32)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(Circle())
-                            }
-                            Spacer()
-                        }
-                        
-                        // Minimized title
-                        if scrollProgress > 0.5 {
-                            Text(invoice.merchant)
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
-                        }
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-                    
-                    // Title and subtitle
-                    if scrollProgress <= 0.5 {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Invoice Details")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .opacity(1.0 - scrollProgress * 2)
-                            
-                            Text(invoice.merchant)
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.bottom, 16)
-                    }
-                }
-                .background(Color(uiColor: .systemBackground).opacity(0.95))
-                .background(.ultraThinMaterial)
-                .animation(.easeInOut(duration: 0.2), value: scrollProgress)
-                .frame(width: geometry.size.width)
             }
+            .coordinateSpace(name: "scroll")
+
+            // Sticky Header
+            VStack(spacing: 0) {
+                ZStack {
+                    // Back button
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "chevron.left")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 32, height: 32)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                        Spacer()
+                    }
+
+                    // Minimized title
+                    if scrollProgress > 0.5 {
+                        Text(invoice.merchant)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
+
+                // Title and subtitle
+                if scrollProgress <= 0.5 {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Invoice Details")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .opacity(1.0 - scrollProgress * 2)
+
+                        Text(invoice.merchant)
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    .padding(.bottom, 16)
+                }
+            }
+            .background(Color(uiColor: .systemBackground).opacity(0.95))
+            .background(.ultraThinMaterial)
+            .animation(.easeInOut(duration: 0.2), value: scrollProgress)
+            .frame(width: geometry.size.width)
         }
         .navigationBarHidden(true)
         .sheet(isPresented: $showPaymentSheet) {
             PaymentSheet(
                 invoice: invoice,
+                paidAmount: $paidAmount,
                 onPaymentCompleted: {
                     withAnimation {
                         isPaid = true
                     }
-                }
+                },
+                onSizeChange: { height in paymentSheetHeight = height }
             )
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.height(max(200, min(paymentSheetHeight, UIScreen.main.bounds.height - 60)))])
             .presentationDragIndicator(.visible)
         }
     }
@@ -175,8 +194,23 @@ struct InvoiceDetailView: View {
 struct InvoiceDetailsCard: View {
     let invoice: InvoiceData
     let isPaid: Bool
-    var onPayTapped: (() -> Void)? = nil
-    
+    let paidAmount: Double?
+
+    private func formatSEK(_ value: Double) -> String {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.groupingSeparator = " "
+        f.maximumFractionDigits = 0
+        return (f.string(from: NSNumber(value: value)) ?? "\(Int(value))") + " kr"
+    }
+
+    private var paidLabel: String {
+        if let amount = paidAmount {
+            return "\(formatSEK(amount)) paid"
+        }
+        return "Paid"
+    }
+
     var body: some View {
         VStack(spacing: 16) {
             // Status Badge
@@ -185,7 +219,7 @@ struct InvoiceDetailsCard: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title3)
                         .foregroundColor(.green)
-                    Text("Payment Successful")
+                    Text("Payment Scheduled")
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundColor(.green)
@@ -196,53 +230,31 @@ struct InvoiceDetailsCard: View {
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            
+
             // Amount
             VStack(spacing: 8) {
                 Text(invoice.amount)
                     .font(.system(size: 48, weight: .bold))
-                
+
                 HStack(spacing: 8) {
                     Image(systemName: "doc.text.fill")
                         .font(.caption)
                         .foregroundColor(invoice.color)
-                    Text(isPaid ? "Paid" : invoice.status)
+                    Text(isPaid ? paidLabel : invoice.status)
                         .font(.subheadline)
                         .foregroundColor(isPaid ? .green : invoice.color)
                 }
             }
-            
-            if !isPaid {
-                Button(action: {
-                    onPayTapped?()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "creditcard")
-                            .font(.headline)
-                        Text("Pay Invoice")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color.blue)
-                    .clipShape(Capsule())
-                    .shadow(color: Color.black.opacity(0.12), radius: 8, x: 0, y: 6)
-                }
-                .buttonStyle(.plain)
-                .padding(.vertical, 8)
-            }
-            
+
             Divider()
-            
+
             // Details
             VStack(spacing: 12) {
                 DetailRow(label: "Merchant", value: invoice.merchant)
                 DetailRow(label: "Invoice Number", value: invoice.invoiceNumber)
                 DetailRow(label: "Issue Date", value: invoice.issueDate)
                 DetailRow(label: "Due Date", value: invoice.dueDate)
-                DetailRow(label: "Status", value: isPaid ? "Paid" : invoice.status)
+                DetailRow(label: "Status", value: isPaid ? paidLabel : invoice.status)
             }
         }
         .padding(20)
@@ -255,27 +267,27 @@ struct PaymentInformationCard: View {
     let isScheduled: Bool
     let merchant: String
     let amount: String
-    
+
     private var paymentOptionsText: String {
         merchant == "Bauhaus" ? "Monthly Balance" : "Full Payment"
     }
-    
+
     private var isBauhaus: Bool {
         merchant == "Bauhaus"
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: isScheduled ? "calendar.circle.fill" : "info.circle.fill")
                     .font(.title3)
                     .foregroundColor(isScheduled ? .cyan : .blue)
-                
+
                 Text(isScheduled ? "Scheduled Payment" : "Payment Information")
                     .font(.headline)
                     .fontWeight(.semibold)
             }
-            
+
             if isScheduled {
                 VStack(spacing: 8) {
                     HStack(alignment: .top) {
@@ -287,9 +299,9 @@ struct PaymentInformationCard: View {
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
-                    
+
                     Divider()
-                    
+
                     HStack {
                         Text("Payment Method")
                             .font(.subheadline)
@@ -325,9 +337,9 @@ struct PaymentInformationCard: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
-                    
+
                     Divider()
-                    
+
                     HStack {
                         Text("OCR")
                             .font(.subheadline)
@@ -345,9 +357,9 @@ struct PaymentInformationCard: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
-                    
+
                     Divider()
-                    
+
                     HStack {
                         Text("Bankgiro")
                             .font(.subheadline)
@@ -382,9 +394,9 @@ struct PaymentInformationCard: View {
                                 .fontWeight(.medium)
                         }
                     }
-                    
+
                     Divider()
-                    
+
                     HStack {
                         Text("Payment Options")
                             .font(.subheadline)
@@ -406,7 +418,7 @@ struct PaymentInformationCard: View {
 
 struct InvoiceItemsCard: View {
     let merchant: String
-    
+
     private var items: [(name: String, quantity: String, price: String, total: String)] {
         switch merchant {
         case "Netonnet":
@@ -463,13 +475,13 @@ struct InvoiceItemsCard: View {
             return [("Item", "1", "0 SEK", "0 SEK")]
         }
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Items")
                 .font(.headline)
                 .fontWeight(.semibold)
-            
+
             VStack(spacing: 12) {
                 ForEach(items.indices, id: \.self) { index in
                     InvoiceItemRow(
@@ -478,9 +490,9 @@ struct InvoiceItemsCard: View {
                         price: items[index].price
                     )
                 }
-                
+
                 Divider()
-                
+
                 HStack {
                     Text("Total")
                         .font(.headline)
@@ -502,7 +514,7 @@ struct InvoiceItemRow: View {
     let name: String
     let quantity: String
     let price: String
-    
+
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
@@ -513,9 +525,9 @@ struct InvoiceItemRow: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-            
+
             Spacer()
-            
+
             Text(price)
                 .font(.subheadline)
                 .fontWeight(.semibold)
@@ -525,41 +537,26 @@ struct InvoiceItemRow: View {
 
 struct PaymentOptionsCard: View {
     let onPayInFull: () -> Void
-    let onPartPayment: () -> Void
     let onSnooze: () -> Void
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Payment Options")
-                .font(.headline)
-                .fontWeight(.semibold)
-            
-            VStack(spacing: 12) {
-                PaymentOptionRow(
-                    icon: "checkmark.circle.fill",
-                    title: "Pay Invoice",
-                    description: "Pay this month's balance",
-                    color: .blue,
-                    isDefaultOption: true,
-                    action: onPayInFull
-                )
-                
-                PaymentOptionRow(
-                    icon: "calendar.circle.fill",
-                    title: "Change Payment Plan",
-                    description: "Change plan, or pay custom amount",
-                    color: .purple,
-                    action: onPartPayment
-                )
-                
-                PaymentOptionRow(
-                    icon: "clock.badge.checkmark.fill",
-                    title: "Snooze",
-                    description: "Postpone payment to a later date",
-                    color: .green,
-                    action: onSnooze
-                )
-            }
+            PaymentOptionRow(
+                icon: "checkmark.circle.fill",
+                title: "Pay Invoice",
+                description: "Pay this month's balance",
+                color: .blue,
+                isDefaultOption: true,
+                action: onPayInFull
+            )
+
+            PaymentOptionRow(
+                icon: "clock.badge.checkmark.fill",
+                title: "Snooze",
+                description: "Postpone payment to a later date",
+                color: .green,
+                action: onSnooze
+            )
         }
         .padding(20)
         .background(.ultraThinMaterial)
@@ -574,15 +571,15 @@ struct PaymentOptionRow: View {
     let color: Color
     var isDefaultOption: Bool = false
     let action: () -> Void
-    
+
     @State private var isPressed = false
-    
+
     var body: some View {
         Button(action: {
             // Haptic feedback
             let impact = UIImpactFeedbackGenerator(style: .medium)
             impact.impactOccurred()
-            
+
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 action()
             }
@@ -594,7 +591,7 @@ struct PaymentOptionRow: View {
                     .frame(width: 36, height: 36)
                     .background(color.opacity(0.2))
                     .clipShape(Circle())
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
                         .font(.subheadline)
@@ -604,7 +601,7 @@ struct PaymentOptionRow: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                
+
                 Spacer()
             }
             .padding(16)
@@ -637,77 +634,225 @@ struct PaymentSheet: View {
     @Environment(\.dismiss) var dismiss
     @State private var paymentDate = Date()
     @State private var isProcessing = false
-    
+
+    @State private var showPlanOptions: Bool = false
+    @State private var selectedPlan: InstallmentPlan? = nil
+    @State private var planSheetHeight: CGFloat = 0
+    @State private var displayAmount: Double = 0
+    @State private var amountTimer: Timer? = nil
+    @State private var pendingTargetAmount: Double? = nil
+    @State private var insuranceEnabled: Bool = false
+
     let invoice: InvoiceData
+    @Binding var paidAmount: Double?
     let onPaymentCompleted: () -> Void
-    
+    let onSizeChange: (CGFloat) -> Void
+
+    private var invoiceBaseAmount: Double {
+        let amountString = invoice.amount
+            .replacingOccurrences(of: "kr", with: "")
+            .replacingOccurrences(of: "SEK", with: "")
+            .replacingOccurrences(of: " ", with: "")
+            .trimmingCharacters(in: .whitespaces)
+        return Double(amountString) ?? 0
+    }
+
+    private var availablePlans: [InstallmentPlan] {
+        let base = invoiceBaseAmount
+        func plan(_ months: Int, interest: Double, fee: Double) -> InstallmentPlan {
+            let total = base * (1 + interest) + fee
+            let monthly = months > 0 ? total / Double(months) : total
+            return InstallmentPlan(months: months, interestRate: interest, fee: fee, monthlyCost: monthly, totalCost: total)
+        }
+        return [
+            InstallmentPlan(months: 0, interestRate: 0, fee: 0, monthlyCost: base, totalCost: base),
+            plan(3, interest: 0.00, fee: 0),
+            plan(6, interest: 0.00, fee: 0),
+            plan(12, interest: 0.06, fee: 199),
+            plan(24, interest: 0.09, fee: 299)
+        ]
+    }
+
+    private func formatSEK(_ value: Double) -> String {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.groupingSeparator = " "
+        f.maximumFractionDigits = 0
+        return (f.string(from: NSNumber(value: value)) ?? "\(Int(value))") + " kr"
+    }
+
+    private var targetAmount: Double {
+        if let selected = selectedPlan, selected.months != 0 {
+            return adjustedMonthly(for: selected)
+        }
+        return invoiceBaseAmount
+    }
+
+    private func adjustedMonthly(for plan: InstallmentPlan) -> Double {
+        guard plan.months > 0 else { return plan.monthlyCost }
+        let surchargeTotal = plan.totalCost * 0.004 // 0.4% of total
+        let surchargePerMonth = surchargeTotal / Double(plan.months)
+        return plan.monthlyCost + (insuranceEnabled ? surchargePerMonth : 0)
+    }
+
+    private func adjustedTotal(for plan: InstallmentPlan) -> Double {
+        guard plan.months > 0 else { return plan.totalCost }
+        let surchargeTotal = plan.totalCost * 0.004
+        return insuranceEnabled ? (plan.totalCost + surchargeTotal) : plan.totalCost
+    }
+
+    private func animateAmountChange(to newValue: Double) {
+        amountTimer?.invalidate()
+
+        let startValue = displayAmount
+        guard startValue != newValue else { return }
+
+        let duration: Double = 1.0
+        let fps: Double = 60.0
+        let steps = max(1, Int(duration * fps))
+        var currentStep = 0
+        let delta = newValue - startValue
+
+        let timer = Timer.scheduledTimer(withTimeInterval: 1 / fps, repeats: true) { timer in
+            currentStep += 1
+            let progress = min(Double(currentStep) / Double(steps), 1)
+            let eased = 1 - pow(1 - progress, 3) // ease-out cubic for a soft finish
+            displayAmount = startValue + delta * eased
+
+            if currentStep >= steps {
+                timer.invalidate()
+                amountTimer = nil
+                displayAmount = newValue
+            }
+        }
+
+        amountTimer = timer
+    }
+
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                HStack {
-                    Spacer()
-                    GlassIconButton(size: 40, action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.primary)
-                    }
-                    .disabled(isProcessing)
-                    .opacity(isProcessing ? 0.4 : 1)
-                }
-                .padding(.top, 8)
-                .padding(.horizontal)
-                
-                // Payment Amount
-                VStack(spacing: 12) {
-                    Text("Payment Amount")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    Text(invoice.amount)
-                        .font(.system(size: 42, weight: .bold))
+        VStack(spacing: 12) {
+            // Payment Amount (title removed per design)
+            VStack(spacing: 8) {
+                Text(formatSEK(displayAmount))
+                    .font(.system(size: 42, weight: .bold))
+                    .foregroundColor(.blue)
+                    .accessibilityLabel("Amount \(formatSEK(displayAmount))")
+                Button(action: {
+                    showPlanOptions = true
+                }) {
+                    Text("Change Amount")
+                        .font(.caption.weight(.semibold))
                         .foregroundColor(.blue)
-                    
-                    Text(invoice.merchant)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.blue.opacity(0.12))
+                        .clipShape(Capsule())
                 }
-                
-                // Payment Details
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Payment Details")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    
+                .buttonStyle(.plain)
+            }
+            .padding(.top, 36)
+            .onAppear {
+                displayAmount = targetAmount
+            }
+            .onChange(of: targetAmount) { newValue in
+                if showPlanOptions {
+                    pendingTargetAmount = newValue
+                } else {
+                    animateAmountChange(to: newValue)
+                }
+            }
+            .onChange(of: showPlanOptions) { isPresented in
+                if !isPresented {
+                    let next = pendingTargetAmount ?? targetAmount
+                    pendingTargetAmount = nil
+                    animateAmountChange(to: next)
+                }
+            }
+            .onDisappear {
+                amountTimer?.invalidate()
+                amountTimer = nil
+            }
+
+            VStack(alignment: .leading, spacing: 12) {
+                // Account Card
+                HStack(alignment: .center) {
+                    Image(systemName: "creditcard.fill")
+                        .font(.title3)
+                        .foregroundColor(.blue)
+                        .frame(width: 36, height: 36)
+                        .background(Color.blue.opacity(0.2))
+                        .clipShape(Circle())
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Nordea *894")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        Text("Checking account")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    HStack(spacing: 4) {
+                        Text("Change")
+                            .font(.caption.weight(.semibold))
+                        Image(systemName: "chevron.forward")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .foregroundColor(.blue)
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.top, 8)
+
+                // Payment Plan Card
+                Button(action: { showPlanOptions = true }) {
                     HStack(alignment: .top) {
-                        Image(systemName: "creditcard.fill")
+                        Image(systemName: "list.bullet.rectangle.fill")
                             .font(.title3)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.purple)
                             .frame(width: 36, height: 36)
-                            .background(Color.blue.opacity(0.2))
+                            .background(Color.purple.opacity(0.2))
                             .clipShape(Circle())
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Nordea *894")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Text("Checking account")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+
+                        HStack(alignment: .center) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                let isFull = (selectedPlan == nil || selectedPlan?.months == 0)
+                                Text(isFull ? "Full payment" : (selectedPlan?.title ?? "Full payment"))
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                if isFull {
+                                    Text("One payment. Total \(invoice.amount)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text("No fees or interest")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                } else if let plan = selectedPlan {
+                                    Text("\(Int(plan.monthlyCost)) kr / month · Total \(Int(plan.totalCost)) kr")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            Spacer()
+                        HStack(spacing: 4) {
+                            Text("Part Pay")
+                                .font(.caption.weight(.semibold))
+                            Image(systemName: "chevron.forward")
+                                .font(.caption.weight(.semibold))
                         }
-                        
-                        Spacer()
-                        
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
+                        .foregroundColor(.blue)
+                        }
                     }
                     .padding(16)
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .contentShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .padding(.horizontal)
-                
+                .buttonStyle(.plain)
+
                 // Payment Date
                 HStack(spacing: 12) {
                     Image(systemName: "calendar.badge.clock")
@@ -716,9 +861,9 @@ struct PaymentSheet: View {
                         .frame(width: 36, height: 36)
                         .background(Color.blue.opacity(0.15))
                         .clipShape(Circle())
-                    
+
                     Spacer()
-                    
+
                     DatePicker(
                         "Payment Date",
                         selection: $paymentDate,
@@ -732,44 +877,285 @@ struct PaymentSheet: View {
                 .padding(16)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding(.horizontal)
-                
-                Spacer(minLength: 0)
-                
-                // Confirm Button
-                Button(action: {
-                    isProcessing = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        onPaymentCompleted()
-                        dismiss()
+            }
+            .padding(.horizontal)
+
+            // Confirm Button
+            Button(action: {
+                isProcessing = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    paidAmount = targetAmount
+                    onPaymentCompleted()
+                    dismiss()
+                }
+            }) {
+                HStack {
+                    if isProcessing {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
                     }
-                }) {
-                    HStack {
-                        if isProcessing {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    Text(isProcessing ? "Processing..." : "Confirm Payment")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(isProcessing ? Color.gray : Color.blue)
+                .clipShape(Capsule())
+                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 6)
+            }
+            .disabled(isProcessing)
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+        }
+        .background(Color(UIColor.systemBackground))
+        .fixedSize(horizontal: false, vertical: true)
+        .overlay(alignment: .topTrailing) {
+            Button(action: { if !isProcessing { dismiss() } }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.primary)
+                    .frame(width: 40, height: 40)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+                    .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
+            }
+            .padding(.trailing, 12)
+            .padding(.top, 8)
+            .accessibilityLabel("Close")
+            .buttonStyle(.plain)
+            .disabled(isProcessing)
+            .opacity(isProcessing ? 0.4 : 1)
+        }
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { onSizeChange(geo.size.height) }
+                    .onChange(of: geo.size.height) { _, newValue in
+                        onSizeChange(newValue)
+                    }
+            }
+        )
+        .sheet(isPresented: $showPlanOptions) {
+            PlanOptionsSheet(
+                plans: availablePlans,
+                selectedPlan: selectedPlan,
+                insuranceEnabled: $insuranceEnabled,
+                onSelect: { plan in
+                    selectedPlan = plan
+                }
+            )
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onAppear { planSheetHeight = geo.size.height }
+                        .onChange(of: geo.size.height) { _, newValue in planSheetHeight = newValue }
+                }
+            )
+            .presentationDetents([.height(max(200, min(planSheetHeight, UIScreen.main.bounds.height - 60)))])
+            .presentationDragIndicator(.visible)
+        }
+    }
+}
+
+struct PlanOptionsSheet: View {
+    let plans: [InstallmentPlan]
+    let selectedPlan: InstallmentPlan?
+    @Binding var insuranceEnabled: Bool
+    let onSelect: (InstallmentPlan) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var sliderIndex: Double = 0
+
+    private func fmt(_ value: Double) -> String {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.groupingSeparator = " "
+        f.maximumFractionDigits = 0
+        return f.string(from: NSNumber(value: value)) ?? "\(Int(value))"
+    }
+
+    private var sliderRange: ClosedRange<Double> {
+        0...Double(max(plans.count - 1, 0))
+    }
+
+    private var currentIndex: Int {
+        guard !plans.isEmpty else { return 0 }
+        return min(max(Int(round(sliderIndex)), 0), plans.count - 1)
+    }
+
+    private var currentPlan: InstallmentPlan? {
+        guard !plans.isEmpty else { return nil }
+        return plans[currentIndex]
+    }
+
+    private func initialIndex() -> Double {
+        if let selected = selectedPlan {
+            if let match = plans.firstIndex(where: {
+                $0.months == selected.months &&
+                abs($0.interestRate - selected.interestRate) < 0.0001 &&
+                abs($0.fee - selected.fee) < 0.01
+            }) {
+                return Double(match)
+            }
+        }
+        // Default to 3 months if available, else first
+        if let threeIndex = plans.firstIndex(where: { $0.months == 3 }) {
+            return Double(threeIndex)
+        }
+        return 0
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            ZStack {
+                // Centered title
+                Text("Pay Over Time")
+                    .font(.headline.weight(.semibold))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 12)
+            .overlay(alignment: .topLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.primary)
+                        .frame(width: 40, height: 40)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                        .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
+                }
+            }
+            .padding(.bottom, 12)
+
+            if plans.isEmpty {
+                Text("No payment plans available right now.")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            } else {
+                if let plan = currentPlan {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(plan.months == 0 ? "Full payment" : plan.title)
+                            .font(.headline.weight(.semibold))
+
+                        let surchargeTotal = plan.totalCost * 0.004
+                        let surchargePerMonth = plan.months > 0 ? surchargeTotal / Double(plan.months) : 0
+                        let monthly = plan.months > 0 ? plan.monthlyCost + (insuranceEnabled ? surchargePerMonth : 0) : plan.monthlyCost
+                        let total = plan.months > 0 ? plan.totalCost + (insuranceEnabled ? surchargeTotal : 0) : plan.totalCost
+
+                        if plan.months == 0 {
+                            Text("One payment · Total \(fmt(plan.totalCost)) kr")
+                                .font(.subheadline)
+                                .foregroundColor(.primary)
+                            Text("No fees or interest")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         } else {
+                            Text("\(fmt(monthly)) kr / month · Total \(fmt(total)) kr")
+                                .font(.subheadline)
+                                .foregroundColor(.primary)
+                            Text("Interest \(Int(plan.interestRate * 100))% · Fee \(Int(plan.fee)) kr")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+
+                        if plan.months >= 12 {
+                            Divider().padding(.vertical, 4)
+                            Toggle(isOn: $insuranceEnabled) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Add Payment Insurance")
+                                        .font(.subheadline.weight(.semibold))
+                                    Text("Adds 0.4% of total to monthly amount")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .toggleStyle(SwitchToggleStyle(tint: .blue))
+                        }
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .animation(.spring(response: 0.35, dampingFraction: 0.82), value: currentPlan?.id)
+                    .animation(.spring(response: 0.35, dampingFraction: 0.82), value: insuranceEnabled)
+                }
+
+                VStack(spacing: 10) {
+                    Slider(
+                        value: $sliderIndex,
+                        in: sliderRange,
+                        step: 1
+                    ) { }
+                    .padding(.horizontal, 4)
+                    .onChange(of: sliderIndex) { _ in
+                        if let plan = currentPlan {
+                            onSelect(plan)
+                        }
+                    }
+
+                    HStack {
+                        Text(plans.first?.months == 0 ? "Full" : (plans.first?.title ?? ""))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(plans.last?.title ?? "")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Credit warning: Borrowing costs money. Be sure you can repay, as missed payments can lead to fees and debt. Consider your budget carefully before choosing a payment plan.")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                }
+                .padding(12)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                if let plan = currentPlan {
+                    Button(action: {
+                        onSelect(plan)
+                        dismiss()
+                    }) {
+                        HStack {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.title3)
+                            Text("Confirm Selection")
+                                .font(.headline)
+                                .fontWeight(.semibold)
                         }
-                        Text(isProcessing ? "Processing..." : "Confirm Payment")
-                            .font(.headline)
-                            .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color.blue)
+                        .clipShape(Capsule())
+                        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 3)
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(isProcessing ? Color.gray : Color.blue)
-                    .clipShape(Capsule())
-                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 6)
+                    .buttonStyle(.plain)
+                    .padding(.top, 8)
                 }
-                .disabled(isProcessing)
-                .padding(.horizontal)
-                .padding(.bottom, 32)
             }
-            .background(Color(UIColor.systemBackground))
         }
-        .toolbar(.hidden, for: .navigationBar)
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .fixedSize(horizontal: false, vertical: true)
+        .onAppear {
+            sliderIndex = initialIndex()
+            if let plan = currentPlan {
+                onSelect(plan)
+            }
+        }
+        .onChange(of: insuranceEnabled) { _ in
+            if let plan = currentPlan {
+                onSelect(plan)
+            }
+        }
     }
 }
 
