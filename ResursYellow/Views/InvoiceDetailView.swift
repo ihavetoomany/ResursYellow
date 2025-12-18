@@ -125,7 +125,7 @@ struct InvoiceDetailView: View {
             // Sticky Header
             VStack(spacing: 0) {
                 ZStack {
-                    // Back button
+                    // Back + Pay
                     HStack {
                         Button(action: { dismiss() }) {
                             Image(systemName: "chevron.left")
@@ -136,6 +136,18 @@ struct InvoiceDetailView: View {
                                 .clipShape(Circle())
                         }
                         Spacer()
+                        if shouldShowPayButton && scrollProgress > 0.5 {
+                            Button(action: { showPaymentSheet = true }) {
+                                Text("Pay")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .background(Color.blue)
+                                    .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
 
                     // Minimized title
@@ -152,18 +164,33 @@ struct InvoiceDetailView: View {
 
                 // Title and subtitle
                 if scrollProgress <= 0.5 {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Invoice Details")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .opacity(1.0 - scrollProgress * 2)
+                    HStack(alignment: .center) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Invoice Details")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .opacity(1.0 - scrollProgress * 2)
 
-                        Text(invoice.merchant)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
+                            Text(invoice.merchant)
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
+                        }
+                        Spacer()
+                        if shouldShowPayButton {
+                            Button(action: { showPaymentSheet = true }) {
+                                Text("Pay")
+                                    .font(.headline.weight(.semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 18)
+                                    .padding(.vertical, 12)
+                                    .background(Color.blue)
+                                    .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
                     .padding(.horizontal)
                     .padding(.bottom, 16)
                 }
@@ -540,7 +567,7 @@ struct PaymentOptionsCard: View {
     let onSnooze: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(spacing: 12) {
             PaymentOptionRow(
                 icon: "checkmark.circle.fill",
                 title: "Pay Invoice",
@@ -558,9 +585,6 @@ struct PaymentOptionsCard: View {
                 action: onSnooze
             )
         }
-        .padding(20)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -688,6 +712,12 @@ struct PaymentSheet: View {
         return invoiceBaseAmount
     }
 
+    private func ensureSelectionDefault() {
+        if selectedPlan == nil {
+            selectedPlan = availablePlans.first(where: { $0.months == 3 }) ?? availablePlans.first
+        }
+    }
+
     private func adjustedMonthly(for plan: InstallmentPlan) -> Double {
         guard plan.months > 0 else { return plan.monthlyCost }
         let surchargeTotal = plan.totalCost * 0.004 // 0.4% of total
@@ -699,6 +729,11 @@ struct PaymentSheet: View {
         guard plan.months > 0 else { return plan.totalCost }
         let surchargeTotal = plan.totalCost * 0.004
         return insuranceEnabled ? (plan.totalCost + surchargeTotal) : plan.totalCost
+    }
+
+    private var isGekas: Bool {
+        let name = invoice.merchant.lowercased()
+        return name.contains("gekås") || name.contains("gekas")
     }
 
     private func animateAmountChange(to newValue: Double) {
@@ -738,6 +773,7 @@ struct PaymentSheet: View {
                     .foregroundColor(.blue)
                     .accessibilityLabel("Amount \(formatSEK(displayAmount))")
                 Button(action: {
+                    ensureSelectionDefault()
                     showPlanOptions = true
                 }) {
                     Text("Change Amount")
@@ -752,6 +788,7 @@ struct PaymentSheet: View {
             }
             .padding(.top, 36)
             .onAppear {
+                ensureSelectionDefault()
                 displayAmount = targetAmount
             }
             .onChange(of: targetAmount) { newValue in
@@ -941,23 +978,36 @@ struct PaymentSheet: View {
             }
         )
         .sheet(isPresented: $showPlanOptions) {
-            PlanOptionsSheet(
-                plans: availablePlans,
-                selectedPlan: selectedPlan,
-                insuranceEnabled: $insuranceEnabled,
-                onSelect: { plan in
-                    selectedPlan = plan
-                }
-            )
-            .background(
-                GeometryReader { geo in
-                    Color.clear
-                        .onAppear { planSheetHeight = geo.size.height }
-                        .onChange(of: geo.size.height) { _, newValue in planSheetHeight = newValue }
-                }
-            )
-            .presentationDetents([.height(max(200, min(planSheetHeight, UIScreen.main.bounds.height - 60)))])
-            .presentationDragIndicator(.visible)
+            if isGekas {
+                PlanOptionsListSheet(
+                    plans: availablePlans,
+                    selectedPlan: selectedPlan,
+                    insuranceEnabled: $insuranceEnabled,
+                    onSelect: { plan in
+                        selectedPlan = plan
+                    }
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            } else {
+                PlanOptionsSheet(
+                    plans: availablePlans,
+                    selectedPlan: selectedPlan,
+                    insuranceEnabled: $insuranceEnabled,
+                    onSelect: { plan in
+                        selectedPlan = plan
+                    }
+                )
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .onAppear { planSheetHeight = geo.size.height }
+                            .onChange(of: geo.size.height) { _, newValue in planSheetHeight = newValue }
+                    }
+                )
+                .presentationDetents([.height(max(200, min(planSheetHeight, UIScreen.main.bounds.height - 60)))])
+                .presentationDragIndicator(.visible)
+            }
         }
     }
 }
@@ -1054,9 +1104,28 @@ struct PlanOptionsSheet: View {
                             Text("No fees or interest")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                            if selectedPlan?.months == 0 {
+                                Divider().padding(.vertical, 4)
+                                Toggle(isOn: Binding(get: {
+                                    false
+                                }, set: { _ in })) {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Clear all debt")
+                                            .font(.subheadline.weight(.semibold))
+                                        Text("Also pay debt not yet invoiced")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .toggleStyle(SwitchToggleStyle(tint: .blue))
+                                .disabled(true)
+                            }
                         } else {
                             Text("\(fmt(monthly)) kr / month · Total \(fmt(total)) kr")
                                 .font(.subheadline)
+                                .foregroundColor(.primary)
+                            Text(plan.title)
+                                .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.primary)
                             Text("Interest \(Int(plan.interestRate * 100))% · Fee \(Int(plan.fee)) kr")
                                 .font(.caption)
@@ -1154,6 +1223,163 @@ struct PlanOptionsSheet: View {
         .onChange(of: insuranceEnabled) { _ in
             if let plan = currentPlan {
                 onSelect(plan)
+            }
+        }
+    }
+}
+
+struct PlanOptionsListSheet: View {
+    let plans: [InstallmentPlan]
+    let selectedPlan: InstallmentPlan?
+    @Binding var insuranceEnabled: Bool
+    let onSelect: (InstallmentPlan) -> Void
+
+    @State private var localSelection: InstallmentPlan? = nil
+
+    @Environment(\.dismiss) private var dismiss
+
+    private func fmt(_ value: Double) -> String {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.groupingSeparator = " "
+        f.maximumFractionDigits = 0
+        return (f.string(from: NSNumber(value: value)) ?? "\(Int(value))")
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            ZStack {
+                Text("Select Payment Option")
+                    .font(.headline.weight(.semibold))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 12)
+            .overlay(alignment: .topLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.primary)
+                        .frame(width: 40, height: 40)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                        .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
+                }
+            }
+            .padding(.bottom, 8)
+
+            ScrollView {
+                VStack(spacing: 12) {
+                    let activeSelection = localSelection ?? selectedPlan ?? plans.first
+                    let currentSelectionMonths = activeSelection?.months
+                    ForEach(plans) { plan in
+                        let isSelected = currentSelectionMonths == plan.months
+                        Button(action: {
+                            localSelection = plan
+                            onSelect(plan)
+                        }) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(alignment: .top, spacing: 12) {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        if plan.months == 0 {
+                                            Text("Full payment")
+                                                .font(.subheadline).fontWeight(.semibold)
+                                            Text("One payment · Total \(fmt(plan.totalCost)) kr")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                            Text("No fees or interest")
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+                                            if isSelected {
+                                                Divider().padding(.vertical, 4)
+                                                Toggle(isOn: Binding(get: {
+                                                    false
+                                                }, set: { _ in })) {
+                                                    VStack(alignment: .leading, spacing: 2) {
+                                                        Text("Clear all debt")
+                                                            .font(.subheadline.weight(.semibold))
+                                                        Text("Also pay debt not yet invoiced")
+                                                            .font(.caption)
+                                                            .foregroundColor(.secondary)
+                                                    }
+                                                }
+                                                .toggleStyle(SwitchToggleStyle(tint: .blue))
+                                                .disabled(true)
+                                            }
+                                        } else {
+                                            Text("\(fmt(plan.monthlyCost)) kr / month · Total \(fmt(plan.totalCost)) kr")
+                                                .font(.subheadline)
+                                                .foregroundColor(.primary)
+                                            Text(plan.title)
+                                                .font(.subheadline).fontWeight(.semibold)
+                                            Text("Interest \(Int(plan.interestRate * 100))% · Fee \(Int(plan.fee)) kr")
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+                                        }
+                                    }
+                                    Spacer()
+                                }
+
+                                if plan.months >= 12 && isSelected {
+                                    Divider()
+                                    Toggle(isOn: $insuranceEnabled) {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text("Add Payment Insurance")
+                                                .font(.subheadline.weight(.semibold))
+                                            Text("Adds 0.4% of total to monthly amount")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                    }
+                                    .toggleStyle(SwitchToggleStyle(tint: .blue))
+                                }
+                            }
+                            .padding(16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.ultraThinMaterial)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(isSelected ? Color.blue : Color.clear, lineWidth: isSelected ? 1.5 : 0)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+
+            Button(action: {
+                let plan = localSelection ?? selectedPlan ?? plans.first
+                if let plan { onSelect(plan) }
+                dismiss()
+            }) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .fill(Color.blue)
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                        Text("Confirm Selection")
+                            .font(.headline.weight(.semibold))
+                    }
+                    .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity, minHeight: 54, maxHeight: 54)
+                .shadow(color: Color.black.opacity(0.18), radius: 8, x: 0, y: 4)
+            }
+            .buttonStyle(.plain)
+            .disabled(false)
+            .opacity(1)
+        }
+        .padding()
+        .background(Color(UIColor.systemBackground))
+        .task {
+            if localSelection == nil {
+                let initial = selectedPlan ?? plans.first(where: { $0.months == 3 }) ?? plans.first
+                if let initial {
+                    localSelection = initial
+                    onSelect(initial)
+                }
             }
         }
     }
