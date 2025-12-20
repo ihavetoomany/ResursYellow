@@ -476,8 +476,8 @@ struct WalletView: View {
                 title: "John",
                 subtitle: greeting,
                 minimizedTitle: "Wallet",
-                trailingButton: availableSymbol("person.badge.gearshape", fallback: "person.fill"),
-                trailingButtonTint: .blue,
+                trailingButton: availableSymbol("bell.fill", fallback: "bell"),
+                trailingButtonTint: .primary,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
                 trailingButtonAction: { showProfile = true }
@@ -538,7 +538,7 @@ struct WalletView: View {
                                     SummaryBox(
                                         title: "Connect",
                                         headline: "Add Merchant",
-                                        subtitle: "Enable express checkout",
+                                        subtitle: "Find your favorite stores",
                                         icon: "plus",
                                         tint: .blue
                                     )
@@ -638,26 +638,6 @@ struct WalletView: View {
                         .padding(.horizontal)
                     }
 
-                    // Suggested Actions Section
-                    VStack(alignment: .leading, spacing: 12) {
-                        WalletSectionHeader(title: "Suggested Actions", actionTitle: "See all") {
-                            navigationPath.append(WalletDestination.actions)
-                        }
-                        .padding(.horizontal)
-
-                        VStack(spacing: 12) {
-                            ForEach(suggestedActions) { action in
-                                ActionRow(
-                                    title: action.title,
-                                    subtitle: action.subtitle,
-                                    icon: action.icon,
-                                    color: action.color
-                                )
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-
                     Spacer(minLength: 24)
                 }
                 .padding(.horizontal, 0)
@@ -686,8 +666,71 @@ struct WalletView: View {
                 InvoiceDetailView(invoice: invoice)
             }
             .sheet(isPresented: $showProfile) {
-                ProfileView()
+                let rows = suggestedActions.count
+                let estimated = CGFloat(rows) * 82 + 200
+                let preferredHeight = min(max(estimated, 320), UIScreen.main.bounds.height * 0.9)
+                FavoritesOverlay(actions: suggestedActions)
+                    .presentationDetents([.height(preferredHeight)])
             }
+        }
+    }
+}
+
+struct FavoritesOverlay: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    let actions: [ActionItem]
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                ZStack {
+                    Capsule()
+                        .fill(Color.secondary.opacity(0.4))
+                        .frame(width: 40, height: 5)
+                        .padding(.top, 0)
+                        .frame(maxWidth: .infinity, alignment: .center)
+
+                    HStack {
+                        Spacer()
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.headline.weight(.bold))
+                                .foregroundColor(.primary)
+                                .frame(width: 36, height: 36)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                                .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
+                        }
+                        .padding(.trailing, 16)
+                        .padding(.top, 16)
+                    }
+                }
+                
+                Text("Notifications")
+                    .font(.title2.weight(.semibold))
+                    .padding(.top, 4)
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(spacing: 12) {
+                            ForEach(actions) { action in
+                                ActionRow(
+                                    title: action.title,
+                                    subtitle: action.subtitle,
+                                    icon: action.icon,
+                                    color: action.color
+                                )
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.bottom, 24)
+                }
+                
+            }
+            .padding(.bottom, 12)
+            .background(Color(UIColor.systemBackground).ignoresSafeArea())
         }
     }
 }

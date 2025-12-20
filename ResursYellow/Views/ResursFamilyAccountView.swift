@@ -46,7 +46,7 @@ struct ResursFamilyAccountView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("Family Cards")
-                                .font(.title2)
+                                .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
                             Button(action: {
@@ -82,7 +82,7 @@ struct ResursFamilyAccountView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("Active Payment Plans")
-                                .font(.title2)
+                                .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
                             Button(action: {

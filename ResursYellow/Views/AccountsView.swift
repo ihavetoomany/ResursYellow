@@ -114,13 +114,13 @@ struct AccountCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Keep hierarchy icon + account type on one row per HIG Typography
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .center, spacing: 10) {
                     Image(systemName: icon)
-                        .font(.title2)
+                        .font(.title3.weight(.semibold))
                         .foregroundColor(color)
-                        .frame(width: 44, height: 44)
-                        .background(color.opacity(0.2))
+                        .frame(width: 40, height: 40)
+                        .background(color.opacity(0.18))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     if let accountType {
                         Text(accountType)
@@ -132,8 +132,7 @@ struct AccountCard: View {
                 }
                 
                 Text(title)
-                    .font(.title)
-                    .fontWeight(.semibold)
+                    .font(.title2.weight(.semibold))
                     .foregroundColor(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -147,11 +146,11 @@ struct AccountCard: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Text(balance)
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.system(size: 20, weight: .bold))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(18)
+        .padding(16)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }

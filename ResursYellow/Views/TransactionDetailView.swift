@@ -657,7 +657,7 @@ struct PartPaymentsExplanationCard: View {
                     .font(.title3)
                     .foregroundColor(.orange)
                 
-                Text("About Part Payments")
+                Text("About Open Accounts")
                     .font(.headline)
                     .fontWeight(.semibold)
                 

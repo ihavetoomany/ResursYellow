@@ -63,7 +63,7 @@ struct ContentView: View {
                         WalletView()
                     }
                     .tabItem {
-                        Label("Wallet", systemImage: selectedTab == 0 ? "creditcard.fill" : "creditcard")
+                        Label("Wallet", systemImage: selectedTab == 0 ? "wallet.bifold.fill" : "wallet.bifold")
                     }
                     .tag(0)
                     
@@ -93,22 +93,22 @@ struct ContentView: View {
                         }
                     }
                     .tabItem {
-                        Label("Merchants", systemImage: selectedTab == 2 ? "bag.fill" : "bag")
+                        Label("Merchants", systemImage: selectedTab == 2 ? "cart.fill" : "cart")
                     }
                     .tag(2)
                     
-                    // Support Tab (lazy loaded)
+                    // Manage Tab (lazy loaded)
                     NavigationStack {
                         Group {
                             if hasAppeared || selectedTab == 3 {
-                                ChatView()
+                                ManageView()
                             } else {
                                 Color.clear
                             }
                         }
                     }
                     .tabItem {
-                        Label("Support", systemImage: selectedTab == 3 ? "message.fill" : "message")
+                        Label("Manage", systemImage: selectedTab == 3 ? "gearshape.fill" : "gearshape")
                     }
                     .tag(3)
                 }

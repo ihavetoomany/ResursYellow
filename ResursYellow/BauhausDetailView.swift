@@ -220,9 +220,9 @@ struct BauhausDetailView: View {
                 }
                 .padding(.horizontal)
                 
-                // Part Payments Section
+                // Open Accounts Section
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Part Payments")
+                    Text("Open Accounts")
                         .font(.headline)
                         .fontWeight(.semibold)
                         .padding(.horizontal, 4)

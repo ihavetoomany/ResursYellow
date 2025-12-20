@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-struct ChatView: View {
+struct ManageView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showCallSupport = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
-                title: "Support",
-                subtitle: "Get help anytime",
+                title: "Manage",
+                subtitle: "Support, profile & settings",
                 trailingButton: "phone.fill",
                 trailingButtonTint: .blue,
                 trailingButtonSize: 52,
@@ -24,9 +24,14 @@ struct ChatView: View {
                     showCallSupport = true
                 }
             ) {
-                VStack(spacing: 16) {
-                    // Support Options
-                    VStack(alignment: .leading, spacing: 16) {
+                VStack(spacing: 24) {
+                    // Support Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Support")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                            .padding(.horizontal)
                         VStack(spacing: 12) {
                             ContactMethodRow(
                                 title: "Report issue",
@@ -34,28 +39,24 @@ struct ChatView: View {
                                 icon: "exclamationmark.triangle.fill",
                                 color: .red
                             )
-                            
                             ContactMethodRow(
                                 title: "Messages from the bank",
                                 subtitle: "View bank notifications",
                                 icon: "envelope.fill",
                                 color: .blue
                             )
-                            
                             ContactMethodRow(
                                 title: "Live chat",
                                 subtitle: "Zendesk",
                                 icon: "message.fill",
                                 color: .green
                             )
-                            
                             ContactMethodRow(
                                 title: "FAQ",
                                 subtitle: "Zendesk",
                                 icon: "questionmark.circle.fill",
                                 color: .orange
                             )
-                            
                             ContactMethodRow(
                                 title: "Aktiv låneansökan?",
                                 subtitle: "Check loan application status",
@@ -65,8 +66,108 @@ struct ChatView: View {
                         }
                         .padding(.horizontal)
                     }
-                    .padding(.top, 24)
+
+                    // Profile Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Profile")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                            .padding(.horizontal)
+                        VStack(spacing: 12) {
+                            ProfileRow(
+                                title: "Customer ID",
+                                subtitle: "12345678",
+                                icon: "person.fill",
+                                color: .blue
+                            )
+                            ProfileRow(
+                                title: "Contact information",
+                                subtitle: "Email, Phone",
+                                icon: "envelope.fill",
+                                color: .green,
+                                showChevron: true
+                            )
+                            ProfileRow(
+                                title: "KYC",
+                                subtitle: "Know Your Customer",
+                                icon: "person.text.rectangle.fill",
+                                color: .purple,
+                                showChevron: true
+                            )
+                            ProfileRow(
+                                title: "My documents",
+                                subtitle: "Agreements, Contracts",
+                                icon: "doc.fill",
+                                color: .orange,
+                                showChevron: true
+                            )
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    // Settings Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Settings")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                            .padding(.horizontal)
+                        VStack(spacing: 12) {
+                            ProfileRow(
+                                title: "Connect bank account",
+                                subtitle: "Link external accounts",
+                                icon: "building.columns.fill",
+                                color: .blue,
+                                showChevron: true
+                            )
+                            ProfileRow(
+                                title: "Notification settings",
+                                subtitle: "Communication, Marketing",
+                                icon: "bell.fill",
+                                color: .orange,
+                                showChevron: true
+                            )
+                            ProfileRow(
+                                title: "Theme",
+                                subtitle: "Light, Dark, Auto",
+                                icon: "paintbrush.fill",
+                                color: .purple,
+                                showChevron: true
+                            )
+                            ProfileRow(
+                                title: "Language",
+                                subtitle: "App language",
+                                icon: "globe",
+                                color: .cyan,
+                                showChevron: true
+                            )
+                            ProfileRow(
+                                title: "A11y",
+                                subtitle: "Accessibility settings",
+                                icon: "accessibility",
+                                color: .indigo,
+                                showChevron: true
+                            )
+                            ProfileRow(
+                                title: "Autopay",
+                                subtitle: "Automatic payments",
+                                icon: "arrow.clockwise.circle.fill",
+                                color: .green,
+                                showChevron: true
+                            )
+                            ProfileRow(
+                                title: "Change shortcuts on homepage",
+                                subtitle: "Customize homepage",
+                                icon: "square.grid.2x2.fill",
+                                color: .pink,
+                                showChevron: true
+                            )
+                        }
+                        .padding(.horizontal)
+                    }
                 }
+                .padding(.top, 24)
             }
             .navigationBarHidden(true)
             .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
@@ -120,7 +221,7 @@ struct ContactMethodRow: View {
 }
 
 #Preview {
-    ChatView()
+    ManageView()
         .preferredColorScheme(.dark)
 }
 
