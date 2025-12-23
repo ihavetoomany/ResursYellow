@@ -883,9 +883,6 @@ struct PaymentSheet: View {
                                     Text("One payment. Total \(invoice.amount)")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
-                                    Text("No fees or interest")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
                                 } else if let plan = selectedPlan {
                                     Text("\(Int(plan.monthlyCost)) kr / month · Total \(Int(plan.totalCost)) kr")
                                         .font(.caption)
@@ -1385,9 +1382,6 @@ struct PlanOptionsListSheet: View {
                                                 .font(.subheadline).fontWeight(.semibold)
                                             Text("One payment · Total \(fmt(plan.totalCost)) kr")
                                                 .font(.caption)
-                                                .foregroundColor(.secondary)
-                                            Text("No fees or interest")
-                                                .font(.caption2)
                                                 .foregroundColor(.secondary)
                                             if isSelected {
                                                 Divider().padding(.vertical, 4)

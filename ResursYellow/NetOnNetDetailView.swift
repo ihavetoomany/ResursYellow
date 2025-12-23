@@ -131,7 +131,7 @@ struct NetOnNetDetailView: View {
     
     private var partPaymentsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Open Accounts")
+            Text("Invoice accounts")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)

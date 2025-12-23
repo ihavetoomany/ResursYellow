@@ -684,11 +684,11 @@ struct FavoritesOverlay: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
-                ZStack {
+                ZStack(alignment: .top) {
                     Capsule()
                         .fill(Color.secondary.opacity(0.4))
                         .frame(width: 40, height: 5)
-                        .padding(.top, 0)
+                        .padding(.top, 8)
                         .frame(maxWidth: .infinity, alignment: .center)
 
                     HStack {
@@ -730,6 +730,7 @@ struct FavoritesOverlay: View {
                 
             }
             .padding(.bottom, 12)
+            .padding(.top, 0)
             .background(Color(UIColor.systemBackground).ignoresSafeArea())
         }
     }

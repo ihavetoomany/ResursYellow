@@ -43,7 +43,7 @@ struct BauhausDetailView: View {
     // Example part payments for the new section
     let partPayments: [PartPaymentItem] = [
         PartPaymentItem(
-            title: "Paint Project Split",
+            title: "Bauhaus - October",
             subtitle: "2 of 6 payments completed",
             amount: "726 kr / 4 356 kr",
             progress: 2.0/6.0,
@@ -55,19 +55,7 @@ struct BauhausDetailView: View {
             autopaySource: "Bauhaus Invoice"
         ),
         PartPaymentItem(
-            title: "Kitchen Remodel",
-            subtitle: "1 of 4 payments completed",
-            amount: "1 200 kr / 4 800 kr",
-            progress: 1.0/4.0,
-            installmentAmount: "1 200 kr",
-            totalAmount: "4 800 kr",
-            completedPayments: 1,
-            totalPayments: 4,
-            nextDueDate: "Nov 28, 2025",
-            autopaySource: "Resurs Family"
-        ),
-        PartPaymentItem(
-            title: "Garden Supplies",
+            title: "Bauhaus - September",
             subtitle: "3 of 5 payments completed",
             amount: "900 kr / 1 500 kr",
             progress: 3.0/5.0,
@@ -121,6 +109,44 @@ struct BauhausDetailView: View {
             dueDate: "Mar 15, 2026",
             amount: "726 kr",
             reference: "PP-2026-03-001",
+            status: .upcoming
+        )
+    ]
+    
+    let gardenSuppliesInvoices: [PartPaymentInvoice] = [
+        PartPaymentInvoice(
+            installment: 1,
+            dueDate: "Sep 30, 2025",
+            amount: "300 kr",
+            reference: "PP-2025-09-001",
+            status: .paid
+        ),
+        PartPaymentInvoice(
+            installment: 2,
+            dueDate: "Oct 30, 2025",
+            amount: "300 kr",
+            reference: "PP-2025-10-002",
+            status: .paid
+        ),
+        PartPaymentInvoice(
+            installment: 3,
+            dueDate: "Nov 30, 2025",
+            amount: "300 kr",
+            reference: "PP-2025-11-002",
+            status: .paid
+        ),
+        PartPaymentInvoice(
+            installment: 4,
+            dueDate: "Dec 30, 2025",
+            amount: "300 kr",
+            reference: "PP-2025-12-002",
+            status: .upcoming
+        ),
+        PartPaymentInvoice(
+            installment: 5,
+            dueDate: "Jan 30, 2026",
+            amount: "300 kr",
+            reference: "PP-2026-01-002",
             status: .upcoming
         )
     ]
@@ -222,15 +248,22 @@ struct BauhausDetailView: View {
                 
                 // Open Accounts Section
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Open Accounts")
+                    Text("Invoice accounts")
                         .font(.headline)
                         .fontWeight(.semibold)
                         .padding(.horizontal, 4)
                     VStack(spacing: 12) {
                         ForEach(partPayments, id: \.title) { payment in
-                            if payment.title == "Paint Project Split" {
+                            if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
                                 NavigationLink {
                                     PaintProjectSplitDetailView(plan: payment, invoices: paintProjectInvoices)
+                                } label: {
+                                    PartPaymentRow(payment: payment, showsDisclosure: true)
+                                }
+                                .buttonStyle(.plain)
+                            } else if payment.title == "Bauhaus - September" && payment.totalAmount == "1 500 kr" {
+                                NavigationLink {
+                                    PaintProjectSplitDetailView(plan: payment, invoices: gardenSuppliesInvoices)
                                 } label: {
                                     PartPaymentRow(payment: payment, showsDisclosure: true)
                                 }
