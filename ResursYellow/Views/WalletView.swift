@@ -57,7 +57,7 @@ struct CreditAccount: Identifiable {
 
 extension CreditAccount {
     static let sampleAccounts: [CreditAccount] = [
-        CreditAccount(name: "Resurs Family", available: 15_000, limit: 30_000)
+        CreditAccount(name: "Resurs Gold", available: 15_000, limit: 30_000)
     ]
 }
 
@@ -137,7 +137,7 @@ struct TransactionData: Hashable {
 
 enum PaymentMethod: String, CaseIterable, Identifiable {
     case swish = "Swish"
-    case resursFamily = "Resurs Family"
+    case resursFamily = "Resurs Gold"
     case bauhausInvoice = "Bauhaus Invoice"
     case bauhausAccount = "Bauhaus Account"
     case netonnetAccount = "Netonnet Account"
@@ -428,11 +428,17 @@ enum WalletDestination: Hashable {
     case actions
 }
 
+enum WalletSegment: String, CaseIterable {
+    case invoices = "Invoices"
+    case purchases = "Purchases"
+}
+
 struct WalletView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showProfile = false
     
     @State private var currentSummaryIndex: Int = 0
+    @State private var selectedSegment: WalletSegment = .invoices
 
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -447,6 +453,15 @@ struct WalletView: View {
     // Data sources for sections
     private var toPayInvoices: [InvoiceItem] {
         InvoiceItem.overdueSamples + InvoiceItem.dueSoonSamples
+    }
+    private var allInvoices: [InvoiceItem] {
+        InvoiceItem.overdueSamples + 
+        InvoiceItem.dueSoonSamples + 
+        InvoiceItem.handledScheduledSamples + 
+        InvoiceItem.handledPaidSamples
+    }
+    private var allPurchases: [PurchaseItem] {
+        PurchaseItem.sampleData
     }
     private var recentPurchases: [PurchaseItem] {
         Array(PurchaseItem.sampleData.prefix(5))
@@ -463,7 +478,7 @@ struct WalletView: View {
     }
 
     private var availableFamilyCreditLabel: String {
-        // Use CreditAccount.sampleAccounts and show available from the Resurs Family account if present
+        // Use CreditAccount.sampleAccounts and show available from the Resurs Gold account if present
         let accounts = CreditAccount.sampleAccounts
         let family = accounts.first { $0.name.lowercased().contains("family") }
         let available = family?.available ?? accounts.first?.available ?? 0
@@ -476,7 +491,7 @@ struct WalletView: View {
                 title: "John",
                 subtitle: greeting,
                 minimizedTitle: "Wallet",
-                trailingButton: availableSymbol("bell.fill", fallback: "bell"),
+                trailingButton: availableSymbol("sparkle2", fallback: "sparkle"),
                 trailingButtonTint: .primary,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
@@ -509,11 +524,11 @@ struct WalletView: View {
                             )
                             
                             Button {
-                                // Switch to Banking tab and request deep link to Resurs Family account view
+                                // Switch to Banking tab and request deep link to Resurs Gold account view
                                 NotificationCenter.default.post(name: .switchToBanking, object: nil, userInfo: ["destination": "ResursFamilyAccountView"])
                             } label: {
                                 ZStack(alignment: .leading) {
-                                    SummaryBox(title: "Resurs Family", headline: availableFamilyCreditLabel, subtitle: "Avaliable credit", icon: "creditcard.fill", tint: .green)
+                                    SummaryBox(title: "Resurs Gold", headline: availableFamilyCreditLabel, subtitle: "Avaliable credit", icon: "creditcard.fill", tint: .green)
                                     Color.clear.frame(width: 1)
                                         .accessibilityHidden(true)
                                         .id("summaryAnchor1")
@@ -574,68 +589,65 @@ struct WalletView: View {
                         }
                     }
 
-                    // To Pay Section
-                    VStack(alignment: .leading, spacing: 12) {
-                        WalletSectionHeader(title: "Invoices", actionTitle: "See all") {
-                            navigationPath.append(WalletDestination.invoices)
-                        }
-                        .padding(.horizontal)
-
-                        VStack(spacing: 12) {
-                            if toPayInvoices.isEmpty {
-                                EmptyStateRow(title: "No unpaid invoices", subtitle: "You're all caught up for now")
-                            } else {
-                                ForEach(toPayInvoices) { invoice in
-                                    Button {
-                                        navigationPath.append(invoice.detail)
-                                    } label: {
-                                        InvoiceRow(
-                                            title: invoice.merchant,
-                                            subtitle: invoice.subtitle,
-                                            amount: invoice.amount,
-                                            icon: invoice.icon,
-                                            color: invoice.color,
-                                            isOverdue: invoice.isOverdue,
-                                            statusOverride: invoice.statusOverride
-                                        )
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
+                    // Segmented Control for Invoices/Purchases
+                    Picker("Content", selection: $selectedSegment) {
+                        Text("Invoices").tag(WalletSegment.invoices)
+                        Text("Purchases").tag(WalletSegment.purchases)
                     }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
 
-                    // Recent Purchases Section
-                    VStack(alignment: .leading, spacing: 12) {
-                        WalletSectionHeader(title: "Purchases", actionTitle: "See all") {
-                            navigationPath.append(WalletDestination.purchases(filter: .all))
-                        }
-                        .padding(.horizontal)
-
-                        VStack(spacing: 12) {
-                            if recentPurchases.isEmpty {
-                                EmptyStateRow(title: "No recent purchases", subtitle: "Your recent activity will appear here")
-                            } else {
-                                ForEach(recentPurchases) { purchase in
-                                    Button {
-                                        navigationPath.append(purchase.transactionDetailData)
-                                    } label: {
-                                        PurchaseRow(
-                                            title: purchase.title,
-                                            subtitle: purchase.subtitleWithoutTime,
-                                            amount: purchase.amount,
-                                            icon: purchase.icon,
-                                            color: purchase.color,
-                                            paymentMethod: purchase.paymentMethod,
-                                            showsPartPayBadge: purchase.isEligibleForPartPay
-                                        )
+                    // Content based on selected segment
+                    Group {
+                        if selectedSegment == .invoices {
+                            VStack(spacing: 12) {
+                                if allInvoices.isEmpty {
+                                    EmptyStateRow(title: "No unpaid invoices", subtitle: "You're all caught up for now")
+                                } else {
+                                    ForEach(allInvoices) { invoice in
+                                        Button {
+                                            navigationPath.append(invoice.detail)
+                                        } label: {
+                                            InvoiceRow(
+                                                title: invoice.merchant,
+                                                subtitle: invoice.subtitle,
+                                                amount: invoice.amount,
+                                                icon: invoice.icon,
+                                                color: invoice.color,
+                                                isOverdue: invoice.isOverdue,
+                                                statusOverride: invoice.statusOverride
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
                                     }
-                                    .buttonStyle(.plain)
                                 }
                             }
+                            .padding(.horizontal)
+                        } else {
+                            VStack(spacing: 12) {
+                                if allPurchases.isEmpty {
+                                    EmptyStateRow(title: "No recent purchases", subtitle: "Your recent activity will appear here")
+                                } else {
+                                    ForEach(allPurchases) { purchase in
+                                        Button {
+                                            navigationPath.append(purchase.transactionDetailData)
+                                        } label: {
+                                            PurchaseRow(
+                                                title: purchase.title,
+                                                subtitle: purchase.subtitleWithoutTime,
+                                                amount: purchase.amount,
+                                                icon: purchase.icon,
+                                                color: purchase.color,
+                                                paymentMethod: purchase.paymentMethod,
+                                                showsPartPayBadge: purchase.isEligibleForPartPay
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
 
                     Spacer(minLength: 24)
@@ -707,7 +719,7 @@ struct FavoritesOverlay: View {
                     }
                 }
                 
-                Text("Notifications")
+                Text("Recommended Actions")
                     .font(.title2.weight(.semibold))
                     .padding(.top, 4)
                 
@@ -1012,7 +1024,7 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
         case .all:
             return "All activity"
         case .mastercard:
-            return "Resurs Family card"
+            return "Resurs Gold card"
         case .merchants:
             return "Connected merchants"
         case .swish:
@@ -1027,7 +1039,7 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
         case .all:
             return "Shows every purchase"
         case .mastercard:
-            return "Shows purchases paid with the Resurs Family card"
+            return "Shows purchases paid with the Resurs Gold card"
         case .merchants:
             return "Shows purchases paid with merchant accounts"
         case .swish:

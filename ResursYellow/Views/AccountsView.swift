@@ -32,8 +32,8 @@ struct AccountsView: View {
                             navigationPath.append("ResursFamily")
                         } label: {
                             AccountCard(
-                                title: "Resurs Family",
-                                accountType: "Joint Credit Account",
+                                title: "Resurs Gold",
+                                accountType: "Credit Account",
                                 accountNumber: "**** 1234",
                                 balance: "56 005 SEK",
                                 icon: "heart.fill",
@@ -42,7 +42,7 @@ struct AccountsView: View {
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .accessibilityLabel("Resurs Family joint credit account. 56 005 kronor available.")
+                        .accessibilityLabel("Resurs Gold credit account. 56 005 kronor available.")
                         .accessibilityHint("Opens detailed view.")
                         
                         Button {
@@ -81,7 +81,7 @@ struct AccountsView: View {
             .onReceive(NotificationCenter.default.publisher(for: .switchToBanking)) { notification in
                 if let destination = notification.userInfo?["destination"] as? String,
                    destination == "ResursFamilyAccountView" {
-                    // Ensure we are at root, then navigate to Resurs Family detail
+                    // Ensure we are at root, then navigate to Resurs Gold detail
                     if !navigationPath.isEmpty {
                         navigationPath.removeLast(navigationPath.count)
                     }

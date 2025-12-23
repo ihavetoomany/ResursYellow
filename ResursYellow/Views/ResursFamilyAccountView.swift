@@ -10,9 +10,43 @@ import Combine
 
 struct ResursFamilyAccountView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var paymentPlansManager: PaymentPlansManager
     @StateObject private var scrollObserver = ScrollOffsetObserver()
-    @State private var showPaymentPlanOptions = false
+    
+    // Invoice Accounts - Resurs Gold's own payment plans
+    private let invoiceAccounts: [PartPaymentItem] = [
+        PartPaymentItem(
+            title: "Resurs Gold Main",
+            subtitle: "5 of 10 payments completed",
+            amount: "3 200 kr / 32 000 kr",
+            progress: 5.0/10.0,
+            installmentAmount: "3 200 kr",
+            totalAmount: "32 000 kr",
+            completedPayments: 5,
+            totalPayments: 10,
+            nextDueDate: "Dec 20, 2025",
+            autopaySource: "Resurs Gold"
+        ),
+        PartPaymentItem(
+            title: "Resurs Flex October",
+            subtitle: "3 of 12 payments completed",
+            amount: "2 500 kr / 30 000 kr",
+            progress: 3.0/12.0,
+            installmentAmount: "2 500 kr",
+            totalAmount: "30 000 kr",
+            completedPayments: 3,
+            totalPayments: 12,
+            nextDueDate: "Dec 15, 2025",
+            autopaySource: "Resurs Gold"
+        )
+    ]
+    
+    // Benefits for Resurs Gold
+    private let benefits: [(icon: String, title: String, desc: String)] = [
+        ("calendar.badge.clock", "Flexible Payments", "Choose flexible part payment plans for large purchases."),
+        ("creditcard.fill", "Easy Checkout", "Use your Resurs Gold card for quick and secure payments."),
+        ("heart.fill", "Family Sharing", "Share your credit account with family members."),
+        ("shield.checkerboard", "Payment Protection", "Protect your purchases with optional payment insurance.")
+    ]
     
     var body: some View {
         let scrollProgress = min(scrollObserver.offset / 100, 1.0)
@@ -45,17 +79,10 @@ struct ResursFamilyAccountView: View {
                     // Credit Cards Section
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Family Cards")
+                            Text("Cards")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
-                            Button(action: {
-                                // Action for card options
-                            }) {
-                                Image(systemName: "ellipsis.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.blue)
-                            }
                         }
                         .padding(.horizontal)
                         
@@ -78,40 +105,57 @@ struct ResursFamilyAccountView: View {
                     }
                     .padding(.bottom, 16)
                     
-                    // Payment Plans Section
+                    // Invoice Accounts Section
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Active Payment Plans")
+                            Text("Invoice accounts")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
-                            Button(action: {
-                                showPaymentPlanOptions = true
-                            }) {
-                                Image(systemName: "ellipsis.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.blue)
-                            }
                         }
                         .padding(.horizontal)
                         
                         VStack(spacing: 12) {
-                            ForEach(paymentPlansManager.paymentPlans) { paymentPlan in
-                                PaymentPlanCard(
-                                    title: paymentPlan.name,
-                                    store: paymentPlan.store,
-                                    totalAmount: paymentPlan.totalAmount,
-                                    paidAmount: paymentPlan.paidAmount,
-                                    progress: paymentPlan.progress,
-                                    dueDate: paymentPlan.dueDate,
-                                    monthlyAmount: paymentPlan.monthlyAmount,
-                                    icon: paymentPlan.icon,
-                                    color: paymentPlan.color
-                                )
+                            ForEach(invoiceAccounts, id: \.title) { payment in
+                                ResursGoldPartPaymentRow(payment: payment, showsDisclosure: false)
                             }
                         }
                         .padding(.horizontal)
                     }
+                    .padding(.bottom, 16)
+                    
+                    // Benefits Section
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Resurs Gold Benefits")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal, 4)
+                        VStack(spacing: 12) {
+                            ForEach(benefits, id: \.title) { benefit in
+                                HStack(spacing: 16) {
+                                    Image(systemName: benefit.icon)
+                                        .font(.title3)
+                                        .foregroundColor(.blue)
+                                        .frame(width: 36, height: 36)
+                                        .background(Color.blue.opacity(0.15))
+                                        .clipShape(Circle())
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(benefit.title)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                        Text(benefit.desc)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Spacer()
+                                }
+                                .padding(16)
+                                .background(.ultraThinMaterial)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
                 .padding(.top, 20)
                 .padding(.bottom, 120) // Add bottom padding to clear custom tab bar
@@ -143,7 +187,7 @@ struct ResursFamilyAccountView: View {
                     
                     // Minimized title - centered in view
                     if scrollProgress > 0.5 {
-                        Text("Resurs Family")
+                        Text("Resurs Gold")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
@@ -157,13 +201,13 @@ struct ResursFamilyAccountView: View {
                 if scrollProgress <= 0.5 {
                     VStack(alignment: .leading, spacing: 4) {
                         // Subtitle
-                        Text("Joint Credit Account")
+                        Text("Credit Account")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                             .opacity(1.0 - scrollProgress * 2)
                         
                         // Title
-                        Text("Resurs Family")
+                        Text("Resurs Gold")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
@@ -178,56 +222,52 @@ struct ResursFamilyAccountView: View {
             .animation(.easeInOut(duration: 0.2), value: scrollProgress)
         }
         .navigationBarHidden(true)
-        .sheet(isPresented: $showPaymentPlanOptions) {
-            PaymentPlanOptionsSheet()
-                .presentationDetents([.height(220)])
-                .presentationDragIndicator(.visible)
-        }
     }
 }
 
-struct PaymentPlanOptionsSheet: View {
-    @Environment(\.dismiss) var dismiss
+struct ResursGoldPartPaymentRow: View {
+    let payment: PartPaymentItem
+    let showsDisclosure: Bool
     
     var body: some View {
-        VStack(spacing: 0) {
-            Button(action: {
-                dismiss()
-                // Action to create new payment plan
-            }) {
-                HStack {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(.blue)
-                    Text("Create New Payment Plan")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    Spacer()
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(payment.title)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text(payment.subtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
-                .padding()
-                .background(Color(UIColor.secondarySystemBackground))
+                Spacer()
+                if showsDisclosure {
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(.secondary)
+                }
             }
             
-            Divider()
+            Text(payment.amount)
+                .font(.subheadline)
+                .fontWeight(.semibold)
             
-            Button(action: {
-                dismiss()
-                // Action to view payment plan history
-            }) {
-                HStack {
-                    Image(systemName: "clock.fill")
-                        .font(.title3)
-                        .foregroundColor(.blue)
-                    Text("Payment Plan History")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    Spacer()
-                }
-                .padding()
-                .background(Color(UIColor.secondarySystemBackground))
+            ProgressView(value: payment.progress)
+                .tint(.blue)
+            
+            HStack {
+                Text("\(payment.completedPayments) of \(payment.totalPayments) payments")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(payment.nextDueDate)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
         }
-        .background(Color(UIColor.systemBackground))
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
@@ -257,7 +297,7 @@ struct AccountOverviewCard: View {
             
             HStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Shared Limit")
+                    Text("Limit")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("80 000 SEK")
@@ -268,16 +308,22 @@ struct AccountOverviewCard: View {
                 Divider()
                     .frame(height: 30)
                 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("In Payment Plans")
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Used Credit")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text("62 000 SEK")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("15 050 SEK")
-                        .font(.headline)
-                        .fontWeight(.semibold)
                 }
-                
-                Spacer()
             }
         }
         .padding(20)
@@ -327,90 +373,9 @@ struct CreditCardMini: View {
     }
 }
 
-struct PaymentPlanCard: View {
-    let title: String
-    let store: String
-    let totalAmount: String
-    let paidAmount: String
-    let progress: Double
-    let dueDate: String
-    let monthlyAmount: String?
-    let icon: String
-    let color: Color
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundColor(color)
-                    .frame(width: 40, height: 40)
-                    .background(color.opacity(0.2))
-                    .clipShape(Circle())
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    
-                    Text(store)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.secondary)
-                    
-                    if let monthly = monthlyAmount {
-                        Text("\(dueDate) · \(monthly)")
-                            .font(.caption)
-                            .foregroundColor(progress == 1.0 ? .green : .secondary)
-                    } else {
-                        Text(dueDate)
-                            .font(.caption)
-                            .foregroundColor(progress == 1.0 ? .green : .secondary)
-                    }
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            // Progress bar
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(paidAmount)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(totalAmount)
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                }
-                
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.secondary.opacity(0.2))
-                            .frame(height: 8)
-                        
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(progress == 1.0 ? Color.green : color)
-                            .frame(width: geometry.size.width * progress, height: 8)
-                    }
-                }
-                .frame(height: 8)
-            }
-        }
-        .padding(20)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-}
 
 #Preview {
     ResursFamilyAccountView()
-        .environmentObject(PaymentPlansManager())
         .preferredColorScheme(.dark)
 }
 
