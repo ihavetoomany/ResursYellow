@@ -124,7 +124,7 @@ struct InvoiceAccountDetailView: View {
             
             VStack(spacing: 8) {
                 HStack {
-                    Text("Total debt")
+                    Text("Current debt")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -172,7 +172,7 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Due")
+                    Text("Next due")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -212,7 +212,8 @@ struct InvoiceAccountDetailView: View {
                     TransactionRow(
                         date: transaction.date,
                         description: transaction.description,
-                        amount: transaction.amount
+                        amount: transaction.amount,
+                        amountColor: transaction.amountColor
                     )
                 }
             }
@@ -276,23 +277,61 @@ struct InvoiceAccountDetailView: View {
     }
     
     private var sampleTransactions: [TransactionItem] {
-        [
-            TransactionItem(
-                date: "Nov 15, 2025",
-                description: "Payment received",
-                amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount
-            ),
-            TransactionItem(
-                date: "Oct 15, 2025",
-                description: "Payment received",
-                amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount
-            ),
-            TransactionItem(
-                date: "Sep 15, 2025",
-                description: "Payment received",
-                amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount
-            )
-        ]
+        var transactions: [TransactionItem] = []
+        
+        // Add transactions for Flex August account with specific dates
+        if account.title == "Flex August" {
+            transactions = [
+                TransactionItem(
+                    date: "Oct 30, 2025",
+                    description: "Payment received",
+                    amount: account.installmentAmount.isEmpty ? "917 kr" : account.installmentAmount,
+                    amountColor: .green
+                ),
+                TransactionItem(
+                    date: "Sep 30, 2025",
+                    description: "Payment received",
+                    amount: account.installmentAmount.isEmpty ? "917 kr" : account.installmentAmount,
+                    amountColor: .green
+                ),
+                TransactionItem(
+                    date: "Aug 30, 2025",
+                    description: "Payment received",
+                    amount: account.installmentAmount.isEmpty ? "917 kr" : account.installmentAmount,
+                    amountColor: .green
+                ),
+                TransactionItem(
+                    date: "Jul 10, 2025",
+                    description: "Apoteket Hjärtat",
+                    amount: "5 500 kr",
+                    amountColor: .red
+                )
+            ]
+        } else {
+            // Default transactions for other accounts
+            transactions = [
+                TransactionItem(
+                    date: "Nov 15, 2025",
+                    description: "Payment received",
+                    amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount,
+                    amountColor: .green
+                ),
+                TransactionItem(
+                    date: "Oct 15, 2025",
+                    description: "Payment received",
+                    amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount,
+                    amountColor: .green
+                ),
+                TransactionItem(
+                    date: "Sep 15, 2025",
+                    description: "Payment received",
+                    amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount,
+                    amountColor: .green
+                )
+            ]
+        }
+        
+        return transactions
     }
 }
 
@@ -321,6 +360,7 @@ struct TransactionRow: View {
     let date: String
     let description: String
     let amount: String
+    let amountColor: Color
     
     var body: some View {
         HStack {
@@ -336,6 +376,7 @@ struct TransactionRow: View {
             Text(amount)
                 .font(.subheadline)
                 .fontWeight(.semibold)
+                .foregroundColor(amountColor)
         }
         .padding(16)
         .background(.ultraThinMaterial)
@@ -348,6 +389,7 @@ struct TransactionItem: Identifiable {
     let date: String
     let description: String
     let amount: String
+    let amountColor: Color
 }
 
 // MARK: - Actions Sheet

@@ -32,10 +32,10 @@ struct ResursFamilyAccountView: View {
             amount: "2 750 kr",
             progress: 3.0/6.0,
             installmentAmount: "917 kr",
-            totalAmount: "5 500 kr",
+            totalAmount: "2 750 kr",
             completedPayments: 3,
             totalPayments: 6,
-            nextDueDate: "Jan 2026",
+            nextDueDate: "Nov 30, 2025",
             autopaySource: "Resurs Gold"
         )
     ]

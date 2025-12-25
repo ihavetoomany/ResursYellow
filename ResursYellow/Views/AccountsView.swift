@@ -38,7 +38,7 @@ struct AccountsView: View {
                                 balance: "56 005 SEK",
                                 icon: "heart.fill",
                                 color: .blue,
-                                balanceLabel: "Available Balance"
+                                balanceLabel: "Available credit"
                             )
                         }
                         .buttonStyle(PlainButtonStyle())
