@@ -194,7 +194,7 @@ struct ResursFamilyAccountView: View {
                     
                     // Benefits Section
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Resurs Gold Benefits")
+                        Text("Benefits and services")
                             .font(.headline)
                             .fontWeight(.semibold)
                             .padding(.horizontal, 4)

@@ -1,8 +1,11 @@
 import SwiftUI
 
 struct NetOnNetDetailView: View {
-    private let availableCredit = "18 300 kr"
-    private let creditLimit = "35 000 kr"
+    @Environment(\.dismiss) var dismiss
+    @StateObject private var scrollObserver = ScrollOffsetObserver()
+    
+    private let availableCredit = "20 000 kr"
+    private let creditLimit = "20 000 kr"
     
     struct MerchantPurchase: Identifiable {
         let id = UUID()
@@ -25,41 +28,112 @@ struct NetOnNetDetailView: View {
         ("creditcard.and.123", "Flexible PNPL", "Split large electronics into monthly payments with instant approval.")
     ]
     
-    private let partPayments: [PartPaymentItem] = [
-        PartPaymentItem(title: "Smart TV Upgrade", subtitle: "2 of 8 payments done", amount: "1 540 kr / 12 320 kr", progress: 0.25),
-        PartPaymentItem(title: "Home Office Setup", subtitle: "3 of 6 payments done", amount: "1 250 kr / 7 500 kr", progress: 0.5)
-    ]
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                heroIcon
-                infoCard
-                purchasesSection
-                partPaymentsSection
-                benefitsSection
+        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
+        
+        ZStack(alignment: .top) {
+            // Scrollable Content
+            ScrollViewReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        // Tracking element
+                        GeometryReader { geometry in
+                            Color.clear
+                                .onChange(of: geometry.frame(in: .named("scroll")).minY) { oldValue, newValue in
+                                    scrollObserver.offset = max(0, -newValue)
+                                }
+                        }
+                        .frame(height: 0)
+                        .id("scrollTop")
+                        
+                        // Account for header height
+                        Color.clear.frame(height: 120)
+                    
+                    VStack(spacing: 24) {
+                        infoCard
+                            .padding(.top, 20)
+                        purchasesSection
+                        partPaymentsSection
+                        benefitsSection
+                    }
+                    .padding(.bottom, 120)
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        proxy.scrollTo("scrollTop", anchor: .top)
+                    }
+                }
             }
-            .padding(.top, 16)
+            .coordinateSpace(name: "scroll")
+            
+            // Sticky Header (overlays the content)
+            VStack(spacing: 0) {
+                ZStack {
+                    // Back button (always visible) - on the left
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "chevron.left")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 32, height: 32)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                        Spacer()
+                    }
+                    
+                    // Minimized title - centered in view
+                    if scrollProgress > 0.5 {
+                        Text("Netonnet")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
+                
+                // Title and subtitle - only shown when not minimized
+                if scrollProgress <= 0.5 {
+                    VStack(alignment: .leading, spacing: 4) {
+                        // Subtitle
+                        Text("Store Credit available")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .opacity(1.0 - scrollProgress * 2)
+                        
+                        // Title
+                        Text("Netonnet")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    .padding(.bottom, 16)
+                }
+            }
+            .background(Color(uiColor: .systemBackground).opacity(0.95))
+            .background(.ultraThinMaterial)
+            .animation(.easeInOut(duration: 0.2), value: scrollProgress)
         }
-        .background(Color.clear)
-        .navigationTitle("NetOnNet")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
     }
     
     private var heroIcon: some View {
         Image(systemName: "shippingbox.fill")
             .font(.system(size: 54))
-            .foregroundColor(.blue)
+            .foregroundColor(.green)
             .padding(28)
-            .background(Circle().fill(Color.blue.opacity(0.12)))
+            .background(Circle().fill(Color.green.opacity(0.12)))
             .frame(maxWidth: .infinity)
     }
     
     private var infoCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Unlock faster tech upgrades")
-                .font(.headline)
-                .fontWeight(.semibold)
             Text("NetOnNet customers can link their Resurs credit to enjoy instant checkout, delivery tracking and flexible financing for every gadget.")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
@@ -94,7 +168,7 @@ struct NetOnNetDetailView: View {
     
     private var purchasesSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Recent NetOnNet Purchases")
+            Text("Purchases")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
@@ -135,30 +209,18 @@ struct NetOnNetDetailView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
+            
             VStack(spacing: 12) {
-                ForEach(partPayments, id: \.title) { plan in
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(plan.title)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        Text(plan.subtitle)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text(plan.amount)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                        GeometryReader { geo in
-                            Capsule()
-                                .fill(Color.blue)
-                                .frame(width: geo.size.width * CGFloat(plan.progress), height: 8)
-                                .animation(.easeInOut, value: plan.progress)
-                        }
-                        .frame(height: 8)
-                    }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("You have no open accounts and no unpaid purchases at Bauhaus.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background(Color.green.opacity(0.1))
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
         .padding(.horizontal)
@@ -166,7 +228,7 @@ struct NetOnNetDetailView: View {
     
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Why connect NetOnNet")
+            Text("Benefits and services")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
@@ -175,9 +237,9 @@ struct NetOnNetDetailView: View {
                     HStack(spacing: 16) {
                         Image(systemName: benefit.icon)
                             .font(.title3)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.green)
                             .frame(width: 36, height: 36)
-                            .background(Color.blue.opacity(0.15))
+                            .background(Color.green.opacity(0.15))
                             .clipShape(Circle())
                         VStack(alignment: .leading, spacing: 4) {
                             Text(benefit.title)

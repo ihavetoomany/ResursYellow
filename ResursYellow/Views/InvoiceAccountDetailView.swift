@@ -10,11 +10,11 @@ import SwiftUI
 struct InvoiceAccountDetailView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @State private var showActionsMenu = false
     
     let account: PartPaymentItem
     
     var body: some View {
-        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
         
         ZStack(alignment: .top) {
             // Scrollable Content
@@ -31,8 +31,8 @@ struct InvoiceAccountDetailView: View {
                         .frame(height: 0)
                         .id("scrollTop")
                         
-                        // Account for header height
-                        Color.clear.frame(height: 120)
+                        // Account for header height (minimized)
+                        Color.clear.frame(height: 60)
                     
                         VStack(spacing: 24) {
                             // Account Info Section
@@ -40,9 +40,6 @@ struct InvoiceAccountDetailView: View {
                             
                             // Transactions Section
                             transactionsSection
-                            
-                            // Actions Section
-                            actionsSection
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)
@@ -57,7 +54,7 @@ struct InvoiceAccountDetailView: View {
             }
             .coordinateSpace(name: "scroll")
             
-            // Sticky Header
+            // Sticky Header (always minimized)
             VStack(spacing: 0) {
                 ZStack {
                     HStack {
@@ -70,41 +67,46 @@ struct InvoiceAccountDetailView: View {
                                 .clipShape(Circle())
                         }
                         Spacer()
+                        
+                        Button(action: { showActionsMenu = true }) {
+                            Image(systemName: "ellipsis")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 32, height: 32)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
                     }
                     
-                    if scrollProgress > 0.5 {
-                        Text(account.title)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
+                    // Always show minimized title
+                    Text(account.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
-                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-                
-                if scrollProgress <= 0.5 {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Invoice Account")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .opacity(1.0 - scrollProgress * 2)
-                        
-                        Text(account.title)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
-                }
+                .padding(.bottom, 8)
             }
             .background(Color(uiColor: .systemBackground).opacity(0.95))
             .background(.ultraThinMaterial)
-            .animation(.easeInOut(duration: 0.2), value: scrollProgress)
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showActionsMenu) {
+            ActionsSheet(
+                onPayExtra: {
+                    showActionsMenu = false
+                    // Handle pay extra action
+                },
+                onMakeEndPayment: {
+                    showActionsMenu = false
+                    // Handle make end payment action
+                }
+            )
+            .presentationDetents([.height(200)])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(.ultraThinMaterial)
+        }
     }
     
     // MARK: - Account Info Section
@@ -115,7 +117,7 @@ struct InvoiceAccountDetailView: View {
                     .font(.title3)
                     .foregroundColor(.blue)
                 
-                Text("Account Info")
+                Text("Account information")
                     .font(.headline)
                     .fontWeight(.semibold)
             }
@@ -129,15 +131,6 @@ struct InvoiceAccountDetailView: View {
                     Text(account.totalAmount.isEmpty ? account.amount : account.totalAmount)
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Button(action: {
-                        let value = account.totalAmount.isEmpty ? account.amount : account.totalAmount
-                        UIPasteboard.general.string = value
-                    }) {
-                        Image(systemName: "doc.on.doc")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(PlainButtonStyle())
                 }
                 
                 Divider()
@@ -150,14 +143,6 @@ struct InvoiceAccountDetailView: View {
                     Text(generateOCR())
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Button(action: {
-                        UIPasteboard.general.string = generateOCR()
-                    }) {
-                        Image(systemName: "doc.on.doc")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(PlainButtonStyle())
                 }
                 
                 Divider()
@@ -170,14 +155,6 @@ struct InvoiceAccountDetailView: View {
                     Text("540-1234")
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Button(action: {
-                        UIPasteboard.general.string = "540-1234"
-                    }) {
-                        Image(systemName: "doc.on.doc")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(PlainButtonStyle())
                 }
                 
                 Divider()
@@ -190,15 +167,6 @@ struct InvoiceAccountDetailView: View {
                     Text(account.installmentAmount.isEmpty ? account.amount : account.installmentAmount)
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Button(action: {
-                        let value = account.installmentAmount.isEmpty ? account.amount : account.installmentAmount
-                        UIPasteboard.general.string = value
-                    }) {
-                        Image(systemName: "doc.on.doc")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(PlainButtonStyle())
                 }
                 
                 Divider()
@@ -380,5 +348,53 @@ struct TransactionItem: Identifiable {
     let date: String
     let description: String
     let amount: String
+}
+
+// MARK: - Actions Sheet
+struct ActionsSheet: View {
+    @Environment(\.dismiss) var dismiss
+    let onPayExtra: () -> Void
+    let onMakeEndPayment: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            Button(action: onPayExtra) {
+                HStack {
+                    Spacer()
+                    Text("Pay Extra")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                    Spacer()
+                }
+                .padding(.vertical, 16)
+                .background(Color.clear)
+                .overlay(
+                    Capsule()
+                        .stroke(Color.blue, lineWidth: 1.5)
+                )
+            }
+            
+            Button(action: onMakeEndPayment) {
+                HStack {
+                    Spacer()
+                    Text("Make end payment")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                    Spacer()
+                }
+                .padding(.vertical, 16)
+                .background(Color.clear)
+                .overlay(
+                    Capsule()
+                        .stroke(Color.blue, lineWidth: 1.5)
+                )
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, 8)
+        .padding(.bottom, 20)
+    }
 }
 

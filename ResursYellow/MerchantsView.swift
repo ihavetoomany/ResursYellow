@@ -8,11 +8,12 @@ struct MerchantCard: View {
     let icon: String
     let color: Color
     var titleColor: Color = .primary
+    var iconFont: Font = .title
 
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title)
+                .font(iconFont)
                 .foregroundColor(color)
                 .frame(width: 48, height: 48)
                 .background(color.opacity(0.2))
@@ -48,7 +49,7 @@ struct MerchantsView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showAddMerchant = false
     
-    @State private var connected: [String] = ["Bauhaus", "NetOnNet", "Jula"]
+    @State private var connected: [String] = ["Bauhaus", "Netonnet"]
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -79,7 +80,8 @@ struct MerchantsView: View {
                                         amount: card.amount,
                                         icon: card.icon,
                                         color: card.color,
-                                        titleColor: card.titleColor
+                                        titleColor: card.titleColor,
+                                        iconFont: card.iconFont
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -123,33 +125,37 @@ private extension MerchantsView {
         let icon: String
         let color: Color
         let titleColor: Color
+        let iconFont: Font
     }
     
     func cardConfig(for merchant: String) -> MerchantCardConfig {
         switch merchant {
         case "Bauhaus":
             return MerchantCardConfig(
-                subtitle: "Easy checkout enabled",
-                amount: "Available amount: 14 500 kr",
-                icon: "house.lodge.fill",
-                color: .orange,
-                titleColor: .primary
+                subtitle: "Store Credit and Invoice available",
+                amount: "Available credit: 14 500 kr",
+                icon: "hammer.fill",
+                color: .red,
+                titleColor: .primary,
+                iconFont: .title2
             )
-        case "NetOnNet":
+        case "Netonnet":
             return MerchantCardConfig(
-                subtitle: "Linked to NetOnNet Warehouse",
-                amount: "Available amount: 18 300 kr",
+                subtitle: "Store Credit available",
+                amount: "Available credit: 20 000 kr",
                 icon: "shippingbox.fill",
-                color: .blue,
-                titleColor: .primary
+                color: .green,
+                titleColor: .primary,
+                iconFont: .title
             )
         case "Jula":
             return MerchantCardConfig(
                 subtitle: "Pay later active in-store",
-                amount: "Available amount: 9 200 kr",
+                amount: "Available credit: 9 200 kr",
                 icon: "hammer.circle.fill",
                 color: .red,
-                titleColor: .primary
+                titleColor: .primary,
+                iconFont: .title
             )
         default:
             return MerchantCardConfig(
@@ -157,7 +163,8 @@ private extension MerchantsView {
                 amount: nil,
                 icon: "link.circle.fill",
                 color: .green,
-                titleColor: .primary
+                titleColor: .primary,
+                iconFont: .title
             )
         }
     }
@@ -167,7 +174,7 @@ private extension MerchantsView {
         switch merchant {
         case "Bauhaus":
             BauhausDetailView()
-        case "NetOnNet":
+        case "Netonnet":
             NetOnNetDetailView()
         case "Jula":
             JulaDetailView()

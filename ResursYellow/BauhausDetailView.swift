@@ -6,9 +6,12 @@
 import SwiftUI
 
 struct BauhausDetailView: View {
+    @Environment(\.dismiss) var dismiss
+    @StateObject private var scrollObserver = ScrollOffsetObserver()
+    
     // Example credit info
     let availableCredit: String = "14 500 kr"
-    let creditLimit: String = "25 000 kr"
+    let creditLimit: String = "20 000 kr"
     
     // Define a local struct to avoid collision with global PurchaseItem
     struct BauhausPurchase: Identifiable {
@@ -28,9 +31,9 @@ struct BauhausDetailView: View {
     
     // Example purchases list using BauhausPurchase
     let purchases: [BauhausPurchase] = [
-        BauhausPurchase(title: "Paint Roller Set", subtitle: "Nov 2, 2025", amount: "298 kr", icon: "paintbrush.pointed.fill", color: .orange, category: .large, transaction: nil),
-        BauhausPurchase(title: "Interior Paint", subtitle: "Nov 2, 2025", amount: "800 kr", icon: "paintpalette.fill", color: .orange, category: .large, transaction: nil),
-        BauhausPurchase(title: "Drop Cloth", subtitle: "Oct 5, 2025", amount: "200 kr", icon: "drop.fill", color: .orange, category: .recent, transaction: nil)
+        BauhausPurchase(title: "Paint Roller Set", subtitle: "Nov 2, 2025", amount: "298 kr", icon: "paintbrush.pointed.fill", color: .red, category: .large, transaction: nil),
+        BauhausPurchase(title: "Interior Paint", subtitle: "Nov 2, 2025", amount: "800 kr", icon: "paintpalette.fill", color: .red, category: .large, transaction: nil),
+        BauhausPurchase(title: "Drop Cloth", subtitle: "Oct 5, 2025", amount: "200 kr", icon: "drop.fill", color: .red, category: .recent, transaction: nil)
     ]
     
     let benefits: [(icon: String, title: String, desc: String)] = [
@@ -152,168 +155,232 @@ struct BauhausDetailView: View {
     ]
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                
-                VStack {
-                    Image(systemName: "house.lodge.fill")
-                        .font(.system(size: 54))
-                        .foregroundColor(.orange)
-                        .background(
-                            Circle()
-                                .fill(Color.orange.opacity(0.12))
-                                .frame(width: 82, height: 82)
-                        )
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.bottom, 12)
-                
-                // Top info box
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Easy flexible payments")
+        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
+        
+        ZStack(alignment: .top) {
+            // Scrollable Content
+            ScrollViewReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        // Tracking element
+                        GeometryReader { geometry in
+                            Color.clear
+                                .onChange(of: geometry.frame(in: .named("scroll")).minY) { oldValue, newValue in
+                                    scrollObserver.offset = max(0, -newValue)
+                                }
+                        }
+                        .frame(height: 0)
+                        .id("scrollTop")
+                        
+                        // Account for header height
+                        Color.clear.frame(height: 120)
+                    
+                    VStack(spacing: 24) {
+                        
+                        // Top info box
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Bauhaus offers Purchase Now, Pay Later (PNPL) with several part payment options.")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    Text("You can also open a credit account for easy checkout and part payment at Bauhaus stores and online.")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                            }
+                            Divider()
+                            HStack(spacing: 32) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Available Credit")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text(availableCredit)
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                }
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Credit Limit")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text(creditLimit)
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                }
+                                Spacer()
+                            }
+                        }
+                        .padding(20)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        .padding(.horizontal)
+                        .padding(.top, 20)
+                        
+                        // Purchases
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Purchases")
                                 .font(.headline)
                                 .fontWeight(.semibold)
-                            Text("Bauhaus offers Purchase Now, Pay Later (PNPL) with several part payment options.")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Text("You can also open a credit account for easy checkout and part payment at Bauhaus stores and online.")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        Spacer()
-                    }
-                    Divider()
-                    HStack(spacing: 32) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Available Credit")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(availableCredit)
-                                .font(.title2)
-                                .fontWeight(.bold)
-                        }
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Credit Limit")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(creditLimit)
-                                .font(.title2)
-                                .fontWeight(.bold)
-                        }
-                        Spacer()
-                    }
-                }
-                .padding(20)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .padding(.horizontal)
-                
-                // Purchases
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Your Bauhaus Purchases")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 4)
-                    VStack(spacing: 12) {
-                        ForEach(purchases) { item in
-                            HStack(spacing: 16) {
-                                Image(systemName: item.icon)
-                                    .font(.title3)
-                                    .foregroundColor(item.color)
-                                    .frame(width: 36, height: 36)
-                                    .background(item.color.opacity(0.2))
-                                    .clipShape(Circle())
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(item.title)
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                    Text(item.subtitle)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                                .padding(.horizontal, 4)
+                            VStack(spacing: 12) {
+                                ForEach(purchases) { item in
+                                    HStack(spacing: 16) {
+                                        Image(systemName: item.icon)
+                                            .font(.title3)
+                                            .foregroundColor(item.color)
+                                            .frame(width: 36, height: 36)
+                                            .background(item.color.opacity(0.2))
+                                            .clipShape(Circle())
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(item.title)
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                            Text(item.subtitle)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Spacer()
+                                        Text(item.amount)
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                    }
+                                    .padding(16)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
                                 }
-                                Spacer()
-                                Text(item.amount)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                            }
-                            .padding(16)
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                
-                // Open Accounts Section
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Invoice accounts")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 4)
-                    VStack(spacing: 12) {
-                        ForEach(partPayments, id: \.title) { payment in
-                            if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
-                                NavigationLink {
-                                    PaintProjectSplitDetailView(plan: payment, invoices: paintProjectInvoices)
-                                } label: {
-                                    PartPaymentRow(payment: payment, showsDisclosure: true)
-                                }
-                                .buttonStyle(.plain)
-                            } else if payment.title == "Bauhaus - September" && payment.totalAmount == "1 500 kr" {
-                                NavigationLink {
-                                    PaintProjectSplitDetailView(plan: payment, invoices: gardenSuppliesInvoices)
-                                } label: {
-                                    PartPaymentRow(payment: payment, showsDisclosure: true)
-                                }
-                                .buttonStyle(.plain)
-                            } else {
-                                PartPaymentRow(payment: payment, showsDisclosure: false)
                             }
                         }
-                    }
-                }
-                .padding(.horizontal)
-                
-                // Benefits
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Bauhaus Benefits")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 4)
-                    VStack(spacing: 12) {
-                        ForEach(benefits, id: \.title) { benefit in
-                            HStack(spacing: 16) {
-                                Image(systemName: benefit.icon)
-                                    .font(.title3)
-                                    .foregroundColor(.orange)
-                                    .frame(width: 36, height: 36)
-                                    .background(Color.orange.opacity(0.15))
-                                    .clipShape(Circle())
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(benefit.title)
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                    Text(benefit.desc)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                        
+                        // Open Accounts Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Invoice accounts")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 4)
+                            VStack(spacing: 12) {
+                                ForEach(partPayments, id: \.title) { payment in
+                                    if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
+                                        NavigationLink {
+                                            PaintProjectSplitDetailView(plan: payment, invoices: paintProjectInvoices)
+                                        } label: {
+                                            PartPaymentRow(payment: payment, showsDisclosure: true)
+                                        }
+                                        .buttonStyle(.plain)
+                                    } else if payment.title == "Bauhaus - September" && payment.totalAmount == "1 500 kr" {
+                                        NavigationLink {
+                                            PaintProjectSplitDetailView(plan: payment, invoices: gardenSuppliesInvoices)
+                                        } label: {
+                                            PartPaymentRow(payment: payment, showsDisclosure: true)
+                                        }
+                                        .buttonStyle(.plain)
+                                    } else {
+                                        PartPaymentRow(payment: payment, showsDisclosure: false)
+                                    }
                                 }
-                                Spacer()
                             }
-                            .padding(16)
-                            .background(.ultraThinMaterial)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
+                        .padding(.horizontal)
+                        
+                        // Benefits
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Benefits and services")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 4)
+                            VStack(spacing: 12) {
+                                ForEach(benefits, id: \.title) { benefit in
+                                    HStack(spacing: 16) {
+                                        Image(systemName: benefit.icon)
+                                            .font(.title3)
+                                            .foregroundColor(.red)
+                                            .frame(width: 36, height: 36)
+                                            .background(Color.red.opacity(0.15))
+                                            .clipShape(Circle())
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(benefit.title)
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                            Text(benefit.desc)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Spacer()
+                                    }
+                                    .padding(16)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        Spacer(minLength: 40)
+                    }
+                    .padding(.bottom, 120)
                     }
                 }
-                .padding(.horizontal)
-                Spacer(minLength: 40)
+                .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        proxy.scrollTo("scrollTop", anchor: .top)
+                    }
+                }
             }
-            .padding(.top, 16)
+            .coordinateSpace(name: "scroll")
+            
+            // Sticky Header (overlays the content)
+            VStack(spacing: 0) {
+                ZStack {
+                    // Back button (always visible) - on the left
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "chevron.left")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 32, height: 32)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                        Spacer()
+                    }
+                    
+                    // Minimized title - centered in view
+                    if scrollProgress > 0.5 {
+                        Text("Bauhaus")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
+                
+                // Title and subtitle - only shown when not minimized
+                if scrollProgress <= 0.5 {
+                    VStack(alignment: .leading, spacing: 4) {
+                        // Subtitle
+                        Text("Store Credit and Invoice available")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .opacity(1.0 - scrollProgress * 2)
+                        
+                        // Title
+                        Text("Bauhaus")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    .padding(.bottom, 16)
+                }
+            }
+            .background(Color(uiColor: .systemBackground).opacity(0.95))
+            .background(.ultraThinMaterial)
+            .animation(.easeInOut(duration: 0.2), value: scrollProgress)
         }
-        .navigationTitle("Bauhaus")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
     }
 }
 
@@ -345,7 +412,7 @@ private struct PartPaymentRow: View {
                 .fontWeight(.semibold)
             
             ProgressView(value: payment.progress)
-                .tint(.orange)
+                .tint(.red)
             
             HStack {
                 Text("\(payment.completedPayments) of \(payment.totalPayments) payments")
@@ -396,7 +463,7 @@ struct PaintProjectSplitDetailView: View {
                 .foregroundColor(.secondary)
             
             ProgressView(value: plan.progress)
-                .tint(.orange)
+                .tint(.red)
             
             HStack {
                 Text("\(plan.completedPayments) of \(plan.totalPayments) payments completed")
@@ -422,7 +489,7 @@ struct PaintProjectSplitDetailView: View {
                     .fontWeight(.semibold)
             } icon: {
                 Image(systemName: "calendar.badge.clock")
-                    .foregroundColor(.orange)
+                    .foregroundColor(.red)
             }
             
             Divider()
@@ -495,7 +562,7 @@ struct PartPaymentInvoice: Identifiable {
             case .paid:
                 return .green
             case .upcoming:
-                return .orange
+                return .red
             }
         }
     }
