@@ -455,7 +455,8 @@ struct PaintProjectSplitDetailView: View {
 }
 
 // Supporting structs for example data models to avoid errors
-struct PartPaymentItem {
+struct PartPaymentItem: Hashable, Identifiable {
+    let id = UUID()
     var title: String
     var subtitle: String
     var amount: String

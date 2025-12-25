@@ -15,27 +15,27 @@ struct ResursFamilyAccountView: View {
     // Invoice Accounts - Resurs Gold's own payment plans
     private let invoiceAccounts: [PartPaymentItem] = [
         PartPaymentItem(
-            title: "Resurs Gold Main",
-            subtitle: "5 of 10 payments completed",
-            amount: "3 200 kr / 32 000 kr",
+            title: "Main Account",
+            subtitle: "Next invoice due Nov 30",
+            amount: "21 245 kr",
             progress: 5.0/10.0,
-            installmentAmount: "3 200 kr",
-            totalAmount: "32 000 kr",
+            installmentAmount: "7 725 kr",
+            totalAmount: "77 250 kr",
             completedPayments: 5,
             totalPayments: 10,
-            nextDueDate: "Dec 20, 2025",
+            nextDueDate: "Nov 2025",
             autopaySource: "Resurs Gold"
         ),
         PartPaymentItem(
-            title: "Resurs Flex October",
-            subtitle: "3 of 12 payments completed",
-            amount: "2 500 kr / 30 000 kr",
-            progress: 3.0/12.0,
-            installmentAmount: "2 500 kr",
-            totalAmount: "30 000 kr",
+            title: "Flex August",
+            subtitle: "Next invoice due Nov 30",
+            amount: "2 750 kr",
+            progress: 3.0/6.0,
+            installmentAmount: "917 kr",
+            totalAmount: "5 500 kr",
             completedPayments: 3,
-            totalPayments: 12,
-            nextDueDate: "Dec 15, 2025",
+            totalPayments: 6,
+            nextDueDate: "Jan 2026",
             autopaySource: "Resurs Gold"
         )
     ]
@@ -90,15 +90,80 @@ struct ResursFamilyAccountView: View {
                             CreditCardMini(
                                 holder: "Jane Doe",
                                 lastFour: "1234",
-                                used: "5 500 SEK",
+                                used: "13 000 SEK",
                                 color: .green
                             )
                             
                             CreditCardMini(
                                 holder: "John Doe",
                                 lastFour: "5678",
-                                used: "3 445 SEK",
+                                used: "10 995 SEK",
                                 color: .purple
+                            )
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.bottom, 16)
+                    
+                    // Purchases Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Purchases")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        
+                        VStack(spacing: 12) {
+                            PurchaseRow(
+                                title: "Elgiganten",
+                                subtitle: "Today - Stockholm",
+                                amount: "5 699 kr",
+                                icon: "display.2",
+                                color: .green,
+                                paymentMethod: .resursFamily,
+                                showsPartPayBadge: true
+                            )
+                            
+                            PurchaseRow(
+                                title: "ICA Maxi",
+                                subtitle: "Yesterday - Lund",
+                                amount: "1 245 kr",
+                                icon: "cart.fill",
+                                color: .brown,
+                                paymentMethod: .resursFamily,
+                                showsPartPayBadge: false
+                            )
+                            
+                            PurchaseRow(
+                                title: "Stadium Outlet",
+                                subtitle: "2 days ago - Orebro",
+                                amount: "1 080 kr",
+                                icon: "sportscourt.fill",
+                                color: .purple,
+                                paymentMethod: .resursFamily,
+                                showsPartPayBadge: false
+                            )
+                            
+                            PurchaseRow(
+                                title: "Clas Ohlson",
+                                subtitle: "3 days ago - Malmo",
+                                amount: "890 kr",
+                                icon: "lightbulb.fill",
+                                color: .yellow,
+                                paymentMethod: .resursFamily,
+                                showsPartPayBadge: false
+                            )
+                            
+                            PurchaseRow(
+                                title: "Åhléns",
+                                subtitle: "1 week ago - Stockholm",
+                                amount: "2 450 kr",
+                                icon: "bag.fill",
+                                color: .pink,
+                                paymentMethod: .resursFamily,
+                                showsPartPayBadge: true
                             )
                         }
                         .padding(.horizontal)
@@ -116,8 +181,11 @@ struct ResursFamilyAccountView: View {
                         .padding(.horizontal)
                         
                         VStack(spacing: 12) {
-                            ForEach(invoiceAccounts, id: \.title) { payment in
-                                ResursGoldPartPaymentRow(payment: payment, showsDisclosure: false)
+                            ForEach(invoiceAccounts) { payment in
+                                NavigationLink(value: payment) {
+                                    ResursGoldPartPaymentRow(payment: payment, showsDisclosure: true)
+                                }
+                                .buttonStyle(.plain)
                             }
                         }
                         .padding(.horizontal)
@@ -222,12 +290,35 @@ struct ResursFamilyAccountView: View {
             .animation(.easeInOut(duration: 0.2), value: scrollProgress)
         }
         .navigationBarHidden(true)
+        .navigationDestination(for: PartPaymentItem.self) { account in
+            InvoiceAccountDetailView(account: account)
+        }
     }
 }
 
 struct ResursGoldPartPaymentRow: View {
     let payment: PartPaymentItem
     let showsDisclosure: Bool
+    
+    private func calculateUsedCredit(completedPayments: Int, installmentAmount: String) -> String {
+        // Extract numeric value from installmentAmount (e.g., "5 326 kr" -> 5326)
+        let cleaned = installmentAmount
+            .replacingOccurrences(of: "kr", with: "")
+            .replacingOccurrences(of: "SEK", with: "")
+            .replacingOccurrences(of: " ", with: "")
+            .trimmingCharacters(in: .whitespaces)
+        if let amount = Double(cleaned) {
+            let totalUsed = amount * Double(completedPayments)
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.groupingSeparator = " "
+            formatter.maximumFractionDigits = 0
+            if let formatted = formatter.string(from: NSNumber(value: totalUsed)) {
+                return "\(formatted) kr"
+            }
+        }
+        return "0 kr"
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -248,17 +339,52 @@ struct ResursGoldPartPaymentRow: View {
                 }
             }
             
-            Text(payment.amount)
-                .font(.subheadline)
-                .fontWeight(.semibold)
+            if payment.amount.contains("left to pay") {
+                let components = payment.amount.components(separatedBy: " left to pay")
+                let amountValue = components.first ?? payment.amount
+                HStack(spacing: 4) {
+                    Text(amountValue)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    Text("left to pay")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                }
+            } else if payment.title == "Main Account" || payment.title == "Flex August" {
+                HStack(spacing: 4) {
+                    Text("Debt:")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                    Text(payment.amount)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                .padding(.top, 8)
+            } else {
+                Text(payment.amount)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+            }
             
             ProgressView(value: payment.progress)
-                .tint(.blue)
+                .tint(payment.title == "Main Account" ? .green : .blue)
             
             HStack {
-                Text("\(payment.completedPayments) of \(payment.totalPayments) payments")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if payment.title == "Main Account" {
+                    Text("Options available on next invoice")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else if payment.title == "Flex August" {
+                    Text("Part payment ongoing")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("\(payment.completedPayments) of \(payment.totalPayments) payments")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
                 Spacer()
                 Text(payment.nextDueDate)
                     .font(.caption)
@@ -313,7 +439,7 @@ struct AccountOverviewCard: View {
                         Text("Used Credit")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("62 000 SEK")
+                        Text("23 995 SEK")
                             .font(.headline)
                             .fontWeight(.semibold)
                     }
