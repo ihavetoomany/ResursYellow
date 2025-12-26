@@ -47,7 +47,7 @@ struct BauhausDetailView: View {
     let partPayments: [PartPaymentItem] = [
         PartPaymentItem(
             title: "Bauhaus - October",
-            subtitle: "2 of 6 payments completed",
+            subtitle: "Next invoice 30 Nov",
             amount: "726 kr / 4 356 kr",
             progress: 2.0/6.0,
             installmentAmount: "726 kr",
@@ -59,7 +59,7 @@ struct BauhausDetailView: View {
         ),
         PartPaymentItem(
             title: "Bauhaus - September",
-            subtitle: "3 of 5 payments completed",
+            subtitle: "Next invoice 30 Nov",
             amount: "900 kr / 1 500 kr",
             progress: 3.0/5.0,
             installmentAmount: "300 kr",
@@ -440,7 +440,7 @@ private struct PartPaymentRow: View {
                 .tint(.orange)
             
             HStack {
-                Text("\(payment.completedPayments) of \(payment.totalPayments) payments")
+                Text("Part payment ongoing")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
