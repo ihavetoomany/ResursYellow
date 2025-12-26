@@ -3,6 +3,7 @@ import SwiftUI
 struct NetOnNetDetailView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @StateObject private var dataManager = DataManager.shared
     
     private let availableCredit = "20 000 kr"
     private let creditLimit = "20 000 kr"
@@ -210,21 +211,35 @@ struct NetOnNetDetailView: View {
                 .padding(.horizontal, 4)
             
             VStack(spacing: 12) {
-                ResursGoldPartPaymentRow(
-                    payment: PartPaymentItem(
-                        title: "Main Account",
-                        subtitle: "No invoice until you make a purchase",
-                        amount: "0 kr",
-                        progress: 0.0,
-                        installmentAmount: "",
-                        totalAmount: "0 kr",
-                        completedPayments: 0,
-                        totalPayments: 0,
-                        nextDueDate: "Nov 30, 2025",
-                        autopaySource: "Netonnet"
-                    ),
-                    showsDisclosure: false
-                )
+                // Get Main Account for Netonnet from DataManager
+                if let mainAccount = dataManager.invoiceAccounts.first(where: { account in
+                    account.title.lowercased().contains("main account") &&
+                    (account.autopaySource.lowercased().contains("netonnet") ||
+                     account.autopaySource.lowercased().contains("netonnet"))
+                }) {
+                    ResursGoldPartPaymentRow(
+                        payment: mainAccount.toPartPaymentItem(),
+                        showsDisclosure: false
+                    )
+                } else {
+                    // Fallback if not found
+                    ResursGoldPartPaymentRow(
+                        payment: PartPaymentItem(
+                            id: UUID(),
+                            title: "Main Account",
+                            subtitle: "No invoice until you make a purchase",
+                            amount: "0 kr",
+                            progress: 0.0,
+                            installmentAmount: "",
+                            totalAmount: "0 kr",
+                            completedPayments: 0,
+                            totalPayments: 0,
+                            nextDueDate: "",
+                            autopaySource: "Netonnet Account"
+                        ),
+                        showsDisclosure: false
+                    )
+                }
             }
         }
         .padding(.horizontal)

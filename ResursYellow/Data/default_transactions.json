@@ -1,0 +1,326 @@
+{
+  "invoices": [],
+  "transactions": [
+    {
+      "id": "10000000-0000-0000-0000-000000000001",
+      "dateOffset": 0,
+      "description": "Bauhaus Megastore",
+      "amount": "4 356 kr",
+      "amountColorName": "orange",
+      "merchant": "Bauhaus",
+      "paymentMethod": "Bauhaus Invoice",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000002",
+      "dateOffset": -1,
+      "description": "NetOnNet Warehouse",
+      "amount": "12 499 kr",
+      "amountColorName": "blue",
+      "merchant": "NetOnNet",
+      "paymentMethod": "Netonnet Account",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000003",
+      "dateOffset": -1,
+      "description": "Jula Kungens Kurva",
+      "amount": "2 145 kr",
+      "amountColorName": "red",
+      "merchant": "Jula",
+      "paymentMethod": "Jula Account",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000004",
+      "dateOffset": -2,
+      "description": "Clas Ohlson",
+      "amount": "890 kr",
+      "amountColorName": "yellow",
+      "merchant": "Clas Ohlson",
+      "paymentMethod": "Resurs Gold",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000005",
+      "dateOffset": -3,
+      "description": "Elgiganten",
+      "amount": "5 699 kr",
+      "amountColorName": "green",
+      "merchant": "Elgiganten",
+      "paymentMethod": "Swish",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000006",
+      "dateOffset": -4,
+      "description": "Lyko Beauty",
+      "amount": "640 kr",
+      "amountColorName": "pink",
+      "merchant": "Lyko",
+      "paymentMethod": "Swish",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000007",
+      "dateOffset": -5,
+      "description": "ICA Maxi",
+      "amount": "1 245 kr",
+      "amountColorName": "brown",
+      "merchant": "ICA Maxi",
+      "paymentMethod": "Resurs Gold",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000008",
+      "dateOffset": -6,
+      "description": "Willys Hemma",
+      "amount": "925 kr",
+      "amountColorName": "teal",
+      "merchant": "Willys",
+      "paymentMethod": "Swish",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "10000000-0000-0000-0000-000000000009",
+      "dateOffset": -7,
+      "description": "Stadium Outlet",
+      "amount": "1 080 kr",
+      "amountColorName": "purple",
+      "merchant": "Stadium",
+      "paymentMethod": "Resurs Gold",
+      "category": "purchase",
+      "accountId": null
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000001",
+      "dateOffset": 5,
+      "description": "ICA Maxi",
+      "amount": "1 245 kr",
+      "amountColorName": "red",
+      "merchant": "ICA Maxi",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000002",
+      "dateOffset": 2,
+      "description": "Stadium Outlet",
+      "amount": "1 080 kr",
+      "amountColorName": "red",
+      "merchant": "Stadium Outlet",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000003",
+      "dateOffset": -2,
+      "description": "Clas Ohlson",
+      "amount": "890 kr",
+      "amountColorName": "red",
+      "merchant": "Clas Ohlson",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000004",
+      "dateOffset": -5,
+      "description": "Åhléns",
+      "amount": "2 450 kr",
+      "amountColorName": "red",
+      "merchant": "Åhléns",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000005",
+      "dateOffset": -8,
+      "description": "NetOnNet Warehouse",
+      "amount": "12 499 kr",
+      "amountColorName": "red",
+      "merchant": "NetOnNet Warehouse",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000006",
+      "dateOffset": -12,
+      "description": "Bauhaus Megastore",
+      "amount": "4 356 kr",
+      "amountColorName": "red",
+      "merchant": "Bauhaus Megastore",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000007",
+      "dateOffset": -17,
+      "description": "Jula Kungens Kurva",
+      "amount": "2 145 kr",
+      "amountColorName": "red",
+      "merchant": "Jula Kungens Kurva",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000008",
+      "dateOffset": -20,
+      "description": "Payment received",
+      "amount": "18 750 kr",
+      "amountColorName": "green",
+      "merchant": null,
+      "paymentMethod": null,
+      "category": "payment",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000009",
+      "dateOffset": -23,
+      "description": "Elgiganten",
+      "amount": "5 699 kr",
+      "amountColorName": "red",
+      "merchant": "Elgiganten",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000010",
+      "dateOffset": -26,
+      "description": "ICA",
+      "amount": "452 kr",
+      "amountColorName": "red",
+      "merchant": "ICA",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000011",
+      "dateOffset": -31,
+      "description": "Stadium",
+      "amount": "2 340 SEK",
+      "amountColorName": "red",
+      "merchant": "Stadium",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000012",
+      "dateOffset": -36,
+      "description": "Clas Ohlson",
+      "amount": "785 SEK",
+      "amountColorName": "red",
+      "merchant": "Clas Ohlson",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000013",
+      "dateOffset": -41,
+      "description": "Åhléns",
+      "amount": "300 SEK",
+      "amountColorName": "red",
+      "merchant": "Åhléns",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000014",
+      "dateOffset": -46,
+      "description": "NetOnNet",
+      "amount": "1 568 SEK",
+      "amountColorName": "red",
+      "merchant": "NetOnNet",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000015",
+      "dateOffset": -49,
+      "description": "Bauhaus",
+      "amount": "4 356 kr",
+      "amountColorName": "red",
+      "merchant": "Bauhaus",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "20000000-0000-0000-0000-000000000016",
+      "dateOffset": -51,
+      "description": "Payment received",
+      "amount": "15 200 kr",
+      "amountColorName": "green",
+      "merchant": null,
+      "paymentMethod": null,
+      "category": "payment",
+      "accountId": "30000000-0000-0000-0000-000000000001"
+    },
+    {
+      "id": "40000000-0000-0000-0000-000000000001",
+      "dateOffset": -21,
+      "description": "Payment received",
+      "amount": "917 kr",
+      "amountColorName": "green",
+      "merchant": null,
+      "paymentMethod": null,
+      "category": "payment",
+      "accountId": "30000000-0000-0000-0000-000000000002"
+    },
+    {
+      "id": "40000000-0000-0000-0000-000000000002",
+      "dateOffset": -51,
+      "description": "Payment received",
+      "amount": "917 kr",
+      "amountColorName": "green",
+      "merchant": null,
+      "paymentMethod": null,
+      "category": "payment",
+      "accountId": "30000000-0000-0000-0000-000000000002"
+    },
+    {
+      "id": "40000000-0000-0000-0000-000000000003",
+      "dateOffset": -82,
+      "description": "Payment received",
+      "amount": "917 kr",
+      "amountColorName": "green",
+      "merchant": null,
+      "paymentMethod": null,
+      "category": "payment",
+      "accountId": "30000000-0000-0000-0000-000000000002"
+    },
+    {
+      "id": "40000000-0000-0000-0000-000000000004",
+      "dateOffset": -133,
+      "description": "Apoteket Hjärtat",
+      "amount": "5 500 kr",
+      "amountColorName": "red",
+      "merchant": "Apoteket Hjärtat",
+      "paymentMethod": null,
+      "category": "purchase",
+      "accountId": "30000000-0000-0000-0000-000000000002"
+    }
+  ],
+  "invoiceAccounts": []
+}
+

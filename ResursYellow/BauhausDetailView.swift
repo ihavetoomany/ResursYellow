@@ -8,6 +8,7 @@ import SwiftUI
 struct BauhausDetailView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @StateObject private var dataManager = DataManager.shared
     
     // Example credit info
     let availableCredit: String = "14 500 kr"
@@ -43,33 +44,15 @@ struct BauhausDetailView: View {
         ("shield.checkerboard", "Payment Insurance", "Protect your purchases with optional payment insurance.")
     ]
     
-    // Example part payments for the new section
-    let partPayments: [PartPaymentItem] = [
-        PartPaymentItem(
-            title: "Bauhaus - October",
-            subtitle: "Next invoice 30 Nov",
-            amount: "726 kr / 4 356 kr",
-            progress: 2.0/6.0,
-            installmentAmount: "726 kr",
-            totalAmount: "4 356 kr",
-            completedPayments: 2,
-            totalPayments: 6,
-            nextDueDate: "Dec 15, 2025",
-            autopaySource: "Bauhaus Invoice"
-        ),
-        PartPaymentItem(
-            title: "Bauhaus - September",
-            subtitle: "Next invoice 30 Nov",
-            amount: "900 kr / 1 500 kr",
-            progress: 3.0/5.0,
-            installmentAmount: "300 kr",
-            totalAmount: "1 500 kr",
-            completedPayments: 3,
-            totalPayments: 5,
-            nextDueDate: "Nov 30, 2025",
-            autopaySource: "Swish"
-        )
-    ]
+    // Part payments from DataManager (filtered for Bauhaus)
+    private var partPayments: [PartPaymentItem] {
+        dataManager.invoiceAccounts
+            .filter { account in
+                account.title.lowercased().contains("bauhaus") ||
+                account.autopaySource.lowercased().contains("bauhaus")
+            }
+            .map { $0.toPartPaymentItem() }
+    }
     
     let paintProjectInvoices: [PartPaymentInvoice] = [
         PartPaymentInvoice(
@@ -669,18 +652,21 @@ struct PaintProjectSplitDetailView: View {
     private var sampleTransactions: [TransactionItem] {
         [
             TransactionItem(
+                id: UUID(),
                 date: "Nov 15, 2025",
                 description: "Payment received",
                 amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
                 amountColor: .green
             ),
             TransactionItem(
+                id: UUID(),
                 date: "Oct 15, 2025",
                 description: "Payment received",
                 amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
                 amountColor: .green
             ),
             TransactionItem(
+                id: UUID(),
                 date: "Sep 15, 2025",
                 description: "Payment received",
                 amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
@@ -691,27 +677,7 @@ struct PaintProjectSplitDetailView: View {
     
 }
 
-// Supporting structs for example data models to avoid errors
-struct PartPaymentItem: Hashable, Identifiable {
-    let id = UUID()
-    var title: String
-    var subtitle: String
-    var amount: String
-    var progress: Double
-    var installmentAmount: String = ""
-    var totalAmount: String = ""
-    var completedPayments: Int = 0
-    var totalPayments: Int = 0
-    var nextDueDate: String = ""
-    var autopaySource: String = ""
-    
-    var hasDetailedSchedule: Bool {
-        !installmentAmount.isEmpty &&
-        !totalAmount.isEmpty &&
-        totalPayments > 0 &&
-        !nextDueDate.isEmpty
-    }
-}
+// Note: PartPaymentItem is defined in InvoiceAccountExtensions.swift
 
 struct PartPaymentInvoice: Identifiable {
     enum Status {

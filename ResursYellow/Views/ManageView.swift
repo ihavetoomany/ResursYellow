@@ -1,0 +1,455 @@
+//
+//  ManageView.swift
+//  ResursYellow
+//
+//  Created by Bjarne Werner on 2025-10-04.
+//
+
+import SwiftUI
+
+struct ManageView: View {
+    @StateObject private var dataManager = DataManager.shared
+    @StateObject private var localizationService = LocalizationService.shared
+    @State private var navigationPath = NavigationPath()
+    @State private var showCallSupport = false
+    @State private var showLogoutConfirmation = false
+    @State private var showResetConfirmation = false
+    
+    // Helper to ensure views update when language changes
+    private var currentLanguage: Language {
+        localizationService.currentLanguage
+    }
+    
+    private func localized(_ key: String) -> String {
+        _ = currentLanguage // Reference to trigger updates
+        return localizationService.localizedString(key, fallback: key)
+    }
+    
+    var body: some View {
+        let _ = currentLanguage // Ensure view updates when language changes
+        return NavigationStack(path: $navigationPath) {
+            StickyHeaderView(
+                title: localized("Manage"),
+                subtitle: localized("Support, profile & settings"),
+                trailingButton: "phone.fill",
+                trailingButtonTint: .blue,
+                trailingButtonSize: 52,
+                trailingButtonIconScale: 0.6,
+                trailingButtonAction: {
+                    showCallSupport = true
+                }
+            ) {
+                VStack(spacing: 24) {
+                    // Support Section
+                    ProfileSection(title: localized("Support")) {
+                        ContactMethodRow(
+                            title: localized("Report issue"),
+                            subtitle: "Zendesk",
+                            icon: "exclamationmark.triangle.fill",
+                            color: .red
+                        )
+                        ContactMethodRow(
+                            title: localized("Messages from the bank"),
+                            subtitle: localized("View bank notifications"),
+                            icon: "envelope.fill",
+                            color: .blue
+                        )
+                        ContactMethodRow(
+                            title: localized("Live chat"),
+                            subtitle: "Zendesk",
+                            icon: "message.fill",
+                            color: .green
+                        )
+                        ContactMethodRow(
+                            title: localized("FAQ"),
+                            subtitle: "Zendesk",
+                            icon: "questionmark.circle.fill",
+                            color: .orange
+                        )
+                        ContactMethodRow(
+                            title: "Aktiv låneansökan?",
+                            subtitle: localized("Check loan application status"),
+                            icon: "doc.text.fill",
+                            color: .purple
+                        )
+                    }
+                    
+                    // Profile Section
+                    ProfileSection(title: localized("Profile")) {
+                        ProfileRow(
+                            title: localized("Customer ID"),
+                            subtitle: "12345678",
+                            icon: "person.fill",
+                            color: .blue
+                        )
+                        
+                        NavigationLink(value: "ContactInformation") {
+                            ProfileRow(
+                                title: localized("Contact information"),
+                                subtitle: localized("Email, Phone"),
+                                icon: "envelope.fill",
+                                color: .green,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "KYC") {
+                            ProfileRow(
+                                title: "KYC",
+                                subtitle: localized("Know Your Customer"),
+                                icon: "person.text.rectangle.fill",
+                                color: .purple,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "MyDocuments") {
+                            ProfileRow(
+                                title: localized("My documents"),
+                                subtitle: localized("Agreements, Contracts"),
+                                icon: "doc.fill",
+                                color: .orange,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "ChartOfExpenses") {
+                            ProfileRow(
+                                title: localized("Chart of expenses"),
+                                subtitle: localized("View spending breakdown"),
+                                icon: "chart.pie.fill",
+                                color: .red,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "ChartOfAvailableCredit") {
+                            ProfileRow(
+                                title: localized("Chart of available credit"),
+                                subtitle: localized("Credit utilization"),
+                                icon: "chart.bar.fill",
+                                color: .blue,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "SpendingTrends") {
+                            ProfileRow(
+                                title: localized("Spending trends"),
+                                subtitle: localized("Gamification"),
+                                icon: "chart.line.uptrend.xyaxis",
+                                color: .green,
+                                showChevron: true
+                            )
+                        }
+                    }
+                    
+                    // Settings Section
+                    ProfileSection(title: localized("Settings")) {
+                        NavigationLink(value: "ConnectBankAccount") {
+                            ProfileRow(
+                                title: localized("Connect bank account"),
+                                subtitle: localized("Link external accounts"),
+                                icon: "building.columns.fill",
+                                color: .blue,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "NotificationSettings") {
+                            ProfileRow(
+                                title: localized("Notification settings"),
+                                subtitle: localized("Communication, Marketing"),
+                                icon: "bell.fill",
+                                color: .orange,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "Theme") {
+                            ProfileRow(
+                                title: localized("Theme"),
+                                subtitle: localized("Light, Dark, Auto"),
+                                icon: "paintbrush.fill",
+                                color: .purple,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "Language") {
+                            ProfileRow(
+                                title: localized("Language"),
+                                subtitle: localizationService.currentLanguage.displayName,
+                                icon: "globe",
+                                color: .cyan,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "Accessibility") {
+                            ProfileRow(
+                                title: "A11y",
+                                subtitle: localized("Accessibility settings"),
+                                icon: "accessibility",
+                                color: .indigo,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "Autopay") {
+                            ProfileRow(
+                                title: localized("Autopay"),
+                                subtitle: localized("Automatic payments"),
+                                icon: "arrow.clockwise.circle.fill",
+                                color: .green,
+                                showChevron: true
+                            )
+                        }
+                        
+                        NavigationLink(value: "ChangeShortcuts") {
+                            ProfileRow(
+                                title: localized("Change shortcuts on homepage"),
+                                subtitle: localized("Customize homepage"),
+                                icon: "square.grid.2x2.fill",
+                                color: .pink,
+                                showChevron: true
+                            )
+                        }
+                        
+                        Button {
+                            showResetConfirmation = true
+                        } label: {
+                            ProfileRow(
+                                title: localized("Reset Data"),
+                                subtitle: localized("Restore default data"),
+                                icon: "arrow.counterclockwise",
+                                color: .orange,
+                                showChevron: false
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    
+                    // Log out Section
+                    Button {
+                        showLogoutConfirmation = true
+                    } label: {
+                        ProfileRow(
+                            title: localized("Log out"),
+                            subtitle: localized("Sign out of your account"),
+                            icon: "rectangle.portrait.and.arrow.right",
+                            color: .red,
+                            showChevron: false
+                        )
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.top, 8)
+                }
+                .padding(.horizontal)
+                .padding(.top, 24)
+                .padding(.bottom, 100)
+            }
+            .navigationBarHidden(true)
+            .navigationDestination(for: String.self) { destination in
+                destinationView(for: destination)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
+                // If not at root level, pop to root
+                if !navigationPath.isEmpty {
+                    navigationPath.removeLast(navigationPath.count)
+                }
+                // If at root, the StickyHeaderView will handle scrolling to top
+            }
+            .sheet(isPresented: $showCallSupport) {
+                CallSupportView()
+            }
+            .confirmationDialog("Log out", isPresented: $showLogoutConfirmation, titleVisibility: .visible) {
+                Button("Log out", role: .destructive) {
+                    // Handle logout
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Are you sure you want to log out?")
+            }
+            .confirmationDialog("Reset Data", isPresented: $showResetConfirmation, titleVisibility: .visible) {
+                Button("Reset", role: .destructive) {
+                    dataManager.reset()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will restore all data to default values. All your changes will be lost. Are you sure?")
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func destinationView(for destination: String) -> some View {
+        destinationContent(for: destination)
+            .toolbar(.visible, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(Color(uiColor: .systemBackground), for: .navigationBar)
+    }
+    
+    @ViewBuilder
+    private func destinationContent(for destination: String) -> some View {
+        switch destination {
+        case "ContactInformation":
+            ContactInformationView()
+        case "KYC":
+            KYCView()
+        case "MyDocuments":
+            MyDocumentsView()
+        case "ChartOfExpenses":
+            ChartOfExpensesView()
+        case "ChartOfAvailableCredit":
+            ChartOfAvailableCreditView()
+        case "SpendingTrends":
+            SpendingTrendsView()
+        case "ConnectBankAccount":
+            ConnectBankAccountView()
+        case "NotificationSettings":
+            NotificationSettingsView()
+        case "Theme":
+            ThemeSettingsView()
+        case "Language":
+            LanguageSettingsView()
+        case "Accessibility":
+            AccessibilitySettingsView()
+        case "Autopay":
+            AutopaySettingsView()
+        case "ChangeShortcuts":
+            ChangeShortcutsView()
+        default:
+            Text("Coming soon")
+                .navigationTitle(destination)
+        }
+    }
+}
+
+// MARK: - Contact Method Row Component
+struct ContactMethodRow: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(color)
+                .frame(width: 36, height: 36)
+                .background(color.opacity(0.2))
+                .clipShape(Circle())
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+// MARK: - Call Support View
+struct CallSupportView: View {
+    @Environment(\.dismiss) private var dismiss
+    private let supportNumber = "+46 771 11 22 33" // Example number
+    private let telURL = URL(string: "tel://+46771112233")
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                Image(systemName: "phone.fill")
+                    .font(.system(size: 56))
+                    .foregroundColor(.green)
+                    .padding(.top, 24)
+
+                VStack(spacing: 6) {
+                    Text("Customer Support")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    Text("We're here to help")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("Phone")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(supportNumber)
+                            .font(.headline)
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    HStack(alignment: .top) {
+                        Text("Hours")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("Mon–Fri: 08:00–18:00")
+                            Text("Sat: 10:00–14:00")
+                            Text("Sun: Closed")
+                        }
+                        .font(.subheadline)
+                    }
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(.horizontal)
+
+                Spacer()
+
+                Button {
+                    if let telURL, UIApplication.shared.canOpenURL(telURL) {
+                        UIApplication.shared.open(telURL)
+                    }
+                } label: {
+                    HStack {
+                        Image(systemName: "phone.fill")
+                        Text("Call Now")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green)
+                    .clipShape(Capsule())
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
+            }
+            .navigationTitle("Call Support")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    ManageView()
+        .preferredColorScheme(.dark)
+}
+

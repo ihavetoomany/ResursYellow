@@ -226,7 +226,7 @@ enum InvoiceCategory {
 }
 
 struct InvoiceItem: Identifiable {
-    let id = UUID()
+    let id: UUID
     let merchant: String
     let subtitle: String
     let amount: String
@@ -237,6 +237,32 @@ struct InvoiceItem: Identifiable {
     let category: InvoiceCategory
     let detail: InvoiceData
     var isSelected: Bool = false
+    
+    init(
+        id: UUID = UUID(),
+        merchant: String,
+        subtitle: String,
+        amount: String,
+        icon: String?,
+        color: Color,
+        isOverdue: Bool,
+        statusOverride: String? = nil,
+        category: InvoiceCategory,
+        detail: InvoiceData,
+        isSelected: Bool = false
+    ) {
+        self.id = id
+        self.merchant = merchant
+        self.subtitle = subtitle
+        self.amount = amount
+        self.icon = icon
+        self.color = color
+        self.isOverdue = isOverdue
+        self.statusOverride = statusOverride
+        self.category = category
+        self.detail = detail
+        self.isSelected = isSelected
+    }
     
     var numericAmount: Double {
         let cleaned = amount
@@ -434,38 +460,106 @@ enum WalletSegment: String, CaseIterable {
 }
 
 struct WalletView: View {
+    @StateObject private var dataManager = DataManager.shared
+    private let dateService = DateService.shared
+    @StateObject private var localizationService = LocalizationService.shared
+    
     @State private var navigationPath = NavigationPath()
     @State private var showProfile = false
     
     @State private var currentSummaryIndex: Int = 0
     @State private var selectedSegment: WalletSegment = .invoices
+    
+    // Helper to ensure views update when language changes
+    private var currentLanguage: Language {
+        localizationService.currentLanguage // This triggers SwiftUI updates
+    }
+    
+    private func localized(_ key: String) -> String {
+        _ = currentLanguage // Reference to trigger updates
+        return localizationService.localizedString(key, fallback: key)
+    }
 
     private var greeting: String {
-        let hour = Calendar.current.component(.hour, from: Date())
+        let hour = Calendar.current.component(.hour, from: dateService.currentDate())
         switch hour {
-        case 5..<11: return "Good morning"
-        case 11..<16: return "Good day"
-        case 16..<23: return "Good evening"
-        default: return "Good night"
+        case 5..<11: return localizationService.localizedString("greeting_morning", fallback: "Good morning")
+        case 11..<16: return localizationService.localizedString("greeting_day", fallback: "Good day")
+        case 16..<23: return localizationService.localizedString("greeting_evening", fallback: "Good evening")
+        default: return localizationService.localizedString("greeting_night", fallback: "Good night")
         }
     }
 
-    // Data sources for sections
+    // Data sources for sections - converted from DataManager
     private var toPayInvoices: [InvoiceItem] {
-        InvoiceItem.overdueSamples + InvoiceItem.dueSoonSamples
+        let overdue = dataManager.invoicesForCategory(.overdue)
+        let dueSoon = dataManager.invoicesForCategory(.dueSoon)
+        return (overdue + dueSoon).map { invoice in
+            InvoiceItem(
+                id: invoice.id,
+                merchant: invoice.merchant,
+                subtitle: invoice.subtitle(dateService: dateService),
+                amount: invoice.amount,
+                icon: invoice.icon,
+                color: invoice.color,
+                isOverdue: invoice.isOverdue,
+                statusOverride: invoice.statusOverride,
+                category: invoice.category.toInvoiceCategory(),
+                detail: invoice.toInvoiceData(dateService: dateService),
+                isSelected: false
+            )
+        }
     }
+    
     private var allInvoices: [InvoiceItem] {
-        InvoiceItem.overdueSamples + 
-        InvoiceItem.dueSoonSamples + 
-        InvoiceItem.handledScheduledSamples + 
-        InvoiceItem.handledPaidSamples
+        dataManager.invoices.map { invoice in
+            InvoiceItem(
+                id: invoice.id,
+                merchant: invoice.merchant,
+                subtitle: invoice.subtitle(dateService: dateService),
+                amount: invoice.amount,
+                icon: invoice.icon,
+                color: invoice.color,
+                isOverdue: invoice.isOverdue,
+                statusOverride: invoice.statusOverride,
+                category: invoice.category.toInvoiceCategory(),
+                detail: invoice.toInvoiceData(dateService: dateService),
+                isSelected: false
+            )
+        }
     }
+    
     private var allPurchases: [PurchaseItem] {
-        PurchaseItem.sampleData
+        dataManager.transactions.compactMap { transaction in
+            guard let transactionData = transaction.toTransactionData(dateService: dateService) else {
+                return nil
+            }
+            let paymentMethod = transaction.inferredPaymentMethod()
+            let (icon, color) = transaction.iconAndColor()
+            let category = transaction.purchaseCategory()
+            let dateStr = dateService.formatRelativeDate(offset: transaction.dateOffset)
+            let timeStr = dateService.formatDate(dateService.relativeDate(offset: transaction.dateOffset), format: "h:mm a")
+            let subtitle = "\(dateStr), \(timeStr)"
+            
+            return PurchaseItem(
+                id: transaction.id,
+                title: transaction.description,
+                merchant: transaction.merchant ?? transaction.description,
+                subtitle: subtitle,
+                amount: transaction.amount,
+                icon: icon,
+                color: color,
+                category: category,
+                paymentMethod: paymentMethod,
+                transaction: transactionData
+            )
+        }
     }
+    
     private var recentPurchases: [PurchaseItem] {
-        Array(PurchaseItem.sampleData.prefix(5))
+        Array(allPurchases.prefix(5))
     }
+    
     private var suggestedActions: [ActionItem] {
         Array(ActionItem.priorityItems.prefix(5))
     }
@@ -591,8 +685,8 @@ struct WalletView: View {
 
                     // Segmented Control for Invoices/Purchases
                     Picker("Content", selection: $selectedSegment) {
-                        Text("Invoices").tag(WalletSegment.invoices)
-                        Text("Purchases").tag(WalletSegment.purchases)
+                        Text(self.localized("Invoices")).tag(WalletSegment.invoices)
+                        Text(self.localized("Purchases")).tag(WalletSegment.purchases)
                     }
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
@@ -602,7 +696,7 @@ struct WalletView: View {
                         if selectedSegment == .invoices {
                             VStack(spacing: 12) {
                                 if allInvoices.isEmpty {
-                                    EmptyStateRow(title: "No unpaid invoices", subtitle: "You're all caught up for now")
+                                    EmptyStateRow(title: self.localized("No unpaid invoices"), subtitle: self.localized("You're all caught up for now"))
                                 } else {
                                     ForEach(allInvoices) { invoice in
                                         Button {
@@ -626,7 +720,7 @@ struct WalletView: View {
                         } else {
                             VStack(spacing: 12) {
                                 if allPurchases.isEmpty {
-                                    EmptyStateRow(title: "No recent purchases", subtitle: "Your recent activity will appear here")
+                                    EmptyStateRow(title: self.localized("No recent purchases"), subtitle: self.localized("Your recent activity will appear here"))
                                 } else {
                                     ForEach(allPurchases) { purchase in
                                         Button {
@@ -690,6 +784,7 @@ struct WalletView: View {
 
 struct FavoritesOverlay: View {
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var localizationService = LocalizationService.shared
     
     let actions: [ActionItem]
     
@@ -719,7 +814,7 @@ struct FavoritesOverlay: View {
                     }
                 }
                 
-                Text("Recommended Actions")
+                Text(localizationService.localizedString("Recommended Actions", fallback: "Recommended Actions"))
                     .font(.title2.weight(.semibold))
                     .padding(.top, 4)
                 
@@ -749,7 +844,7 @@ struct FavoritesOverlay: View {
 }
 
 struct PurchaseItem: Identifiable {
-    let id = UUID()
+    let id: UUID
     let title: String
     let merchant: String
     let subtitle: String
@@ -760,32 +855,8 @@ struct PurchaseItem: Identifiable {
     let paymentMethod: PaymentMethod
     let transaction: TransactionData?
     
-    var subtitleWithoutTime: String {
-        let dateAndLocation = subtitle.components(separatedBy: " - ")
-        let rawDate = dateAndLocation.first ?? subtitle
-        let cleanedDate = rawDate.components(separatedBy: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? rawDate.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        guard dateAndLocation.count > 1 else {
-            return cleanedDate
-        }
-        
-        let location = dateAndLocation
-            .dropFirst()
-            .joined(separator: " - ")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return location.isEmpty ? cleanedDate : "\(cleanedDate) - \(location)"
-    }
-    
-    var numericAmount: Double {
-        let cleaned = amount
-            .replacingOccurrences(of: "kr", with: "")
-            .replacingOccurrences(of: "SEK", with: "")
-            .replacingOccurrences(of: " ", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return Double(cleaned) ?? 0
-    }
-
     init(
+        id: UUID = UUID(),
         title: String,
         merchant: String,
         subtitle: String,
@@ -813,6 +884,7 @@ struct PurchaseItem: Identifiable {
             }
         }
         
+        self.id = id
         self.title = title
         self.merchant = merchant
         self.subtitle = subtitle
@@ -822,6 +894,31 @@ struct PurchaseItem: Identifiable {
         self.category = category
         self.paymentMethod = resolvedPaymentMethod
         self.transaction = transaction
+    }
+    
+    var subtitleWithoutTime: String {
+        let dateAndLocation = subtitle.components(separatedBy: " - ")
+        let rawDate = dateAndLocation.first ?? subtitle
+        let cleanedDate = rawDate.components(separatedBy: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? rawDate.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard dateAndLocation.count > 1 else {
+            return cleanedDate
+        }
+        
+        let location = dateAndLocation
+            .dropFirst()
+            .joined(separator: " - ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return location.isEmpty ? cleanedDate : "\(cleanedDate) - \(location)"
+    }
+    
+    var numericAmount: Double {
+        let cleaned = amount
+            .replacingOccurrences(of: "kr", with: "")
+            .replacingOccurrences(of: "SEK", with: "")
+            .replacingOccurrences(of: " ", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return Double(cleaned) ?? 0
     }
     
     static let sampleData: [PurchaseItem] = [
@@ -1069,6 +1166,7 @@ struct PurchasesList: View {
     @Binding var navigationPath: NavigationPath
     @Environment(\.dismiss) private var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @StateObject private var localizationService = LocalizationService.shared
     @State private var selectedFilter: PurchaseFilter = .all
     
     init(
@@ -1227,7 +1325,7 @@ struct PurchasesList: View {
                 }
                 
                 if scrollProgress > 0.5 {
-                    Text("Purchases")
+                    Text(localizationService.localizedString("Purchases", fallback: "Purchases"))
                         .font(.title2.weight(.bold))
                         .foregroundColor(.primary)
                 }
@@ -1238,7 +1336,7 @@ struct PurchasesList: View {
             
             if scrollProgress <= 0.5 {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Purchases")
+                    Text(localizationService.localizedString("Purchases", fallback: "Purchases"))
                         .font(.largeTitle.weight(.bold))
                     Text(summaryText)
                         .font(.subheadline)
@@ -1259,6 +1357,7 @@ struct ActionsList: View {
     let actionItems: [ActionItem]
     @Environment(\.dismiss) private var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @StateObject private var localizationService = LocalizationService.shared
     
     var body: some View {
         let scrollProgress = min(scrollObserver.offset / 100, 1.0)
@@ -1324,7 +1423,7 @@ struct ActionsList: View {
                 }
                 
                 if scrollProgress > 0.5 {
-                    Text("Actions")
+                    Text(localizationService.localizedString("Actions", fallback: "Actions"))
                         .font(.title2.weight(.bold))
                         .foregroundColor(.primary)
                 }
@@ -1335,9 +1434,9 @@ struct ActionsList: View {
             
             if scrollProgress <= 0.5 {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Actions")
+                    Text(localizationService.localizedString("Actions", fallback: "Actions"))
                         .font(.largeTitle.weight(.bold))
-                    Text("\(actionItems.count) suggestions")
+                    Text("\(actionItems.count) \(localizationService.localizedString("suggestions", fallback: "suggestions"))")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -1394,6 +1493,7 @@ struct InvoicesList: View {
     @Binding var navigationPath: NavigationPath
     @Environment(\.dismiss) private var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @StateObject private var localizationService = LocalizationService.shared
     @State private var overdueInvoices = InvoiceItem.overdueSamples
     @State private var dueSoonInvoices = InvoiceItem.dueSoonSamples
     @State private var scheduledInvoices = InvoiceItem.handledScheduledSamples
@@ -1535,7 +1635,7 @@ struct InvoicesList: View {
                 }
                 
                 if scrollProgress > 0.5 {
-                    Text("Invoices")
+                    Text(localizationService.localizedString("Invoices", fallback: "Invoices"))
                         .font(.title2.weight(.bold))
                         .foregroundColor(.primary)
                 }
@@ -1546,7 +1646,7 @@ struct InvoicesList: View {
             
             if scrollProgress <= 0.5 {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Invoices")
+                    Text(localizationService.localizedString("Invoices", fallback: "Invoices"))
                         .font(.largeTitle.weight(.bold))
                     Text(outstandingSummaryText)
                         .font(.subheadline)
@@ -1572,6 +1672,8 @@ struct PurchaseRow: View {
     let paymentMethod: PaymentMethod
     let showsPartPayBadge: Bool
     
+    @StateObject private var localizationService = LocalizationService.shared
+    
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
@@ -1590,7 +1692,7 @@ struct PurchaseRow: View {
                 Text(subtitle)
                     .font(.caption)
                     .foregroundColor(.secondary)
-                Text("Paid with \(paymentMethod.displayName)")
+                Text("\(localizationService.localizedString("Paid with", fallback: "Paid with")) \(paymentMethod.displayName)")
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
@@ -1604,7 +1706,7 @@ struct PurchaseRow: View {
                     .foregroundColor(.primary)
                 
                 if showsPartPayBadge {
-                    Text("Part Pay")
+                    Text(localizationService.localizedString("Part Pay", fallback: "Part Pay"))
                         .font(.caption2.weight(.semibold))
                         .foregroundColor(.accentColor)
                         .padding(.horizontal, 10)

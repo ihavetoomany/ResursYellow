@@ -1,0 +1,136 @@
+/* Common */
+"Today" = "Today";
+"Yesterday" = "Yesterday";
+"days ago" = "days ago";
+"In" = "In";
+"days" = "days";
+"Tomorrow" = "Tomorrow";
+"greeting_morning" = "Good morning";
+"greeting_day" = "Good day";
+"greeting_evening" = "Good evening";
+"greeting_night" = "Good night";
+
+/* Wallet */
+"Invoices" = "Invoices";
+"Purchases" = "Purchases";
+"No unpaid invoices" = "No unpaid invoices";
+"You're all caught up for now" = "You're all caught up for now";
+"No recent purchases" = "No recent purchases";
+"Your recent activity will appear here" = "Your recent activity will appear here";
+"Actions" = "Actions";
+"Recommended Actions" = "Recommended Actions";
+"suggestions" = "suggestions";
+"Paid with" = "Paid with";
+"Part Pay" = "Part Pay";
+
+/* Invoice Status */
+"Overdue" = "Overdue";
+"Paid" = "Paid";
+"Scheduled" = "Scheduled";
+"Snoozed" = "Snoozed";
+"Due in" = "Due in";
+"Overdue by" = "Overdue by";
+"Paid on" = "Paid on";
+"Scheduled for" = "Scheduled for";
+
+/* Account Information */
+"Account information" = "Account information";
+"Type" = "Type";
+"Credit" = "Credit";
+"Current debt" = "Current debt";
+"OCR" = "OCR";
+"Bankgiro" = "Bankgiro";
+"Next invoice" = "Next invoice";
+"Next due" = "Next due";
+"Status" = "Status";
+
+/* Next Payment */
+"Next payment" = "Next payment";
+"Amount" = "Amount";
+"Invoice created" = "Invoice created";
+"Invoice due" = "Invoice due";
+"Due date" = "Due date";
+"Payment method" = "Payment method";
+
+/* Transactions */
+"Transactions" = "Transactions";
+"Payment received" = "Payment received";
+"Initial purchase" = "Initial purchase";
+
+/* Invoice History */
+"Invoice History" = "Invoice History";
+
+/* Account Types */
+"Account" = "Account";
+"Flex" = "Flex";
+"Invoice Account" = "Invoice Account";
+
+/* Credit Types */
+"Mastercard" = "Mastercard";
+"Resurs Gold" = "Resurs Gold";
+"Store Credit" = "Store Credit";
+"Onetime Credit" = "Onetime Credit";
+"Bauhaus Invoice" = "Bauhaus Invoice";
+
+/* Status Messages */
+"Part payment ongoing" = "Part payment ongoing";
+"Options available on next invoice" = "Options available on next invoice";
+"All purchases are paid" = "All purchases are paid";
+"No invoice until you make a purchase" = "No invoice until you make a purchase";
+
+/* Actions */
+"Reset Data" = "Reset Data";
+"Reset all data to defaults?" = "Reset all data to defaults?";
+"This will clear all changes you've made." = "This will clear all changes you've made.";
+"Cancel" = "Cancel";
+"Reset" = "Reset";
+
+/* Language */
+"Language" = "Language";
+"Svenska" = "Swedish";
+"English" = "English";
+
+/* Manage / Settings */
+"Manage" = "Manage";
+"Support, profile & settings" = "Support, profile & settings";
+"Support" = "Support";
+"Profile" = "Profile";
+"Settings" = "Settings";
+"Report issue" = "Report issue";
+"Messages from the bank" = "Messages from the bank";
+"View bank notifications" = "View bank notifications";
+"Live chat" = "Live chat";
+"FAQ" = "FAQ";
+"Check loan application status" = "Check loan application status";
+"Customer ID" = "Customer ID";
+"Contact information" = "Contact information";
+"Email, Phone" = "Email, Phone";
+"Know Your Customer" = "Know Your Customer";
+"My documents" = "My documents";
+"Agreements, Contracts" = "Agreements, Contracts";
+"Chart of expenses" = "Chart of expenses";
+"View spending breakdown" = "View spending breakdown";
+"Chart of available credit" = "Chart of available credit";
+"Credit utilization" = "Credit utilization";
+"Spending trends" = "Spending trends";
+"Gamification" = "Gamification";
+"Connect bank account" = "Connect bank account";
+"Link external accounts" = "Link external accounts";
+"Notification settings" = "Notification settings";
+"Communication, Marketing" = "Communication, Marketing";
+"Theme" = "Theme";
+"Light, Dark, Auto" = "Light, Dark, Auto";
+"Accessibility settings" = "Accessibility settings";
+"Autopay" = "Autopay";
+"Automatic payments" = "Automatic payments";
+"Change shortcuts on homepage" = "Change shortcuts on homepage";
+"Customize homepage" = "Customize homepage";
+"Restore default data" = "Restore default data";
+"Log out" = "Log out";
+"Sign out of your account" = "Sign out of your account";
+
+/* Tab Labels */
+"Wallet" = "Wallet";
+"Banking" = "Banking";
+"Merchants" = "Merchants";
+

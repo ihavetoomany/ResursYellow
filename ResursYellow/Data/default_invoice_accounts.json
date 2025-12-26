@@ -1,0 +1,72 @@
+{
+  "invoices": [],
+  "transactions": [],
+  "invoiceAccounts": [
+    {
+      "id": "30000000-0000-0000-0000-000000000001",
+      "title": "Main Account",
+      "subtitle": "Next invoice due Nov 30",
+      "amount": "21 245 kr",
+      "progress": 0.5,
+      "installmentAmount": "21 245 kr",
+      "totalAmount": "21 245 kr",
+      "completedPayments": 5,
+      "totalPayments": 10,
+      "nextDueDate": "Nov 30, 2025",
+      "autopaySource": "Resurs Gold"
+    },
+    {
+      "id": "30000000-0000-0000-0000-000000000002",
+      "title": "Flex August",
+      "subtitle": "Next invoice due Nov 30",
+      "amount": "2 750 kr",
+      "progress": 0.5,
+      "installmentAmount": "917 kr",
+      "totalAmount": "2 750 kr",
+      "completedPayments": 3,
+      "totalPayments": 6,
+      "nextDueDate": "Nov 30, 2025",
+      "autopaySource": "Resurs Gold"
+    },
+    {
+      "id": "30000000-0000-0000-0000-000000000003",
+      "title": "Bauhaus - October",
+      "subtitle": "Next invoice 30 Nov",
+      "amount": "726 kr / 4 356 kr",
+      "progress": 0.3333333333333333,
+      "installmentAmount": "726 kr",
+      "totalAmount": "4 356 kr",
+      "completedPayments": 2,
+      "totalPayments": 6,
+      "nextDueDate": "Dec 15, 2025",
+      "autopaySource": "Bauhaus Invoice"
+    },
+    {
+      "id": "30000000-0000-0000-0000-000000000004",
+      "title": "Bauhaus - September",
+      "subtitle": "Next invoice 30 Nov",
+      "amount": "900 kr / 1 500 kr",
+      "progress": 0.6,
+      "installmentAmount": "300 kr",
+      "totalAmount": "1 500 kr",
+      "completedPayments": 3,
+      "totalPayments": 5,
+      "nextDueDate": "Nov 30, 2025",
+      "autopaySource": "Swish"
+    },
+    {
+      "id": "30000000-0000-0000-0000-000000000005",
+      "title": "Main Account",
+      "subtitle": "No invoice until you make a purchase",
+      "amount": "0 kr",
+      "progress": 0.0,
+      "installmentAmount": "",
+      "totalAmount": "0 kr",
+      "completedPayments": 0,
+      "totalPayments": 0,
+      "nextDueDate": "Nov 30, 2025",
+      "autopaySource": "Netonnet"
+    }
+  ]
+}
+

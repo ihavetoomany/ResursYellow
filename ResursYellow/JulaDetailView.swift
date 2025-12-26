@@ -26,8 +26,8 @@ struct JulaDetailView: View {
     ]
     
     private let partPayments: [PartPaymentItem] = [
-        PartPaymentItem(title: "Garden Upgrade", subtitle: "2 of 5 payments done", amount: "720 kr / 3 600 kr", progress: 0.4),
-        PartPaymentItem(title: "Workshop Refresh", subtitle: "1 of 4 payments done", amount: "500 kr / 2 000 kr", progress: 0.25)
+        PartPaymentItem(id: UUID(), title: "Garden Upgrade", subtitle: "2 of 5 payments done", amount: "720 kr / 3 600 kr", progress: 0.4),
+        PartPaymentItem(id: UUID(), title: "Workshop Refresh", subtitle: "1 of 4 payments done", amount: "500 kr / 2 000 kr", progress: 0.25)
     ]
     
     var body: some View {

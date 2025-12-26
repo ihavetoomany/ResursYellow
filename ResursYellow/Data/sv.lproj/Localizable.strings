@@ -1,0 +1,136 @@
+/* Common */
+"Today" = "Idag";
+"Yesterday" = "Igår";
+"days ago" = "dagar sedan";
+"In" = "Om";
+"days" = "dagar";
+"Tomorrow" = "Imorgon";
+"greeting_morning" = "God morgon";
+"greeting_day" = "God dag";
+"greeting_evening" = "God kväll";
+"greeting_night" = "God natt";
+
+/* Wallet */
+"Invoices" = "Fakturor";
+"Purchases" = "Köp";
+"No unpaid invoices" = "Inga obetalda fakturor";
+"You're all caught up for now" = "Du är allt ikapp för tillfället";
+"No recent purchases" = "Inga senaste köp";
+"Your recent activity will appear here" = "Din senaste aktivitet visas här";
+"Actions" = "Åtgärder";
+"Recommended Actions" = "Rekommenderade åtgärder";
+"suggestions" = "förslag";
+"Paid with" = "Betalad med";
+"Part Pay" = "Delbetala";
+
+/* Invoice Status */
+"Overdue" = "Försenad";
+"Paid" = "Betalad";
+"Scheduled" = "Schemalagd";
+"Snoozed" = "Uppskjuten";
+"Due in" = "Förfaller om";
+"Overdue by" = "Försenad med";
+"Paid on" = "Betalad den";
+"Scheduled for" = "Schemalagd för";
+
+/* Account Information */
+"Account information" = "Kontoinformation";
+"Type" = "Typ";
+"Credit" = "Kredit";
+"Current debt" = "Nuvarande skuld";
+"OCR" = "OCR";
+"Bankgiro" = "Bankgiro";
+"Next invoice" = "Nästa faktura";
+"Next due" = "Nästa förfallodag";
+"Status" = "Status";
+
+/* Next Payment */
+"Next payment" = "Nästa betalning";
+"Amount" = "Belopp";
+"Invoice created" = "Faktura skapad";
+"Invoice due" = "Faktura förfaller";
+"Due date" = "Förfallodag";
+"Payment method" = "Betalningsmetod";
+
+/* Transactions */
+"Transactions" = "Transaktioner";
+"Payment received" = "Betalning mottagen";
+"Initial purchase" = "Första köp";
+
+/* Invoice History */
+"Invoice History" = "Fakturahistorik";
+
+/* Account Types */
+"Account" = "Konto";
+"Flex" = "Flex";
+"Invoice Account" = "Fakturakonto";
+
+/* Credit Types */
+"Mastercard" = "Mastercard";
+"Resurs Gold" = "Resurs Gold";
+"Store Credit" = "Butikskredit";
+"Onetime Credit" = "Engångskredit";
+"Bauhaus Invoice" = "Bauhaus Faktura";
+
+/* Status Messages */
+"Part payment ongoing" = "Delbetalning pågår";
+"Options available on next invoice" = "Alternativ tillgängliga på nästa faktura";
+"All purchases are paid" = "Alla köp är betalda";
+"No invoice until you make a purchase" = "Ingen faktura förrän du gör ett köp";
+
+/* Actions */
+"Reset Data" = "Återställ data";
+"Reset all data to defaults?" = "Återställa all data till standard?";
+"This will clear all changes you've made." = "Detta kommer att radera alla ändringar du har gjort.";
+"Cancel" = "Avbryt";
+"Reset" = "Återställ";
+
+/* Language */
+"Language" = "Språk";
+"Svenska" = "Svenska";
+"English" = "Engelska";
+
+/* Manage / Settings */
+"Manage" = "Hantera";
+"Support, profile & settings" = "Support, profil & inställningar";
+"Support" = "Support";
+"Profile" = "Profil";
+"Settings" = "Inställningar";
+"Report issue" = "Rapportera problem";
+"Messages from the bank" = "Meddelanden från banken";
+"View bank notifications" = "Visa banknotifikationer";
+"Live chat" = "Livechatt";
+"FAQ" = "Vanliga frågor";
+"Check loan application status" = "Kontrollera låneansökningsstatus";
+"Customer ID" = "Kund-ID";
+"Contact information" = "Kontaktinformation";
+"Email, Phone" = "E-post, Telefon";
+"Know Your Customer" = "Känna din kund";
+"My documents" = "Mina dokument";
+"Agreements, Contracts" = "Avtal, Kontrakt";
+"Chart of expenses" = "Utgiftsdiagram";
+"View spending breakdown" = "Visa utgiftsfördelning";
+"Chart of available credit" = "Diagram över tillgänglig kredit";
+"Credit utilization" = "Kreditanvändning";
+"Spending trends" = "Utgiftstrender";
+"Gamification" = "Spelifiering";
+"Connect bank account" = "Anslut bankkonto";
+"Link external accounts" = "Länka externa konton";
+"Notification settings" = "Notifikationsinställningar";
+"Communication, Marketing" = "Kommunikation, Marknadsföring";
+"Theme" = "Tema";
+"Light, Dark, Auto" = "Ljus, Mörk, Auto";
+"Accessibility settings" = "Tillgänglighetsinställningar";
+"Autopay" = "Autobetalning";
+"Automatic payments" = "Automatiska betalningar";
+"Change shortcuts on homepage" = "Ändra genvägar på startsidan";
+"Customize homepage" = "Anpassa startsidan";
+"Restore default data" = "Återställ standarddata";
+"Log out" = "Logga ut";
+"Sign out of your account" = "Logga ut från ditt konto";
+
+/* Tab Labels */
+"Wallet" = "Plånbok";
+"Banking" = "Bank";
+"Merchants" = "Handlare";
+

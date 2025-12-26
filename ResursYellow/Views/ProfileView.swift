@@ -9,8 +9,11 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(\.dismiss) var dismiss
+    @StateObject private var dataManager = DataManager.shared
+    @StateObject private var localizationService = LocalizationService.shared
     @State private var navigationPath = NavigationPath()
     @State private var showLogoutConfirmation = false
+    @State private var showResetConfirmation = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -130,7 +133,7 @@ struct ProfileView: View {
                                 NavigationLink(value: "Language") {
                                     ProfileRow(
                                         title: "Language",
-                                        subtitle: "App language",
+                                        subtitle: localizationService.currentLanguage.displayName,
                                         icon: "globe",
                                         color: .cyan,
                                         showChevron: true
@@ -166,6 +169,19 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                
+                                Button {
+                                    showResetConfirmation = true
+                                } label: {
+                                    ProfileRow(
+                                        title: "Reset Data",
+                                        subtitle: "Restore default data",
+                                        icon: "arrow.counterclockwise",
+                                        color: .orange,
+                                        showChevron: false
+                                    )
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                             
                             // Log out Section
@@ -235,6 +251,14 @@ struct ProfileView: View {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Are you sure you want to log out?")
+            }
+            .confirmationDialog("Reset Data", isPresented: $showResetConfirmation, titleVisibility: .visible) {
+                Button("Reset", role: .destructive) {
+                    dataManager.reset()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will restore all data to default values. All your changes will be lost. Are you sure?")
             }
         }
     }
@@ -610,19 +634,23 @@ struct ThemeSettingsView: View {
 }
 
 struct LanguageSettingsView: View {
-    @AppStorage("selectedLanguage") private var selectedLanguage = "English"
+    @StateObject private var localizationService = LocalizationService.shared
     
     var body: some View {
         List {
             Section {
-                Picker("Language", selection: $selectedLanguage) {
-                    Text("English").tag("English")
-                    Text("Svenska").tag("Svenska")
-                    Text("Norsk").tag("Norsk")
-                    Text("Dansk").tag("Dansk")
+                Picker("Language", selection: Binding(
+                    get: { localizationService.currentLanguage },
+                    set: { localizationService.setLanguage($0) }
+                )) {
+                    ForEach(Language.allCases) { language in
+                        Text(language.displayName).tag(language)
+                    }
                 }
             } header: {
                 Text("App Language")
+            } footer: {
+                Text("Choose your preferred language for the app interface.")
             }
         }
         .navigationTitle("Language")

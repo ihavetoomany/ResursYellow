@@ -11,34 +11,18 @@ import Combine
 struct ResursFamilyAccountView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @StateObject private var dataManager = DataManager.shared
     
-    // Invoice Accounts - Resurs Gold's own payment plans
-    private let invoiceAccounts: [PartPaymentItem] = [
-        PartPaymentItem(
-            title: "Main Account",
-            subtitle: "Next invoice due Nov 30",
-            amount: "21 245 kr",
-            progress: 5.0/10.0,
-            installmentAmount: "21 245 kr",
-            totalAmount: "21 245 kr",
-            completedPayments: 5,
-            totalPayments: 10,
-            nextDueDate: "Nov 2025",
-            autopaySource: "Resurs Gold"
-        ),
-        PartPaymentItem(
-            title: "Flex August",
-            subtitle: "Next invoice due Nov 30",
-            amount: "2 750 kr",
-            progress: 3.0/6.0,
-            installmentAmount: "917 kr",
-            totalAmount: "2 750 kr",
-            completedPayments: 3,
-            totalPayments: 6,
-            nextDueDate: "Nov 30, 2025",
-            autopaySource: "Resurs Gold"
-        )
-    ]
+    // Invoice Accounts - Resurs Gold's own payment plans (filtered from DataManager)
+    private var invoiceAccounts: [PartPaymentItem] {
+        // Filter invoice accounts for Resurs Gold (autopaySource contains "Resurs Gold" or "Mastercard")
+        dataManager.invoiceAccounts
+            .filter { account in
+                account.autopaySource.lowercased().contains("resurs gold") ||
+                account.autopaySource.lowercased().contains("mastercard")
+            }
+            .map { $0.toPartPaymentItem() }
+    }
     
     // Benefits for Resurs Gold
     private let benefits: [(icon: String, title: String, desc: String)] = [

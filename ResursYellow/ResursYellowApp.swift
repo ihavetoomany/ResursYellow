@@ -10,15 +10,28 @@ import SwiftUI
 @main
 struct ResursYellowApp: App {
     @AppStorage("hasSeenAboutDialog") private var hasSeenAboutDialog = false
+    @AppStorage("selectedTheme") private var selectedTheme = "Auto"
     @State private var showAbout = false
     
     init() {
         configureTabBarAppearance()
     }
     
+    private var colorScheme: ColorScheme? {
+        switch selectedTheme {
+        case "Light":
+            return .light
+        case "Dark":
+            return .dark
+        default: // "Auto"
+            return nil // nil means use system setting
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(colorScheme)
                 .task {
                     // Show about dialog only on first launch, after a short delay to let the UI settle
                     if !hasSeenAboutDialog {

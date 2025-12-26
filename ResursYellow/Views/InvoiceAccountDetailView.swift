@@ -10,6 +10,8 @@ import SwiftUI
 struct InvoiceAccountDetailView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @StateObject private var dataManager = DataManager.shared
+    private let dateService = DateService.shared
     @State private var showActionsMenu = false
     
     let account: PartPaymentItem
@@ -318,161 +320,26 @@ struct InvoiceAccountDetailView: View {
     }
     
     private var sampleTransactions: [TransactionItem] {
-        var transactions: [TransactionItem] = []
-        
-        // Add transactions for Flex August account with specific dates
-        if account.title == "Flex August" {
-            transactions = [
-                TransactionItem(
-                    date: "Oct 30, 2025",
-                    description: "Payment received",
-                    amount: account.installmentAmount.isEmpty ? "917 kr" : account.installmentAmount,
-                    amountColor: .green
-                ),
-                TransactionItem(
-                    date: "Sep 30, 2025",
-                    description: "Payment received",
-                    amount: account.installmentAmount.isEmpty ? "917 kr" : account.installmentAmount,
-                    amountColor: .green
-                ),
-                TransactionItem(
-                    date: "Aug 30, 2025",
-                    description: "Payment received",
-                    amount: account.installmentAmount.isEmpty ? "917 kr" : account.installmentAmount,
-                    amountColor: .green
-                ),
-                TransactionItem(
-                    date: "Jul 10, 2025",
-                    description: "Apoteket Hjärtat",
-                    amount: "5 500 kr",
-                    amountColor: .red
-                )
-            ]
-        } else if account.title == "Main Account" {
-            // Credit card-style transactions for Main Account
-            transactions = [
-                TransactionItem(
-                    date: "Nov 25, 2025",
-                    description: "ICA Maxi",
-                    amount: "1 245 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Nov 22, 2025",
-                    description: "Stadium Outlet",
-                    amount: "1 080 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Nov 18, 2025",
-                    description: "Clas Ohlson",
-                    amount: "890 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Nov 15, 2025",
-                    description: "Åhléns",
-                    amount: "2 450 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Nov 12, 2025",
-                    description: "NetOnNet Warehouse",
-                    amount: "12 499 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Nov 8, 2025",
-                    description: "Bauhaus Megastore",
-                    amount: "4 356 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Nov 3, 2025",
-                    description: "Jula Kungens Kurva",
-                    amount: "2 145 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Oct 31, 2025",
-                    description: "Payment received",
-                    amount: "18 750 kr",
-                    amountColor: .green
-                ),
-                TransactionItem(
-                    date: "Oct 28, 2025",
-                    description: "Elgiganten",
-                    amount: "5 699 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Oct 25, 2025",
-                    description: "ICA",
-                    amount: "452 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Oct 20, 2025",
-                    description: "Stadium",
-                    amount: "2 340 SEK",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Oct 15, 2025",
-                    description: "Clas Ohlson",
-                    amount: "785 SEK",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Oct 10, 2025",
-                    description: "Åhléns",
-                    amount: "300 SEK",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Oct 5, 2025",
-                    description: "NetOnNet",
-                    amount: "1 568 SEK",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Oct 2, 2025",
-                    description: "Bauhaus",
-                    amount: "4 356 kr",
-                    amountColor: .red
-                ),
-                TransactionItem(
-                    date: "Sep 30, 2025",
-                    description: "Payment received",
-                    amount: "15 200 kr",
-                    amountColor: .green
-                )
-            ]
-        } else {
-            // Default transactions for other accounts
-            transactions = [
-                TransactionItem(
-                    date: "Nov 15, 2025",
-                    description: "Payment received",
-                    amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount,
-                    amountColor: .green
-                ),
-                TransactionItem(
-                    date: "Oct 15, 2025",
-                    description: "Payment received",
-                    amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount,
-                    amountColor: .green
-                ),
-                TransactionItem(
-                    date: "Sep 15, 2025",
-                    description: "Payment received",
-                    amount: account.installmentAmount.isEmpty ? "5 326 kr" : account.installmentAmount,
-                    amountColor: .green
-                )
-            ]
+        // Find the InvoiceAccount that matches this PartPaymentItem
+        guard let invoiceAccount = dataManager.invoiceAccounts.first(where: { $0.id == account.id }) else {
+            return []
         }
         
-        return transactions
+        // Get transactions for this account
+        let accountTransactions = dataManager.transactionsForAccount(invoiceAccount.id)
+        
+        // Convert to TransactionItem and sort by date (newest first)
+        return accountTransactions
+            .map { $0.toTransactionItem(dateService: dateService) }
+            .sorted { date1, date2 in
+                // Parse dates and compare (simplified - assumes format "MMM d, yyyy")
+                // For simplicity, we'll sort by transaction date offset
+                let t1 = dataManager.transactions.first(where: { $0.id == date1.id })
+                let t2 = dataManager.transactions.first(where: { $0.id == date2.id })
+                let offset1 = t1?.dateOffset ?? 0
+                let offset2 = t2?.dateOffset ?? 0
+                return offset1 > offset2 // Newest first
+            }
     }
 }
 
@@ -525,13 +392,7 @@ struct TransactionRow: View {
     }
 }
 
-struct TransactionItem: Identifiable {
-    let id = UUID()
-    let date: String
-    let description: String
-    let amount: String
-    let amountColor: Color
-}
+// TransactionItem is now defined in TransactionExtensions.swift
 
 // MARK: - Actions Sheet
 struct ActionsSheet: View {

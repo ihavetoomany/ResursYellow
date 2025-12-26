@@ -9,20 +9,17 @@ import SwiftUI
 
 struct ExploreView: View {
     @State private var navigationPath = NavigationPath()
-    @State private var showProfile = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
                 title: "Discover",
                 subtitle: "Explore more",
-                trailingButton: "person.fill",
+                trailingButton: "",
                 trailingButtonTint: .black,
                 trailingButtonSize: 52,
                 trailingButtonIconScale: 0.6,
-                trailingButtonAction: {
-                    showProfile = true
-                }
+                trailingButtonAction: nil
             ) {
                 VStack(spacing: 16) {
                     // Highlights Section
@@ -164,9 +161,6 @@ struct ExploreView: View {
                     navigationPath.removeLast(navigationPath.count)
                 }
                 // If at root, the StickyHeaderView will handle scrolling to top
-            }
-            .sheet(isPresented: $showProfile) {
-                ProfileView()
             }
         }
     }

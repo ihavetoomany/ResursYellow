@@ -15,13 +15,36 @@ extension Notification.Name {
 }
 
 struct ContentView: View {
+    @StateObject private var localizationService = LocalizationService.shared
     @State private var selectedTab = 0
     @StateObject private var paymentPlansManager = PaymentPlansManager()
     @State private var hasAppeared = false
     @State private var isReady = false // defer heavy UI one frame
     
+    // Computed properties for tab labels that reference currentLanguage
+    private var walletLabel: String {
+        _ = localizationService.currentLanguage
+        return localizationService.localizedString("Wallet", fallback: "Wallet")
+    }
+    
+    private var bankingLabel: String {
+        _ = localizationService.currentLanguage
+        return localizationService.localizedString("Banking", fallback: "Banking")
+    }
+    
+    private var merchantsLabel: String {
+        _ = localizationService.currentLanguage
+        return localizationService.localizedString("Merchants", fallback: "Merchants")
+    }
+    
+    private var manageLabel: String {
+        _ = localizationService.currentLanguage
+        return localizationService.localizedString("Manage", fallback: "Manage")
+    }
+    
     var body: some View {
-        Group {
+        let _ = localizationService.currentLanguage // Ensure view updates when language changes
+        return Group {
             if !isReady {
                 // Lightweight launch scaffold for the very first frame
                 ZStack {
@@ -63,7 +86,7 @@ struct ContentView: View {
                         WalletView()
                     }
                     .tabItem {
-                        Label("Wallet", systemImage: selectedTab == 0 ? "wallet.bifold.fill" : "wallet.bifold")
+                        Label(walletLabel, systemImage: selectedTab == 0 ? "wallet.bifold.fill" : "wallet.bifold")
                     }
                     .tag(0)
                     
@@ -78,7 +101,7 @@ struct ContentView: View {
                         }
                     }
                     .tabItem {
-                        Label("Banking", systemImage: selectedTab == 1 ? "building.columns.fill" : "building.columns")
+                        Label(bankingLabel, systemImage: selectedTab == 1 ? "building.columns.fill" : "building.columns")
                     }
                     .tag(1)
                     
@@ -93,7 +116,7 @@ struct ContentView: View {
                         }
                     }
                     .tabItem {
-                        Label("Merchants", systemImage: selectedTab == 2 ? "cart.fill" : "cart")
+                        Label(merchantsLabel, systemImage: selectedTab == 2 ? "cart.fill" : "cart")
                     }
                     .tag(2)
                     
@@ -108,12 +131,14 @@ struct ContentView: View {
                         }
                     }
                     .tabItem {
-                        Label("Manage", systemImage: selectedTab == 3 ? "gearshape.fill" : "gearshape")
+                        Label(manageLabel, systemImage: selectedTab == 3 ? "gearshape.fill" : "gearshape")
                     }
                     .tag(3)
                 }
                 .tint(.blue) // Native iOS blue tint for selected items
                 .environmentObject(paymentPlansManager)
+                .environmentObject(localizationService)
+                .id(localizationService.currentLanguage) // Force refresh when language changes
             }
         }
         .task {
