@@ -702,7 +702,7 @@ struct InvoiceHistorySection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(title)
-                .font(.title2)
+                .font(.headline)
                 .fontWeight(.semibold)
             
             VStack(spacing: 12) {
@@ -717,9 +717,6 @@ struct InvoiceHistorySection: View {
                 }
             }
         }
-        .padding(20)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     
     private static let sampleInvoices: [InvoiceHistoryItem] = [
@@ -754,33 +751,62 @@ struct InvoiceHistoryRow: View {
     let status: String
     let isPaid: Bool
     
+    private var statusColor: Color {
+        if isPaid {
+            return .green
+        } else if status == "Overdue" {
+            return .orange
+        } else {
+            return .yellow
+        }
+    }
+    
+    private var statusText: String {
+        if isPaid {
+            return "Paid"
+        } else if status == "Overdue" {
+            return "Overdue"
+        } else {
+            return status
+        }
+    }
+    
     var body: some View {
         HStack(spacing: 16) {
-            Image(systemName: isPaid ? "checkmark.circle.fill" : "clock.fill")
-                .font(.title3)
-                .foregroundColor(isPaid ? .green : .orange)
-                .frame(width: 36, height: 36)
-                .background((isPaid ? Color.green : Color.orange).opacity(0.2))
-                .clipShape(Circle())
+            // Status indicator
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(statusColor.opacity(0.2))
+                .frame(width: 44, height: 44)
+                .overlay(
+                    Image(systemName: "doc.text.fill")
+                        .font(.title3)
+                        .foregroundColor(statusColor)
+                )
             
+            // Middle: Invoice number and date
             VStack(alignment: .leading, spacing: 4) {
                 Text(invoiceNumber)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
                 Text(date)
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
             }
             
             Spacer()
             
+            // Right: Amount and status
             VStack(alignment: .trailing, spacing: 4) {
                 Text(amount)
-                    .font(.subheadline)
+                    .font(.headline)
                     .fontWeight(.semibold)
-                Text(status)
-                    .font(.caption)
-                    .foregroundColor(isPaid ? .green : .orange)
+                    .foregroundColor(.primary)
+                if !statusText.isEmpty {
+                    Text(statusText)
+                        .font(.subheadline)
+                        .foregroundColor(statusColor)
+                }
             }
         }
         .padding(16)

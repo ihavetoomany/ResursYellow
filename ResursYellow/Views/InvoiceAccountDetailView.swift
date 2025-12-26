@@ -35,6 +35,9 @@ struct InvoiceAccountDetailView: View {
                         Color.clear.frame(height: 60)
                     
                         VStack(spacing: 24) {
+                            // Next Payment Card
+                            nextPaymentCard
+                            
                             // Account Info Section
                             accountInfoSection
                             
@@ -109,6 +112,55 @@ struct InvoiceAccountDetailView: View {
         }
     }
     
+    // MARK: - Next Payment Card
+    private var nextPaymentCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label {
+                Text("Next payment")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+            } icon: {
+                Image(systemName: "calendar.badge.clock")
+                    .foregroundColor(.blue)
+            }
+            
+            Divider()
+            
+            HStack {
+                Text("Amount")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(account.installmentAmount.isEmpty ? account.amount : account.installmentAmount)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+            
+            HStack {
+                Text("Invoice created")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("Nov 10, 2025")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+            
+            HStack {
+                Text("Invoice due")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("Nov 30, 2025")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+        }
+        .padding(20)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+    
     // MARK: - Account Info Section
     private var accountInfoSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -123,6 +175,30 @@ struct InvoiceAccountDetailView: View {
             }
             
             VStack(spacing: 8) {
+                HStack {
+                    Text("Type")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(account.title == "Main Account" ? "Account" : account.title == "Flex August" ? "Flex" : "Invoice Account")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text("Credit")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("Mastercard")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Divider()
+                
                 HStack {
                     Text("Current debt")
                         .font(.subheadline)
@@ -157,41 +233,6 @@ struct InvoiceAccountDetailView: View {
                         .fontWeight(.medium)
                 }
                 
-                Divider()
-                
-                HStack {
-                    Text("Next invoice")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(account.installmentAmount.isEmpty ? account.amount : account.installmentAmount)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                }
-                
-                Divider()
-                
-                HStack {
-                    Text("Next due")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(account.nextDueDate.isEmpty ? "Not scheduled" : account.nextDueDate)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                }
-                
-                Divider()
-                
-                HStack {
-                    Text("Status")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text("Upcoming")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                }
             }
         }
         .padding(20)
@@ -305,6 +346,106 @@ struct InvoiceAccountDetailView: View {
                     description: "Apoteket Hjärtat",
                     amount: "5 500 kr",
                     amountColor: .red
+                )
+            ]
+        } else if account.title == "Main Account" {
+            // Credit card-style transactions for Main Account
+            transactions = [
+                TransactionItem(
+                    date: "Nov 25, 2025",
+                    description: "ICA Maxi",
+                    amount: "1 245 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Nov 22, 2025",
+                    description: "Stadium Outlet",
+                    amount: "1 080 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Nov 18, 2025",
+                    description: "Clas Ohlson",
+                    amount: "890 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Nov 15, 2025",
+                    description: "Åhléns",
+                    amount: "2 450 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Nov 12, 2025",
+                    description: "NetOnNet Warehouse",
+                    amount: "12 499 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Nov 8, 2025",
+                    description: "Bauhaus Megastore",
+                    amount: "4 356 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Nov 3, 2025",
+                    description: "Jula Kungens Kurva",
+                    amount: "2 145 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Oct 31, 2025",
+                    description: "Payment received",
+                    amount: "18 750 kr",
+                    amountColor: .green
+                ),
+                TransactionItem(
+                    date: "Oct 28, 2025",
+                    description: "Elgiganten",
+                    amount: "5 699 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Oct 25, 2025",
+                    description: "ICA",
+                    amount: "452 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Oct 20, 2025",
+                    description: "Stadium",
+                    amount: "2 340 SEK",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Oct 15, 2025",
+                    description: "Clas Ohlson",
+                    amount: "785 SEK",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Oct 10, 2025",
+                    description: "Åhléns",
+                    amount: "300 SEK",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Oct 5, 2025",
+                    description: "NetOnNet",
+                    amount: "1 568 SEK",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Oct 2, 2025",
+                    description: "Bauhaus",
+                    amount: "4 356 kr",
+                    amountColor: .red
+                ),
+                TransactionItem(
+                    date: "Sep 30, 2025",
+                    description: "Payment received",
+                    amount: "15 200 kr",
+                    amountColor: .green
                 )
             ]
         } else {

@@ -17,9 +17,8 @@ struct NetOnNetDetailView: View {
     }
     
     private let purchases: [MerchantPurchase] = [
-        MerchantPurchase(title: "Smart TV 65”", subtitle: "Nov 6, 2025", amount: "12 499 kr", icon: "display.2", color: .blue),
-        MerchantPurchase(title: "Soundbar Bundle", subtitle: "Oct 28, 2025", amount: "4 299 kr", icon: "speaker.wave.3.fill", color: .purple),
-        MerchantPurchase(title: "Gaming Monitor", subtitle: "Oct 12, 2025", amount: "3 990 kr", icon: "gamecontroller.fill", color: .indigo)
+        MerchantPurchase(title: "Smart TV 65\"", subtitle: "Nov 6, 2023", amount: "12 499 kr", icon: "display.2", color: .blue),
+        MerchantPurchase(title: "Soundbar Bundle", subtitle: "Oct 28, 2023", amount: "4 299 kr", icon: "speaker.wave.3.fill", color: .purple)
     ]
     
     private let benefits: [(icon: String, title: String, description: String)] = [
@@ -211,16 +210,21 @@ struct NetOnNetDetailView: View {
                 .padding(.horizontal, 4)
             
             VStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("You have no open accounts and no unpaid purchases at Bauhaus.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
-                .background(Color.green.opacity(0.1))
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                ResursGoldPartPaymentRow(
+                    payment: PartPaymentItem(
+                        title: "Main Account",
+                        subtitle: "No invoice until you make a purchase",
+                        amount: "0 kr",
+                        progress: 0.0,
+                        installmentAmount: "",
+                        totalAmount: "0 kr",
+                        completedPayments: 0,
+                        totalPayments: 0,
+                        nextDueDate: "Nov 30, 2025",
+                        autopaySource: "Netonnet"
+                    ),
+                    showsDisclosure: false
+                )
             }
         }
         .padding(.horizontal)

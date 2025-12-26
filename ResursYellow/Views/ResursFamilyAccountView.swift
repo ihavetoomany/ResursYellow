@@ -19,8 +19,8 @@ struct ResursFamilyAccountView: View {
             subtitle: "Next invoice due Nov 30",
             amount: "21 245 kr",
             progress: 5.0/10.0,
-            installmentAmount: "7 725 kr",
-            totalAmount: "77 250 kr",
+            installmentAmount: "21 245 kr",
+            totalAmount: "21 245 kr",
             completedPayments: 5,
             totalPayments: 10,
             nextDueDate: "Nov 2025",
@@ -373,7 +373,7 @@ struct ResursGoldPartPaymentRow: View {
             
             HStack {
                 if payment.title == "Main Account" {
-                    Text("Options available on next invoice")
+                    Text(payment.amount == "0 kr" ? "All purchases are paid" : "Options available on next invoice")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else if payment.title == "Flex August" {
@@ -386,9 +386,11 @@ struct ResursGoldPartPaymentRow: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                Text(payment.nextDueDate)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if !(payment.title == "Main Account" && payment.amount == "0 kr") {
+                    Text(payment.nextDueDate)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .padding(16)

@@ -407,12 +407,37 @@ private struct PartPaymentRow: View {
                 }
             }
             
-            Text(payment.amount)
-                .font(.subheadline)
-                .fontWeight(.semibold)
+            if payment.amount.contains("left to pay") {
+                let components = payment.amount.components(separatedBy: " left to pay")
+                let amountValue = components.first ?? payment.amount
+                HStack(spacing: 4) {
+                    Text(amountValue)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    Text("left to pay")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                }
+            } else if payment.title.contains("Bauhaus") {
+                HStack(spacing: 4) {
+                    Text("Debt:")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+                    Text(payment.totalAmount.isEmpty ? payment.amount : payment.totalAmount)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                .padding(.top, 8)
+            } else {
+                Text(payment.amount)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+            }
             
             ProgressView(value: payment.progress)
-                .tint(.red)
+                .tint(.orange)
             
             HStack {
                 Text("\(payment.completedPayments) of \(payment.totalPayments) payments")
@@ -441,11 +466,17 @@ struct PaintProjectSplitDetailView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                summaryCard
+            VStack(spacing: 24) {
+                // Next Payment Card
                 nextPaymentCard
-                PartPaymentsExplanationCard()
-                    .padding(.horizontal, 4)
+                
+                // Account Info Section
+                accountInfoSection
+                
+                // Transactions Section
+                transactionsSection
+                
+                // Invoice History
                 InvoiceHistorySection()
             }
             .padding()
@@ -489,13 +520,33 @@ struct PaintProjectSplitDetailView: View {
                     .fontWeight(.semibold)
             } icon: {
                 Image(systemName: "calendar.badge.clock")
-                    .foregroundColor(.red)
+                    .foregroundColor(.orange)
             }
             
             Divider()
             
             HStack {
-                Text("Due date")
+                Text("Amount")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(plan.installmentAmount.isEmpty ? plan.amount : plan.installmentAmount)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+            
+            HStack {
+                Text("Invoice created")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("Nov 10, 2025")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+            
+            HStack {
+                Text("Invoice due")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -503,20 +554,139 @@ struct PaintProjectSplitDetailView: View {
                     .font(.subheadline)
                     .fontWeight(.medium)
             }
-            
-            HStack {
-                Text("Payment method")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text(plan.autopaySource)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-            }
         }
         .padding(20)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+    
+    // MARK: - Account Info Section
+    private var accountInfoSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "info.circle.fill")
+                    .font(.title3)
+                    .foregroundColor(.orange)
+                
+                Text("Account information")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+            }
+            
+            VStack(spacing: 8) {
+                HStack {
+                    Text("Type")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(plan.title == "Bauhaus - October" ? "Account" : "Invoice")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text("Credit")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(plan.title == "Bauhaus - October" ? "Store Credit" : "Onetime Credit")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text("Current debt")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(plan.totalAmount.isEmpty ? plan.amount : plan.totalAmount)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text("OCR")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(generateOCR())
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text("Bankgiro")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("540-1234")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+            }
+        }
+        .padding(20)
+        .background(Color.orange.opacity(0.1))
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+    
+    // MARK: - Transactions Section
+    private var transactionsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Transactions")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            VStack(spacing: 12) {
+                ForEach(sampleTransactions, id: \.id) { transaction in
+                    TransactionRow(
+                        date: transaction.date,
+                        description: transaction.description,
+                        amount: transaction.amount,
+                        amountColor: transaction.amountColor
+                    )
+                }
+            }
+        }
+    }
+    
+    // MARK: - Helper Methods
+    private func generateOCR() -> String {
+        // Generate a simple OCR number based on plan title
+        let hash = abs(plan.title.hashValue) % 10000000
+        return String(format: "%07d", hash)
+    }
+    
+    private var sampleTransactions: [TransactionItem] {
+        [
+            TransactionItem(
+                date: "Nov 15, 2025",
+                description: "Payment received",
+                amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
+                amountColor: .green
+            ),
+            TransactionItem(
+                date: "Oct 15, 2025",
+                description: "Payment received",
+                amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
+                amountColor: .green
+            ),
+            TransactionItem(
+                date: "Sep 15, 2025",
+                description: "Payment received",
+                amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
+                amountColor: .green
+            )
+        ]
     }
     
 }
@@ -574,6 +744,7 @@ struct PartPaymentInvoice: Identifiable {
     let reference: String
     let status: Status
 }
+
 
 #Preview {
     BauhausDetailView()

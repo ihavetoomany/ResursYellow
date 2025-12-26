@@ -320,7 +320,7 @@ extension InvoiceItem {
                 icon: nil,
                 color: .yellow,
                 isOverdue: false,
-                statusOverride: "1 week",
+                statusOverride: "Snoozed",
                 category: .dueSoon,
                 detail: InvoiceData(
                     merchant: "Elgiganten",
@@ -328,7 +328,7 @@ extension InvoiceItem {
                     dueDate: "Nov 16, 2025",
                     invoiceNumber: "INV-2025-11-003",
                     issueDate: "Nov 2, 2025",
-                    status: "Due in 1 week",
+                    status: "Snoozed",
                     color: .yellow
                 )
             )
