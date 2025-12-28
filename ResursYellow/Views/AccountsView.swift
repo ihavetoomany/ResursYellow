@@ -97,6 +97,9 @@ struct AccountsView: View {
             }
             .sheet(isPresented: $showAddAccount) {
                 AddAccountView()
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                    .presentationBackground(.ultraThinMaterial)
             }
         }
     }

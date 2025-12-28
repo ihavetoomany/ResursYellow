@@ -215,7 +215,7 @@ struct TransactionDetailView: View {
                         }
                     }
                     .padding(.top, 20)
-                    .padding(.bottom, 120) // Add bottom padding to clear custom tab bar
+                    .padding(.bottom, 24)
                     .frame(width: geometry.size.width)
                 }
                 .frame(width: geometry.size.width)
@@ -298,8 +298,9 @@ struct TransactionDetailView: View {
                     }
                 }
             )
-            .presentationDetents([.medium])
+            .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+            .presentationBackground(.ultraThinMaterial)
         }
     }
 }
@@ -823,74 +824,87 @@ struct NewPaymentPlanSheet: View {
     @State private var paymentPlanName: String = ""
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 24) {
-                VStack(spacing: 12) {
-                    Text("Create New Payment Plan")
-                        .font(.title2)
-                        .fontWeight(.bold)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    VStack(spacing: 12) {
+                        Text("Create New Payment Plan")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Text("This purchase will be added to the new payment plan")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 8)
                     
-                    Text("This purchase will be added to the new payment plan")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 20)
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Payment Plan Name")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Payment Plan Name")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        
+                        TextField("e.g., Home Renovation", text: $paymentPlanName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding(12)
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding(.horizontal)
                     
-                    TextField("e.g., Home Renovation", text: $paymentPlanName)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(12)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Starting with")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        
+                        HStack {
+                            Text(merchant)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Spacer()
+                            Text(transactionAmount)
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                        }
+                        .padding(16)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .padding(.horizontal)
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Starting with")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    }
+                    .padding(.horizontal)
                     
-                    HStack {
-                        Text(merchant)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        Spacer()
-                        Text(transactionAmount)
-                            .font(.subheadline)
-                            .fontWeight(.bold)
+                    Button(action: {
+                        if !paymentPlanName.isEmpty {
+                            onPaymentPlanCreated(paymentPlanName)
+                            dismiss()
+                        }
+                    }) {
+                        Text("Create Payment Plan")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(paymentPlanName.isEmpty ? Color.gray : Color.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .disabled(paymentPlanName.isEmpty)
+                    .padding(.horizontal)
+                    .padding(.bottom, 24)
                 }
-                .padding(.horizontal)
-                
-                Spacer()
-                
-                Button(action: {
-                    if !paymentPlanName.isEmpty {
-                        onPaymentPlanCreated(paymentPlanName)
-                        dismiss()
-                    }
-                }) {
-                    Text("Create Payment Plan")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(paymentPlanName.isEmpty ? Color.gray : Color.blue)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .disabled(paymentPlanName.isEmpty)
-                .padding(.horizontal)
-                .padding(.bottom, 20)
             }
-            .background(Color(UIColor.systemBackground))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.primary)
+                }
+            }
         }
+        .presentationBackground(.ultraThinMaterial)
     }
 }
 

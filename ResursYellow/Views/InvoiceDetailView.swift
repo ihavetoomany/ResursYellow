@@ -37,7 +37,6 @@ struct InvoiceDetailView: View {
     @State private var showPaymentSheet = false
     @State private var isPaying = false
     @State private var isPaid = false
-    @State private var paymentSheetHeight: CGFloat = 0
     @State private var paidAmount: Double? = nil
     @State private var planSheetHeight: CGFloat = 0
 
@@ -222,10 +221,11 @@ struct InvoiceDetailView: View {
                         isPaid = true
                     }
                 },
-                onSizeChange: { height in paymentSheetHeight = height }
+                onSizeChange: { _ in }
             )
-            .presentationDetents([.height(max(200, min(paymentSheetHeight, UIScreen.main.bounds.height - 60)))])
+            .presentationDetents([.fraction(0.85), .large])
             .presentationDragIndicator(.visible)
+            .presentationBackground(.ultraThinMaterial)
         }
     }
 }
@@ -647,6 +647,7 @@ struct PaymentOptionRow: View {
     }
 }
 
+
 struct PaymentSheet: View {
     @Environment(\.dismiss) var dismiss
     @State private var paymentDate = Date()
@@ -783,239 +784,284 @@ struct PaymentSheet: View {
     }
 
     var body: some View {
-        VStack(spacing: 12) {
-            // Payment Amount (title removed per design)
-            VStack(spacing: 8) {
-                Text(formatSEK(displayAmount))
-                    .font(.system(size: 42, weight: .bold))
-                    .foregroundColor(.blue)
-                    .accessibilityLabel("Amount \(formatSEK(displayAmount))")
-                Button(action: {
+        NavigationStack {
+            VStack(spacing: 12) {
+                // Pay Icon
+                Image(systemName: "arrow.up")
+                    .font(.system(size: 48, weight: .semibold))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.blue, .cyan],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 88, height: 88)
+                    .background(
+                        Circle()
+                            .fill(.ultraThinMaterial)
+                            .overlay(
+                                Circle()
+                                    .strokeBorder(
+                                        LinearGradient(
+                                            colors: [.blue.opacity(0.3), .cyan.opacity(0.3)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 2
+                                    )
+                            )
+                    )
+                    .shadow(color: .blue.opacity(0.2), radius: 12, x: 0, y: 4)
+                    .padding(.top, 8)
+                
+                // Payment Amount
+                VStack(spacing: 8) {
+                    Text(formatSEK(displayAmount))
+                        .font(.system(size: 42, weight: .bold))
+                        .foregroundColor(.blue)
+                        .accessibilityLabel("Amount \(formatSEK(displayAmount))")
+                    Button(action: {
+                        ensureSelectionDefault()
+                        showPlanOptions = true
+                    }) {
+                        Text("Change Amount")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.blue)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.blue.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .onAppear {
                     ensureSelectionDefault()
-                    showPlanOptions = true
-                }) {
-                    Text("Change Amount")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.blue.opacity(0.12))
-                        .clipShape(Capsule())
+                    paymentDate = isOverdueInvoice ? Date() : (dueDateValue ?? Date())
+                    displayAmount = targetAmount
                 }
-                .buttonStyle(.plain)
-            }
-            .padding(.top, 36)
-            .onAppear {
-                ensureSelectionDefault()
-                paymentDate = isOverdueInvoice ? Date() : (dueDateValue ?? Date())
-                displayAmount = targetAmount
-            }
-            .onChange(of: targetAmount) { _, newValue in
-                if showPlanOptions {
-                    pendingTargetAmount = newValue
-                } else {
-                    animateAmountChange(to: newValue)
-                }
-            }
-            .onChange(of: showPlanOptions) { _, isPresented in
-                if !isPresented {
-                    let next = pendingTargetAmount ?? targetAmount
-                    pendingTargetAmount = nil
-                    animateAmountChange(to: next)
-                }
-            }
-            .onDisappear {
-                amountTimer?.invalidate()
-                amountTimer = nil
-            }
-
-            VStack(alignment: .leading, spacing: 12) {
-                // Account Card
-                HStack(alignment: .center) {
-                    Image(systemName: "creditcard.fill")
-                        .font(.title3)
-                        .foregroundColor(.blue)
-                        .frame(width: 36, height: 36)
-                        .background(Color.blue.opacity(0.2))
-                        .clipShape(Circle())
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Nordea *894")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                        Text("Checking account")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                .onChange(of: targetAmount) { _, newValue in
+                    if showPlanOptions {
+                        pendingTargetAmount = newValue
+                    } else {
+                        animateAmountChange(to: newValue)
                     }
-                    Spacer()
-                    HStack(spacing: 4) {
-                        Text("Change")
-                            .font(.caption.weight(.semibold))
-                        Image(systemName: "chevron.forward")
-                            .font(.caption.weight(.semibold))
-                    }
-                    .foregroundColor(.blue)
                 }
-                .padding(16)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding(.top, 8)
+                .onChange(of: showPlanOptions) { _, isPresented in
+                    if !isPresented {
+                        let next = pendingTargetAmount ?? targetAmount
+                        pendingTargetAmount = nil
+                        animateAmountChange(to: next)
+                    }
+                }
+                .onDisappear {
+                    amountTimer?.invalidate()
+                    amountTimer = nil
+                }
 
-                // Payment Plan Card
-                Button(action: { showPlanOptions = true }) {
-                    HStack(alignment: .top) {
-                        Image(systemName: "list.bullet.rectangle.fill")
+                VStack(alignment: .leading, spacing: 12) {
+                    // Account Card
+                    HStack(alignment: .center) {
+                        Image(systemName: "creditcard.fill")
                             .font(.title3)
-                            .foregroundColor(.purple)
+                            .foregroundColor(.blue)
                             .frame(width: 36, height: 36)
-                            .background(Color.purple.opacity(0.2))
+                            .background(Color.blue.opacity(0.2))
                             .clipShape(Circle())
 
-                        HStack(alignment: .center) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                let isFull = (selectedPlan == nil || selectedPlan?.months == 0)
-                                Text(isFull ? "Full payment" : (selectedPlan?.title ?? "Full payment"))
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-                                if isFull {
-                                    Text("One payment. Total \(invoice.amount)")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                } else if let plan = selectedPlan {
-                                    Text("\(Int(plan.monthlyCost)) kr / month · Total \(Int(plan.totalCost)) kr")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    if insuranceEnabled && plan.months >= 12 {
-                                        Text("Payment insurance included")
-                                            .font(.caption)
-                                            .foregroundColor(.green)
-                                    }
-                                }
-                            }
-                            Spacer()
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Nordea *894")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Text("Checking account")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
                         HStack(spacing: 4) {
-                            Text("Part Pay")
+                            Text("Change")
                                 .font(.caption.weight(.semibold))
                             Image(systemName: "chevron.forward")
                                 .font(.caption.weight(.semibold))
                         }
                         .foregroundColor(.blue)
-                        }
                     }
                     .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .contentShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .buttonStyle(.plain)
+                    .padding(.top, 8)
 
-                // Payment Date
-                if isOverdueInvoice {
-                    HStack(spacing: 12) {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .font(.title3)
-                            .foregroundColor(.blue)
-                            .frame(width: 36, height: 36)
-                            .background(Color.blue.opacity(0.15))
-                            .clipShape(Circle())
+                    // Payment Plan Card
+                    Button(action: { showPlanOptions = true }) {
+                        HStack(alignment: .top) {
+                            Image(systemName: "list.bullet.rectangle.fill")
+                                .font(.title3)
+                                .foregroundColor(.purple)
+                                .frame(width: 36, height: 36)
+                                .background(Color.purple.opacity(0.2))
+                                .clipShape(Circle())
 
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Pay now")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.primary)
-                            Text("Overdue invoice")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            HStack(alignment: .center) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    let isFull = (selectedPlan == nil || selectedPlan?.months == 0)
+                                    Text(isFull ? "Full payment" : (selectedPlan?.title ?? "Full payment"))
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.primary)
+                                    if isFull {
+                                        Text("One payment. Total \(invoice.amount)")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    } else if let plan = selectedPlan {
+                                        Text("\(Int(plan.monthlyCost)) kr / month · Total \(Int(plan.totalCost)) kr")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                        if insuranceEnabled && plan.months >= 12 {
+                                            Text("Payment insurance included")
+                                                .font(.caption)
+                                                .foregroundColor(.green)
+                                        }
+                                    }
+                                }
+                                Spacer()
+                                HStack(spacing: 4) {
+                                    Text("Part Pay")
+                                        .font(.caption.weight(.semibold))
+                                    Image(systemName: "chevron.forward")
+                                        .font(.caption.weight(.semibold))
+                                }
+                                .foregroundColor(.blue)
+                            }
                         }
-                        Spacer()
+                        .padding(16)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .contentShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                } else {
-                    HStack(spacing: 12) {
-                        Image(systemName: "calendar.badge.clock")
-                            .font(.title3)
-                            .foregroundColor(.blue)
-                            .frame(width: 36, height: 36)
-                            .background(Color.blue.opacity(0.15))
-                            .clipShape(Circle())
+                    .buttonStyle(.plain)
 
-                        VStack(alignment: .leading, spacing: 2) {
-                            let defaultDue = dueDateValue
-                            let isCustom = !datesEqual(paymentDate, defaultDue)
-                            let isAfterDue = {
-                                guard let due = defaultDue else { return false }
-                                return paymentDate > due && !Calendar.current.isDate(paymentDate, inSameDayAs: due)
-                            }()
-                            Text(isCustom ? "Custom date" : "On due date")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundColor(.primary)
-                            Text(isCustom ? (isAfterDue ? "After due" : "Your choice") : "Pay just in time")
-                                .font(.caption)
-                                .foregroundColor(isAfterDue ? .orange : .secondary)
+                    // Payment Date
+                    if isOverdueInvoice {
+                        HStack(spacing: 12) {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 36, height: 36)
+                                .background(Color.blue.opacity(0.15))
+                                .clipShape(Circle())
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Pay now")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(.primary)
+                                Text("Overdue invoice")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
                         }
-
-                        Spacer()
-
-                        DatePicker(
-                            "Payment Date",
-                            selection: $paymentDate,
-                            in: Date()...,
-                            displayedComponents: [.date]
-                        )
-                        .datePickerStyle(.compact)
-                        .labelsHidden()
-                        .accessibilityLabel("Payment date")
-                    }
-                    .padding(16)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-
-                Text("Scheduling a payment is a request to your bank to make a transfer. The request can be declined or fail for several reasons, and you must ensure there are sufficient funds in the selected account at the time of the requested transfer.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.vertical, 4)
-            }
-            .padding(.horizontal)
-
-            // Confirm Button
-            Button(action: {
-                if (selectedPlan?.months ?? 0) != 0 {
-                    showCreditRisk = true
-                } else {
-                    finalizePayment()
-                }
-            }) {
-                HStack {
-                    if isProcessing {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .padding(16)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     } else {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
+                        HStack(spacing: 12) {
+                            Image(systemName: "calendar.badge.clock")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 36, height: 36)
+                                .background(Color.blue.opacity(0.15))
+                                .clipShape(Circle())
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                let defaultDue = dueDateValue
+                                let isCustom = !datesEqual(paymentDate, defaultDue)
+                                let isAfterDue = {
+                                    guard let due = defaultDue else { return false }
+                                    return paymentDate > due && !Calendar.current.isDate(paymentDate, inSameDayAs: due)
+                                }()
+                                Text(isCustom ? "Custom date" : "On due date")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(.primary)
+                                Text(isCustom ? (isAfterDue ? "After due" : "Your choice") : "Pay just in time")
+                                    .font(.caption)
+                                    .foregroundColor(isAfterDue ? .orange : .secondary)
+                            }
+
+                            Spacer()
+
+                            DatePicker(
+                                "Payment Date",
+                                selection: $paymentDate,
+                                in: Date()...,
+                                displayedComponents: [.date]
+                            )
+                            .datePickerStyle(.compact)
+                            .labelsHidden()
+                            .accessibilityLabel("Payment date")
+                        }
+                        .padding(16)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    Text(isProcessing ? "Processing..." : "Confirm Payment")
-                        .font(.headline)
-                        .fontWeight(.semibold)
+
+                    Text("Scheduling a payment is a request to your bank to make a transfer. The request can be declined or fail for several reasons, and you must ensure there are sufficient funds in the selected account at the time of the requested transfer.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 4)
                 }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(isProcessing ? Color.gray : Color.blue)
-                .clipShape(Capsule())
-                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 6)
+                .padding(.horizontal)
+
+                // Confirm Button
+                Button(action: {
+                    if (selectedPlan?.months ?? 0) != 0 {
+                        showCreditRisk = true
+                    } else {
+                        finalizePayment()
+                    }
+                }) {
+                    HStack {
+                        if isProcessing {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        } else {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.title3)
+                        }
+                        Text(isProcessing ? "Processing..." : "Confirm Payment")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(isProcessing ? Color.gray : Color.blue)
+                    .clipShape(Capsule())
+                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 6)
+                }
+                .disabled(isProcessing)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
-            .disabled(isProcessing)
-            .padding(.horizontal)
-            .padding(.bottom, 8)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        if !isProcessing {
+                            dismiss()
+                        }
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.primary)
+                    .disabled(isProcessing)
+                    .opacity(isProcessing ? 0.4 : 1)
+                }
+            }
         }
-        .background(Color(UIColor.systemBackground))
-        .fixedSize(horizontal: false, vertical: true)
         .fullScreenCover(isPresented: $showCreditRisk) {
             CreditRiskOverlay(
                 onAcknowledge: {
@@ -1027,32 +1073,6 @@ struct PaymentSheet: View {
                 }
             )
         }
-        .overlay(alignment: .topTrailing) {
-            Button(action: { if !isProcessing { dismiss() } }) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.primary)
-                    .frame(width: 40, height: 40)
-                    .background(.ultraThinMaterial)
-                    .clipShape(Circle())
-                    .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
-            }
-            .padding(.trailing, 16)
-            .padding(.top, 16)
-            .accessibilityLabel("Close")
-            .buttonStyle(.plain)
-            .disabled(isProcessing)
-            .opacity(isProcessing ? 0.4 : 1)
-        }
-        .background(
-            GeometryReader { geo in
-                Color.clear
-                    .onAppear { onSizeChange(geo.size.height) }
-                    .onChange(of: geo.size.height) { _, newValue in
-                        onSizeChange(newValue)
-                    }
-            }
-        )
         .sheet(isPresented: $showPlanOptions) {
             PlanOptionsListSheet(
                 plans: availablePlans,
@@ -1062,8 +1082,9 @@ struct PaymentSheet: View {
                     selectedPlan = plan
                 }
             )
-            .presentationDetents([.large])
+            .presentationDetents([.fraction(0.9), .large])
             .presentationDragIndicator(.visible)
+            .presentationBackground(.ultraThinMaterial)
         }
     }
 }
@@ -1131,7 +1152,7 @@ struct PlanOptionsSheet: View {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark")
                             .font(.headline.weight(.bold))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                             .frame(width: 36, height: 36)
                             .background(.ultraThinMaterial)
                             .clipShape(Circle())
@@ -1292,7 +1313,6 @@ struct PlanOptionsSheet: View {
             }
         }
         .padding()
-        .background(Color(UIColor.systemBackground))
         .fixedSize(horizontal: false, vertical: true)
         .onAppear {
             sliderIndex = initialIndex()
@@ -1328,41 +1348,9 @@ struct PlanOptionsListSheet: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .center) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.primary)
-                        .frame(width: 32, height: 32)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
-                        .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
-                }
-
-                Spacer(minLength: 0)
-
-                Text("Select Payment Option")
-                    .font(.headline.weight(.semibold))
-                    .frame(maxWidth: .infinity, alignment: .center)
-
-                Spacer(minLength: 0)
-
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .font(.headline.weight(.bold))
-                        .foregroundColor(.primary)
-                        .frame(width: 32, height: 32)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
-                        .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
-                }
-            }
-            .padding(.horizontal, 8)
-            .padding(.top, 8)
-            .padding(.bottom, 12)
-
-            ScrollView {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 0) {
+                ScrollView {
                 VStack(spacing: 12) {
                     let activeSelection = localSelection ?? selectedPlan ?? plans.first
                     let currentSelectionMonths = activeSelection?.months
@@ -1469,15 +1457,29 @@ struct PlanOptionsListSheet: View {
             .buttonStyle(.plain)
             .disabled(false)
             .opacity(1)
-        }
-        .padding()
-        .background(Color(UIColor.systemBackground))
-        .task {
-            if localSelection == nil {
-                let initial = selectedPlan ?? plans.first
-                if let initial {
-                    localSelection = initial
-                    onSelect(initial)
+            }
+            .padding()
+            .navigationTitle("Select Payment Option")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.primary)
+                }
+            }
+            .task {
+                if localSelection == nil {
+                    let initial = selectedPlan ?? plans.first
+                    if let initial {
+                        localSelection = initial
+                        onSelect(initial)
+                    }
                 }
             }
         }
@@ -1492,30 +1494,6 @@ struct CreditRiskOverlay: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // Grabber + close
-                    ZStack {
-                        Capsule()
-                            .fill(Color.secondary.opacity(0.4))
-                            .frame(width: 40, height: 5)
-                            .padding(.top, 0)
-                            .frame(maxWidth: .infinity, alignment: .center)
-
-                        HStack {
-                            Spacer()
-                            Button(action: onCancel) {
-                                Image(systemName: "xmark")
-                                    .font(.headline.weight(.bold))
-                                    .foregroundColor(.primary)
-                                    .frame(width: 36, height: 36)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(Circle())
-                                    .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
-                            }
-                            .padding(.trailing, 16)
-                            .padding(.top, 16)
-                        }
-                    }
-
                     Text("Credit is a risk")
                         .font(.largeTitle.weight(.bold))
                         .padding(.top, 8)
@@ -1553,16 +1531,21 @@ By proceeding, you acknowledge that:
                 }
                 .padding(20)
             }
-            .background(Color(UIColor.systemBackground))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: onCancel) {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        onCancel()
+                    } label: {
                         Image(systemName: "xmark")
-                            .font(.headline)
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
                     }
+                    .tint(.primary)
                 }
             }
         }
+        .presentationBackground(.ultraThinMaterial)
     }
 }
 

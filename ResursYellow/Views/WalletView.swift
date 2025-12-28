@@ -772,11 +772,7 @@ struct WalletView: View {
                 InvoiceDetailView(invoice: invoice)
             }
             .sheet(isPresented: $showProfile) {
-                let rows = suggestedActions.count
-                let estimated = CGFloat(rows) * 82 + 200
-                let preferredHeight = min(max(estimated, 320), UIScreen.main.bounds.height * 0.9)
                 FavoritesOverlay(actions: suggestedActions)
-                    .presentationDetents([.height(preferredHeight)])
             }
         }
     }
@@ -788,58 +784,98 @@ struct FavoritesOverlay: View {
     
     let actions: [ActionItem]
     
+    // Calculate height based on content
+    private var calculatedHeight: CGFloat {
+        // Header components:
+        // - Navigation bar: ~44pt
+        // - AI icon: 100pt + bottom padding: ~120pt
+        // - Title: ~30pt
+        // - Spacing: ~40pt
+        let headerHeight: CGFloat = 234
+        
+        // Content:
+        // - Each ActionRow: ~82pt (including spacing)
+        // - Horizontal padding: ~32pt
+        // - Bottom padding: 12pt
+        let actionRowHeight: CGFloat = 82
+        let contentHeight = CGFloat(actions.count) * actionRowHeight + 32 + 12
+        
+        // Bottom safe area
+        let safeAreaBottom: CGFloat = 34
+        
+        let totalHeight = headerHeight + contentHeight + safeAreaBottom
+        let maxHeight = UIScreen.main.bounds.height * 0.9
+        
+        return min(max(totalHeight, 320), maxHeight)
+    }
+    
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
-                ZStack(alignment: .top) {
-                    Capsule()
-                        .fill(Color.secondary.opacity(0.4))
-                        .frame(width: 40, height: 5)
-                        .padding(.top, 8)
-                        .frame(maxWidth: .infinity, alignment: .center)
-
-                    HStack {
-                        Spacer()
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "xmark")
-                                .font(.headline.weight(.bold))
-                                .foregroundColor(.primary)
-                                .frame(width: 36, height: 36)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                                .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
-                        }
-                        .padding(.trailing, 16)
-                        .padding(.top, 16)
-                    }
-                }
-                
-                Text(localizationService.localizedString("Recommended Actions", fallback: "Recommended Actions"))
-                    .font(.title2.weight(.semibold))
-                    .padding(.top, 4)
-                
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        VStack(spacing: 12) {
-                            ForEach(actions) { action in
-                                ActionRow(
-                                    title: action.title,
-                                    subtitle: action.subtitle,
-                                    icon: action.icon,
-                                    color: action.color
+            ScrollView {
+                VStack(spacing: 20) {
+                    // AI Robot Icon
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 64, weight: .medium))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.blue, .purple],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 100, height: 100)
+                        .background(
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .overlay(
+                                    Circle()
+                                        .strokeBorder(
+                                            LinearGradient(
+                                                colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 2
+                                        )
                                 )
-                            }
+                        )
+                        .shadow(color: .blue.opacity(0.2), radius: 12, x: 0, y: 4)
+                        .padding(.bottom, 8)
+                    
+                    Text(localizationService.localizedString("Recommended Actions", fallback: "Recommended Actions"))
+                        .font(.title2.weight(.semibold))
+                    
+                    VStack(spacing: 12) {
+                        ForEach(actions) { action in
+                            ActionRow(
+                                title: action.title,
+                                subtitle: action.subtitle,
+                                icon: action.icon,
+                                color: action.color
+                            )
                         }
-                        .padding(.horizontal)
                     }
-                    .padding(.bottom, 24)
+                    .padding(.horizontal)
+                    .padding(.bottom, 12)
                 }
-                
             }
-            .padding(.bottom, 12)
-            .padding(.top, 0)
-            .background(Color(UIColor.systemBackground).ignoresSafeArea())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.primary)
+                }
+            }
         }
+        .presentationDetents([.height(calculatedHeight), .large])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(.ultraThinMaterial)
     }
 }
 
@@ -1908,4 +1944,5 @@ private struct SummaryBox: View {
         .environmentObject(PaymentPlansManager())
         .preferredColorScheme(.dark)
 }
+
 

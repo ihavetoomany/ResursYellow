@@ -210,7 +210,7 @@ struct ResursFamilyAccountView: View {
                     .padding(.horizontal)
                 }
                 .padding(.top, 20)
-                .padding(.bottom, 120) // Add bottom padding to clear custom tab bar
+                .padding(.bottom, 24)
                 }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in

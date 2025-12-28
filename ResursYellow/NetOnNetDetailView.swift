@@ -57,7 +57,7 @@ struct NetOnNetDetailView: View {
                         partPaymentsSection
                         benefitsSection
                     }
-                    .padding(.bottom, 120)
+                    .padding(.bottom, 24)
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in

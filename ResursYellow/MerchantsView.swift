@@ -107,6 +107,9 @@ struct MerchantsView: View {
             }
             .sheet(isPresented: $showAddMerchant) {
                 AddMerchantView()
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                    .presentationBackground(.ultraThinMaterial)
             }
         }
     }

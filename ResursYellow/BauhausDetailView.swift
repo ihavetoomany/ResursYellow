@@ -300,7 +300,7 @@ struct BauhausDetailView: View {
                         .padding(.horizontal)
                         Spacer(minLength: 40)
                     }
-                    .padding(.bottom, 120)
+                    .padding(.bottom, 24)
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in

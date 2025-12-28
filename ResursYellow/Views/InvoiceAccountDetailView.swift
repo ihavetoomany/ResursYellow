@@ -45,10 +45,13 @@ struct InvoiceAccountDetailView: View {
                             
                             // Transactions Section
                             transactionsSection
+                            
+                            // Invoice History Section
+                            invoiceHistorySection
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)
-                        .padding(.bottom, 120)
+                        .padding(.bottom, 24)
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
@@ -108,7 +111,7 @@ struct InvoiceAccountDetailView: View {
                     // Handle make end payment action
                 }
             )
-            .presentationDetents([.height(200)])
+            .presentationDetents([.height(200), .medium])
             .presentationDragIndicator(.visible)
             .presentationBackground(.ultraThinMaterial)
         }
@@ -245,21 +248,79 @@ struct InvoiceAccountDetailView: View {
     
     // MARK: - Transactions Section
     private var transactionsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        let transactions = sampleTransactions
+        
+        return VStack(alignment: .leading, spacing: 16) {
             Text("Transactions")
                 .font(.headline)
                 .fontWeight(.semibold)
             
-            VStack(spacing: 12) {
-                ForEach(sampleTransactions, id: \.id) { transaction in
-                    TransactionRow(
-                        date: transaction.date,
-                        description: transaction.description,
-                        amount: transaction.amount,
-                        amountColor: transaction.amountColor
-                    )
+            if transactions.isEmpty {
+                Text("No transactions yet")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.vertical, 8)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(transactions, id: \.id) { transaction in
+                        TransactionRow(
+                            date: transaction.date,
+                            description: transaction.description,
+                            amount: transaction.amount,
+                            amountColor: transaction.amountColor
+                        )
+                    }
                 }
             }
+        }
+    }
+    
+    // MARK: - Invoice History Section
+    private var invoiceHistorySection: some View {
+        InvoiceHistorySection(
+            invoices: invoiceHistoryItems
+        )
+    }
+    
+    private var invoiceHistoryItems: [InvoiceHistorySection.InvoiceHistoryItem] {
+        // Find the InvoiceAccount that matches this PartPaymentItem
+        guard let invoiceAccount = dataManager.invoiceAccounts.first(where: { $0.id == account.id }) else {
+            return []
+        }
+        
+        // Extract merchant name from account title or autopaySource
+        let merchantName = invoiceAccount.autopaySource.isEmpty ? 
+            invoiceAccount.title.components(separatedBy: " - ").first ?? invoiceAccount.title :
+            invoiceAccount.autopaySource
+        
+        // Get invoices for this merchant from DataManager
+        let accountInvoices = dataManager.invoices.filter { invoice in
+            invoice.merchant.lowercased().contains(merchantName.lowercased()) ||
+            merchantName.lowercased().contains(invoice.merchant.lowercased())
+        }
+        
+        // Convert to InvoiceHistoryItem format
+        return accountInvoices.map { invoice in
+            let isPaid = invoice.status.lowercased().contains("paid") || invoice.category == .handledPaid
+            let status: String
+            if isPaid {
+                status = "Paid"
+            } else if invoice.status.lowercased().contains("overdue") || invoice.isOverdue {
+                status = "Overdue"
+            } else {
+                status = invoice.status
+            }
+            
+            return InvoiceHistorySection.InvoiceHistoryItem(
+                invoiceNumber: invoice.invoiceNumber,
+                date: dateService.formatDateOffset(invoice.issueDateOffset),
+                amount: invoice.amount,
+                status: status,
+                isPaid: isPaid
+            )
+        }.sorted { item1, item2 in
+            // Sort by date (newest first) - simple string comparison for dates
+            item1.date > item2.date
         }
     }
     

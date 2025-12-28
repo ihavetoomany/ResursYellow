@@ -97,7 +97,7 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
                         VStack(spacing: 20) {
                             content
                         }
-                        .padding(.bottom, 100) // Add bottom padding to clear custom tab bar
+                        .padding(.bottom, 16) // Small padding for visual spacing
                     }
                     .padding(.top)
                 }

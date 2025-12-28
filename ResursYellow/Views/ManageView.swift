@@ -247,7 +247,7 @@ struct ManageView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 24)
-                .padding(.bottom, 100)
+                .padding(.bottom, 16)
             }
             .navigationBarHidden(true)
             .navigationDestination(for: String.self) { destination in
@@ -262,6 +262,8 @@ struct ManageView: View {
             }
             .sheet(isPresented: $showCallSupport) {
                 CallSupportView()
+                    .presentationDragIndicator(.visible)
+                    .presentationBackground(.ultraThinMaterial)
             }
             .confirmationDialog("Log out", isPresented: $showLogoutConfirmation, titleVisibility: .visible) {
                 Button("Log out", role: .destructive) {
@@ -371,80 +373,91 @@ struct CallSupportView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                Image(systemName: "phone.fill")
-                    .font(.system(size: 56))
-                    .foregroundColor(.green)
-                    .padding(.top, 24)
+            ScrollView {
+                VStack(spacing: 24) {
+                    Image(systemName: "phone.fill")
+                        .font(.system(size: 56))
+                        .foregroundColor(.green)
+                        .padding(.top, 8)
 
-                VStack(spacing: 6) {
-                    Text("Customer Support")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    Text("We're here to help")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-
-                VStack(spacing: 8) {
-                    HStack {
-                        Text("Phone")
+                    VStack(spacing: 6) {
+                        Text("Customer Support")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text("We're here to help")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        Spacer()
-                        Text(supportNumber)
-                            .font(.headline)
                     }
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                    HStack(alignment: .top) {
-                        Text("Hours")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Text("Mon–Fri: 08:00–18:00")
-                            Text("Sat: 10:00–14:00")
-                            Text("Sun: Closed")
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text("Phone")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            Text(supportNumber)
+                                .font(.headline)
                         }
-                        .font(.subheadline)
-                    }
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                .padding(.horizontal)
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                Spacer()
+                        HStack(alignment: .top) {
+                            Text("Hours")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                            VStack(alignment: .trailing, spacing: 2) {
+                                Text("Mon–Fri: 08:00–18:00")
+                                Text("Sat: 10:00–14:00")
+                                Text("Sun: Closed")
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding(.horizontal)
 
-                Button {
-                    if let telURL, UIApplication.shared.canOpenURL(telURL) {
-                        UIApplication.shared.open(telURL)
+                    Button {
+                        if let telURL, UIApplication.shared.canOpenURL(telURL) {
+                            UIApplication.shared.open(telURL)
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "phone.fill")
+                            Text("Call Now")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .clipShape(Capsule())
                     }
-                } label: {
-                    HStack {
-                        Image(systemName: "phone.fill")
-                        Text("Call Now")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green)
-                    .clipShape(Capsule())
+                    .padding(.horizontal)
+                    .padding(.bottom, 24)
                 }
-                .padding(.horizontal)
-                .padding(.bottom)
             }
             .navigationTitle("Call Support")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.primary)
                 }
             }
         }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(.ultraThinMaterial)
     }
 }
 
