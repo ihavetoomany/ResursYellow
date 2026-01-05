@@ -772,95 +772,172 @@ struct WalletView: View {
                 InvoiceDetailView(invoice: invoice)
             }
             .sheet(isPresented: $showProfile) {
-                FavoritesOverlay(actions: suggestedActions)
+                AISupportChatView()
             }
         }
     }
 }
 
-struct FavoritesOverlay: View {
+// MARK: - AI Support Chat View
+struct AISupportChatView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var localizationService = LocalizationService.shared
-    
-    let actions: [ActionItem]
-    
-    // Calculate height based on content
-    private var calculatedHeight: CGFloat {
-        // Header components:
-        // - Navigation bar: ~44pt
-        // - AI icon: 100pt + bottom padding: ~120pt
-        // - Title: ~30pt
-        // - Spacing: ~40pt
-        let headerHeight: CGFloat = 234
-        
-        // Content:
-        // - Each ActionRow: ~82pt (including spacing)
-        // - Horizontal padding: ~32pt
-        // - Bottom padding: 12pt
-        let actionRowHeight: CGFloat = 82
-        let contentHeight = CGFloat(actions.count) * actionRowHeight + 32 + 12
-        
-        // Bottom safe area
-        let safeAreaBottom: CGFloat = 34
-        
-        let totalHeight = headerHeight + contentHeight + safeAreaBottom
-        let maxHeight = UIScreen.main.bounds.height * 0.9
-        
-        return min(max(totalHeight, 320), maxHeight)
-    }
+    @State private var messages: [ChatMessage] = []
+    @State private var inputText: String = ""
+    @State private var isTyping: Bool = false
+    @FocusState private var isInputFocused: Bool
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // AI Robot Icon
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 64, weight: .medium))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.blue, .purple],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 100, height: 100)
-                        .background(
-                            Circle()
-                                .fill(.ultraThinMaterial)
-                                .overlay(
-                                    Circle()
-                                        .strokeBorder(
+            VStack(spacing: 0) {
+                // Chat messages
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            // Welcome message
+                            if messages.isEmpty {
+                                VStack(spacing: 20) {
+                                    // AI Avatar
+                                    Image(systemName: "sparkles")
+                                        .font(.system(size: 48, weight: .medium))
+                                        .foregroundStyle(
                                             LinearGradient(
-                                                colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
+                                                colors: [.blue, .purple],
                                                 startPoint: .topLeading,
                                                 endPoint: .bottomTrailing
-                                            ),
-                                            lineWidth: 2
+                                            )
                                         )
-                                )
-                        )
-                        .shadow(color: .blue.opacity(0.2), radius: 12, x: 0, y: 4)
-                        .padding(.bottom, 8)
-                    
-                    Text(localizationService.localizedString("Recommended Actions", fallback: "Recommended Actions"))
-                        .font(.title2.weight(.semibold))
-                    
-                    VStack(spacing: 12) {
-                        ForEach(actions) { action in
-                            ActionRow(
-                                title: action.title,
-                                subtitle: action.subtitle,
-                                icon: action.icon,
-                                color: action.color
-                            )
+                                        .frame(width: 80, height: 80)
+                                        .background(
+                                            Circle()
+                                                .fill(.ultraThinMaterial)
+                                                .overlay(
+                                                    Circle()
+                                                        .strokeBorder(
+                                                            LinearGradient(
+                                                                colors: [.blue.opacity(0.3), .purple.opacity(0.3)],
+                                                                startPoint: .topLeading,
+                                                                endPoint: .bottomTrailing
+                                                            ),
+                                                            lineWidth: 2
+                                                        )
+                                                )
+                                        )
+                                        .shadow(color: .blue.opacity(0.2), radius: 12, x: 0, y: 4)
+                                        .padding(.top, 20)
+                                    
+                                    Text(localizationService.localizedString("AI Bank Support", fallback: "AI Bank Support"))
+                                        .font(.title2.weight(.semibold))
+                                    
+                                    Text(localizationService.localizedString("How can I help you today?", fallback: "How can I help you today?"))
+                                        .font(.body)
+                                        .foregroundStyle(.secondary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal)
+                                    
+                                    // Quick action buttons
+                                    VStack(spacing: 12) {
+                                        QuickActionButton(
+                                            title: localizationService.localizedString("Check Account Balance", fallback: "Check Account Balance"),
+                                            icon: "creditcard.fill"
+                                        ) {
+                                            sendMessage(localizationService.localizedString("Check Account Balance", fallback: "Check Account Balance"))
+                                        }
+                                        
+                                        QuickActionButton(
+                                            title: localizationService.localizedString("Payment Questions", fallback: "Payment Questions"),
+                                            icon: "doc.text.fill"
+                                        ) {
+                                            sendMessage(localizationService.localizedString("I have questions about payments", fallback: "I have questions about payments"))
+                                        }
+                                        
+                                        QuickActionButton(
+                                            title: localizationService.localizedString("Invoice Help", fallback: "Invoice Help"),
+                                            icon: "list.bullet.rectangle.fill"
+                                        ) {
+                                            sendMessage(localizationService.localizedString("I need help with invoices", fallback: "I need help with invoices"))
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                    .padding(.top, 8)
+                                }
+                                .padding(.vertical, 32)
+                            } else {
+                                ForEach(messages) { message in
+                                    ChatBubble(message: message)
+                                        .id(message.id)
+                                }
+                                
+                                if isTyping {
+                                    TypingIndicator()
+                                        .id("typing")
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 16)
+                    }
+                    .onChange(of: messages.count) { _, _ in
+                        if let lastMessage = messages.last {
+                            withAnimation {
+                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                            }
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom, 12)
+                    .onChange(of: isTyping) { _, newValue in
+                        if newValue {
+                            withAnimation {
+                                proxy.scrollTo("typing", anchor: .bottom)
+                            }
+                        }
+                    }
                 }
+                
+                // Input area
+                HStack(spacing: 12) {
+                    TextField(
+                        localizationService.localizedString("Type your message...", fallback: "Type your message..."),
+                        text: $inputText,
+                        axis: .vertical
+                    )
+                    .textFieldStyle(.plain)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
+                    )
+                    .focused($isInputFocused)
+                    .lineLimit(1...5)
+                    
+                    Button {
+                        sendMessage(inputText)
+                        inputText = ""
+                        isInputFocused = false
+                    } label: {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.system(size: 32, weight: .medium))
+                            .foregroundStyle(inputText.isEmpty ? .secondary : Color.blue)
+                    }
+                    .disabled(inputText.isEmpty)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 12)
+                .background(.ultraThinMaterial)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    VStack(spacing: 2) {
+                        Text(localizationService.localizedString("AI Bank Support", fallback: "AI Bank Support"))
+                            .font(.headline)
+                        Text(localizationService.localizedString("Online", fallback: "Online"))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         dismiss()
@@ -873,9 +950,193 @@ struct FavoritesOverlay: View {
                 }
             }
         }
-        .presentationDetents([.height(calculatedHeight), .large])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .presentationBackground(.ultraThinMaterial)
+    }
+    
+    private func sendMessage(_ text: String) {
+        guard !text.isEmpty else { return }
+        
+        let userMessage = ChatMessage(
+            id: UUID(),
+            text: text,
+            isFromUser: true,
+            timestamp: Date()
+        )
+        
+        messages.append(userMessage)
+        
+        // Simulate AI response
+        isTyping = true
+        Task {
+            try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+            let aiResponse = generateAIResponse(for: text)
+            let aiMessage = ChatMessage(
+                id: UUID(),
+                text: aiResponse,
+                isFromUser: false,
+                timestamp: Date()
+            )
+            await MainActor.run {
+                messages.append(aiMessage)
+                isTyping = false
+            }
+        }
+    }
+    
+    private func generateAIResponse(for userInput: String) -> String {
+        let lowercased = userInput.lowercased()
+        
+        if lowercased.contains("balance") || lowercased.contains("account") {
+            return localizationService.localizedString(
+                "Your Resurs Gold account has 15,000 SEK available credit out of a 30,000 SEK limit. Would you like more details?",
+                fallback: "Your Resurs Gold account has 15,000 SEK available credit out of a 30,000 SEK limit. Would you like more details?"
+            )
+        } else if lowercased.contains("payment") || lowercased.contains("pay") {
+            return localizationService.localizedString(
+                "I can help you with payments! You can pay invoices directly from the Wallet tab, set up payment plans, or schedule payments. What would you like to do?",
+                fallback: "I can help you with payments! You can pay invoices directly from the Wallet tab, set up payment plans, or schedule payments. What would you like to do?"
+            )
+        } else if lowercased.contains("invoice") {
+            return localizationService.localizedString(
+                "I see you have 2 overdue invoices totaling 1,621 SEK. Would you like me to help you set up a payment plan or pay them now?",
+                fallback: "I see you have 2 overdue invoices totaling 1,621 SEK. Would you like me to help you set up a payment plan or pay them now?"
+            )
+        } else {
+            return localizationService.localizedString(
+                "I'm here to help with your banking needs. You can ask me about your account balance, payments, invoices, or any other banking questions. How can I assist you?",
+                fallback: "I'm here to help with your banking needs. You can ask me about your account balance, payments, invoices, or any other banking questions. How can I assist you?"
+            )
+        }
+    }
+}
+
+// MARK: - Chat Message Model
+struct ChatMessage: Identifiable {
+    let id: UUID
+    let text: String
+    let isFromUser: Bool
+    let timestamp: Date
+}
+
+// MARK: - Chat Bubble
+struct ChatBubble: View {
+    let message: ChatMessage
+    
+    var body: some View {
+        HStack {
+            if message.isFromUser {
+                Spacer(minLength: 60)
+            }
+            
+            VStack(alignment: message.isFromUser ? .trailing : .leading, spacing: 4) {
+                Text(message.text)
+                    .font(.body)
+                    .foregroundStyle(message.isFromUser ? .white : .primary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(
+                        message.isFromUser
+                            ? LinearGradient(
+                                colors: [.blue, .blue.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                            : LinearGradient(
+                                colors: [Color(.systemGray6), Color(.systemGray5)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                        in: RoundedRectangle(cornerRadius: 18)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18)
+                            .strokeBorder(
+                                message.isFromUser
+                                    ? Color.white.opacity(0.2)
+                                    : Color.white.opacity(0.18),
+                                lineWidth: 1
+                            )
+                    )
+                
+                Text(message.timestamp, style: .time)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            
+            if !message.isFromUser {
+                Spacer(minLength: 60)
+            }
+        }
+    }
+}
+
+// MARK: - Typing Indicator
+struct TypingIndicator: View {
+    @State private var isAnimating = false
+    
+    var body: some View {
+        HStack {
+            HStack(spacing: 4) {
+                ForEach(0..<3) { index in
+                    Circle()
+                        .fill(.secondary)
+                        .frame(width: 8, height: 8)
+                        .offset(y: isAnimating ? -4 : 0)
+                        .animation(
+                            .easeInOut(duration: 0.5)
+                            .repeatForever(autoreverses: true)
+                            .delay(Double(index) * 0.15),
+                            value: isAnimating
+                        )
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
+            )
+            
+            Spacer(minLength: 60)
+        }
+        .onAppear {
+            isAnimating = true
+        }
+    }
+}
+
+// MARK: - Quick Action Button
+struct QuickActionButton: View {
+    let title: String
+    let icon: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color.blue)
+                    .frame(width: 24)
+                
+                Text(title)
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 

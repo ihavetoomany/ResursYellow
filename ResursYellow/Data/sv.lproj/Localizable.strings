@@ -134,3 +134,18 @@
 "Banking" = "Bank";
 "Merchants" = "Handlare";
 
+/* AI Support Chat */
+"AI Bank Support" = "AI Banksupport";
+"How can I help you today?" = "Hur kan jag hjälpa dig idag?";
+"Check Account Balance" = "Kontrollera kontosaldot";
+"Payment Questions" = "Betalningsfrågor";
+"Invoice Help" = "Fakturahjälp";
+"I have questions about payments" = "Jag har frågor om betalningar";
+"I need help with invoices" = "Jag behöver hjälp med fakturor";
+"Type your message..." = "Skriv ditt meddelande...";
+"Online" = "Online";
+"Your Resurs Gold account has 15,000 SEK available credit out of a 30,000 SEK limit. Would you like more details?" = "Ditt Resurs Gold-konto har 15 000 SEK tillgänglig kredit av en 30 000 SEK gräns. Vill du ha mer information?";
+"I can help you with payments! You can pay invoices directly from the Wallet tab, set up payment plans, or schedule payments. What would you like to do?" = "Jag kan hjälpa dig med betalningar! Du kan betala fakturor direkt från fliken Plånbok, sätta upp betalningsplaner eller schemalägga betalningar. Vad vill du göra?";
+"I see you have 2 overdue invoices totaling 1,621 SEK. Would you like me to help you set up a payment plan or pay them now?" = "Jag ser att du har 2 försenade fakturor på totalt 1 621 SEK. Vill du att jag hjälper dig att sätta upp en betalningsplan eller betala dem nu?";
+"I'm here to help with your banking needs. You can ask me about your account balance, payments, invoices, or any other banking questions. How can I assist you?" = "Jag är här för att hjälpa dig med dina bankbehov. Du kan fråga mig om ditt kontosaldo, betalningar, fakturor eller andra bankfrågor. Hur kan jag hjälpa dig?";
+

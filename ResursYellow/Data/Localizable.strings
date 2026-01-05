@@ -134,3 +134,18 @@
 "Banking" = "Banking";
 "Merchants" = "Merchants";
 
+/* AI Support Chat */
+"AI Bank Support" = "AI Bank Support";
+"How can I help you today?" = "How can I help you today?";
+"Check Account Balance" = "Check Account Balance";
+"Payment Questions" = "Payment Questions";
+"Invoice Help" = "Invoice Help";
+"I have questions about payments" = "I have questions about payments";
+"I need help with invoices" = "I need help with invoices";
+"Type your message..." = "Type your message...";
+"Online" = "Online";
+"Your Resurs Gold account has 15,000 SEK available credit out of a 30,000 SEK limit. Would you like more details?" = "Your Resurs Gold account has 15,000 SEK available credit out of a 30,000 SEK limit. Would you like more details?";
+"I can help you with payments! You can pay invoices directly from the Wallet tab, set up payment plans, or schedule payments. What would you like to do?" = "I can help you with payments! You can pay invoices directly from the Wallet tab, set up payment plans, or schedule payments. What would you like to do?";
+"I see you have 2 overdue invoices totaling 1,621 SEK. Would you like me to help you set up a payment plan or pay them now?" = "I see you have 2 overdue invoices totaling 1,621 SEK. Would you like me to help you set up a payment plan or pay them now?";
+"I'm here to help with your banking needs. You can ask me about your account balance, payments, invoices, or any other banking questions. How can I assist you?" = "I'm here to help with your banking needs. You can ask me about your account balance, payments, invoices, or any other banking questions. How can I assist you?";
+
