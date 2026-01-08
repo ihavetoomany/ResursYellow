@@ -99,7 +99,9 @@ struct AccountsView: View {
                 AddAccountView()
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
-                    .presentationBackground(.ultraThinMaterial)
+                    .presentationBackground {
+                        AdaptiveSheetBackground()
+                    }
             }
         }
     }

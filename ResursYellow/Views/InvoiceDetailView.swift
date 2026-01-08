@@ -34,6 +34,7 @@ struct InstallmentPlan: Identifiable, Equatable {
 struct InvoiceDetailView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @StateObject private var dataManager = DataManager.shared
     @State private var showPaymentSheet = false
     @State private var isPaying = false
     @State private var isPaid = false
@@ -52,6 +53,18 @@ struct InvoiceDetailView: View {
 
     private var shouldShowPayButton: Bool {
         !isInvoicePaid && !isPaid && !isInvoiceScheduled
+    }
+    
+    private var matchingInvoiceAccount: InvoiceAccount? {
+        // Find invoice account that matches this invoice's merchant
+        dataManager.invoiceAccounts.first { account in
+            let merchantName = account.autopaySource.isEmpty ?
+                account.title.components(separatedBy: " - ").first ?? account.title :
+                account.autopaySource
+            
+            return invoice.merchant.lowercased().contains(merchantName.lowercased()) ||
+                   merchantName.lowercased().contains(invoice.merchant.lowercased())
+        }
     }
 
     var body: some View {
@@ -82,6 +95,14 @@ struct InvoiceDetailView: View {
                                 .padding(.horizontal)
                                 .padding(.top, 36)
                                 .frame(width: geometry.size.width)
+
+                                // What I Pay For Card
+                                WhatIPayForCard(
+                                    merchant: invoice.merchant,
+                                    invoiceAccount: matchingInvoiceAccount
+                                )
+                                    .padding(.horizontal)
+                                    .frame(width: geometry.size.width)
 
                                 // Payment Information Card
                                 if !isInvoicePaid {
@@ -212,6 +233,9 @@ struct InvoiceDetailView: View {
             .frame(width: geometry.size.width)
         }
         .navigationBarHidden(true)
+        .navigationDestination(for: PartPaymentItem.self) { account in
+            InvoiceAccountDetailView(account: account)
+        }
         .sheet(isPresented: $showPaymentSheet) {
             PaymentSheet(
                 invoice: invoice,
@@ -225,7 +249,9 @@ struct InvoiceDetailView: View {
             )
             .presentationDetents([.fraction(0.85), .large])
             .presentationDragIndicator(.visible)
-            .presentationBackground(.ultraThinMaterial)
+            .presentationBackground {
+                AdaptiveSheetBackground()
+            }
         }
     }
 }
@@ -299,6 +325,66 @@ struct InvoiceDetailsCard: View {
         .padding(20)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+struct WhatIPayForCard: View {
+    let merchant: String
+    let invoiceAccount: InvoiceAccount?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "questionmark.circle.fill")
+                    .font(.title3)
+                    .foregroundColor(.purple)
+                
+                Text("What I pay for")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text(explanationText)
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                if let account = invoiceAccount {
+                    NavigationLink(value: account.toPartPaymentItem()) {
+                        HStack {
+                            Text("View invoice account")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.blue)
+                            Spacer()
+                            Image(systemName: "arrow.up.right.circle")
+                                .font(.subheadline)
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding(20)
+        .background(Color.purple.opacity(0.1))
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+    
+    private var explanationText: String {
+        if let account = invoiceAccount {
+            if account.title.contains(" - ") {
+                // Extract period from title (e.g., "Bauhaus - October")
+                let parts = account.title.components(separatedBy: " - ")
+                if parts.count > 1 {
+                    return "This invoice is part of your \(parts[1]) purchase plan with \(merchant). It represents one installment in your payment schedule."
+                }
+            }
+            return "This invoice is part of your payment plan with \(merchant). It represents one installment in your payment schedule."
+        }
+        return "This invoice is for purchases made at \(merchant). It represents the amount you owe for goods or services received."
     }
 }
 
@@ -1084,7 +1170,9 @@ struct PaymentSheet: View {
             )
             .presentationDetents([.fraction(0.9), .large])
             .presentationDragIndicator(.visible)
-            .presentationBackground(.ultraThinMaterial)
+            .presentationBackground {
+                AdaptiveSheetBackground()
+            }
         }
     }
 }
@@ -1545,7 +1633,9 @@ By proceeding, you acknowledge that:
                 }
             }
         }
-        .presentationBackground(.ultraThinMaterial)
+        .presentationBackground {
+            AdaptiveSheetBackground()
+        }
     }
 }
 

@@ -109,7 +109,9 @@ struct MerchantsView: View {
                 AddMerchantView()
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
-                    .presentationBackground(.ultraThinMaterial)
+                    .presentationBackground {
+                        AdaptiveSheetBackground()
+                    }
             }
         }
     }

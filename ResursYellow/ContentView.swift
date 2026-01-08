@@ -17,138 +17,21 @@ extension Notification.Name {
 struct ContentView: View {
     @StateObject private var localizationService = LocalizationService.shared
     @State private var selectedTab = 0
-    @StateObject private var paymentPlansManager = PaymentPlansManager()
+    @StateObject private var paymentPlansManager = PaymentPlansManager.shared
     @State private var hasAppeared = false
-    @State private var isReady = false // defer heavy UI one frame
-    
-    // Computed properties for tab labels that reference currentLanguage
-    private var walletLabel: String {
-        _ = localizationService.currentLanguage
-        return localizationService.localizedString("Wallet", fallback: "Wallet")
-    }
-    
-    private var bankingLabel: String {
-        _ = localizationService.currentLanguage
-        return localizationService.localizedString("Banking", fallback: "Banking")
-    }
-    
-    private var merchantsLabel: String {
-        _ = localizationService.currentLanguage
-        return localizationService.localizedString("Merchants", fallback: "Merchants")
-    }
-    
-    private var manageLabel: String {
-        _ = localizationService.currentLanguage
-        return localizationService.localizedString("Manage", fallback: "Manage")
-    }
     
     var body: some View {
-        let _ = localizationService.currentLanguage // Ensure view updates when language changes
-        return Group {
-            if !isReady {
-                // Lightweight launch scaffold for the very first frame
-                ZStack {
-                    Color(UIColor.systemBackground).ignoresSafeArea()
-                    VStack(spacing: 12) {
-                        // Simple header placeholder to match Wallet look
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Good day")
-                                    .foregroundColor(.secondary)
-                                    .redacted(reason: .placeholder)
-                                Text("John")
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .redacted(reason: .placeholder)
-                            }
-                            Spacer()
-                            Circle()
-                                .fill(Color.secondary.opacity(0.2))
-                                .frame(width: 44, height: 44)
-                                .redacted(reason: .placeholder)
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 24)
-                        
-                        Spacer()
-                        
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .tint(.blue)
-                        
-                        Spacer()
-                    }
-                }
-            } else {
-                TabView(selection: $selectedTab) {
-                    // Wallet Tab
-                    NavigationStack {
-                        WalletView()
-                    }
-                    .tabItem {
-                        Label(walletLabel, systemImage: selectedTab == 0 ? "wallet.bifold.fill" : "wallet.bifold")
-                    }
-                    .tag(0)
-                    
-                    // Accounts Tab (lazy loaded)
-                    NavigationStack {
-                        Group {
-                            if hasAppeared || selectedTab == 1 {
-                                AccountsView()
-                            } else {
-                                Color.clear
-                            }
-                        }
-                    }
-                    .tabItem {
-                        Label(bankingLabel, systemImage: selectedTab == 1 ? "building.columns.fill" : "building.columns")
-                    }
-                    .tag(1)
-                    
-                    // Merchants Tab (lazy loaded)
-                    NavigationStack {
-                        Group {
-                            if hasAppeared || selectedTab == 2 {
-                                MerchantsView()
-                            } else {
-                                Color.clear
-                            }
-                        }
-                    }
-                    .tabItem {
-                        Label(merchantsLabel, systemImage: selectedTab == 2 ? "cart.fill" : "cart")
-                    }
-                    .tag(2)
-                    
-                    // Manage Tab (lazy loaded)
-                    NavigationStack {
-                        Group {
-                            if hasAppeared || selectedTab == 3 {
-                                ManageView()
-                            } else {
-                                Color.clear
-                            }
-                        }
-                    }
-                    .tabItem {
-                        Label(manageLabel, systemImage: selectedTab == 3 ? "gearshape.fill" : "gearshape")
-                    }
-                    .tag(3)
-                }
-                .tint(.blue) // Native iOS blue tint for selected items
-                .environmentObject(paymentPlansManager)
-                .environmentObject(localizationService)
-                .id(localizationService.currentLanguage) // Force refresh when language changes
-            }
-        }
-        .task {
-            // Ensure first frame is rendered before constructing the heavy TabView tree
-            await Task.yield()
-            isReady = true
-            
-            // Defer loading of other tabs to improve startup performance
-            // (no artificial delay; just yield once)
-            await Task.yield()
+        MainTabView(
+            selectedTab: $selectedTab,
+            hasAppeared: $hasAppeared,
+            paymentPlansManager: paymentPlansManager,
+            localizationService: localizationService,
+            walletLabel: "Wallet",
+            bankingLabel: "Banking",
+            merchantsLabel: "Merchants",
+            manageLabel: "Manage"
+        )
+        .onAppear {
             hasAppeared = true
         }
         .onChange(of: selectedTab) { oldValue, newValue in
@@ -163,13 +46,87 @@ struct ContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .switchToBanking)) { notification in
             selectedTab = 1
-            // In the future, you can forward notification.userInfo to AccountsView via another mechanism for deep linking.
         }
         .onReceive(NotificationCenter.default.publisher(for: .switchToMerchants)) { _ in
             selectedTab = 2
         }
     }
 }
+
+// Separate view for TabView construction
+struct MainTabView: View {
+    @Binding var selectedTab: Int
+    @Binding var hasAppeared: Bool
+    @ObservedObject var paymentPlansManager: PaymentPlansManager
+    @ObservedObject var localizationService: LocalizationService
+    let walletLabel: String
+    let bankingLabel: String
+    let merchantsLabel: String
+    let manageLabel: String
+    
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            // Wallet Tab
+            NavigationStack {
+                WalletView()
+            }
+            .tabItem {
+                Label(walletLabel, systemImage: selectedTab == 0 ? "wallet.bifold.fill" : "wallet.bifold")
+            }
+            .tag(0)
+            
+            // Accounts Tab (lazy loaded)
+            NavigationStack {
+                Group {
+                    if hasAppeared || selectedTab == 1 {
+                        AccountsView()
+                    } else {
+                        Color.clear
+                    }
+                }
+            }
+            .tabItem {
+                Label(bankingLabel, systemImage: selectedTab == 1 ? "building.columns.fill" : "building.columns")
+            }
+            .tag(1)
+            
+            // Merchants Tab (lazy loaded)
+            NavigationStack {
+                Group {
+                    if hasAppeared || selectedTab == 2 {
+                        MerchantsView()
+                    } else {
+                        Color.clear
+                    }
+                }
+            }
+            .tabItem {
+                Label(merchantsLabel, systemImage: selectedTab == 2 ? "cart.fill" : "cart")
+            }
+            .tag(2)
+            
+            // Manage Tab (lazy loaded)
+            NavigationStack {
+                Group {
+                    if hasAppeared || selectedTab == 3 {
+                        ManageView()
+                    } else {
+                        Color.clear
+                    }
+                }
+            }
+            .tabItem {
+                Label(manageLabel, systemImage: selectedTab == 3 ? "gearshape.fill" : "gearshape")
+            }
+            .tag(3)
+        }
+        .tint(.blue)
+        .environmentObject(paymentPlansManager)
+        .environmentObject(localizationService)
+        .id(localizationService.currentLanguage)
+    }
+}
+
 
 #Preview("Light Mode") {
     ContentView()

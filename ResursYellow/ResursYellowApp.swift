@@ -9,9 +9,7 @@ import SwiftUI
 
 @main
 struct ResursYellowApp: App {
-    @AppStorage("hasSeenAboutDialog") private var hasSeenAboutDialog = false
     @AppStorage("selectedTheme") private var selectedTheme = "Auto"
-    @State private var showAbout = false
     
     init() {
         configureTabBarAppearance()
@@ -32,19 +30,6 @@ struct ResursYellowApp: App {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(colorScheme)
-                .task {
-                    // Show about dialog only on first launch, after a short delay to let the UI settle
-                    if !hasSeenAboutDialog {
-                        try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
-                        showAbout = true
-                        hasSeenAboutDialog = true
-                    }
-                }
-                .alert("About this app", isPresented: $showAbout) {
-                    Button("OK", role: .cancel) {}
-                } message: {
-                    Text("This app is used to experiment and determine future solutions and information architecture. It does not represent the future app in terms of colors and design. You are welcome to provide any kind of feedback through the feedback functionality in TestFlight.")
-                }
         }
     }
     

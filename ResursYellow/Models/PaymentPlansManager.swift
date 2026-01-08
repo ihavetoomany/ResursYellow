@@ -22,41 +22,47 @@ struct PaymentPlan: Identifiable {
 }
 
 class PaymentPlansManager: ObservableObject {
-    @Published var paymentPlans: [PaymentPlan] = [
-        PaymentPlan(
-            name: "Smart Home Bundle",
-            store: "NetOnNet Warehouse",
-            totalAmount: "12 400 SEK",
-            paidAmount: "0 SEK",
-            progress: 0.0,
-            dueDate: "First payment pending",
-            monthlyAmount: nil,
-            icon: "hourglass",
-            color: .orange
-        ),
-        PaymentPlan(
-            name: "Home Office Setup",
-            store: "Bauhaus",
-            totalAmount: "18 200 SEK",
-            paidAmount: "6 000 SEK",
-            progress: 0.33,
-            dueDate: "Paid off in 6 months",
-            monthlyAmount: "2 000 SEK/month",
-            icon: "doc.text.fill",
-            color: .purple
-        ),
-        PaymentPlan(
-            name: "New Kitchen Appliances",
-            store: "Jula",
-            totalAmount: "28 500 SEK",
-            paidAmount: "25 650 SEK",
-            progress: 0.9,
-            dueDate: "1 payment left",
-            monthlyAmount: "2 850 SEK/month",
-            icon: "doc.text.fill",
-            color: .green
-        )
-    ]
+    static let shared = PaymentPlansManager()
+    
+    @Published var paymentPlans: [PaymentPlan]
+    
+    private init() {
+        self.paymentPlans = [
+            PaymentPlan(
+                name: "Smart Home Bundle",
+                store: "NetOnNet Warehouse",
+                totalAmount: "12 400 SEK",
+                paidAmount: "0 SEK",
+                progress: 0.0,
+                dueDate: "First payment pending",
+                monthlyAmount: nil,
+                icon: "hourglass",
+                color: .orange
+            ),
+            PaymentPlan(
+                name: "Home Office Setup",
+                store: "Bauhaus",
+                totalAmount: "18 200 SEK",
+                paidAmount: "6 000 SEK",
+                progress: 0.33,
+                dueDate: "Paid off in 6 months",
+                monthlyAmount: "2 000 SEK/month",
+                icon: "doc.text.fill",
+                color: .purple
+            ),
+            PaymentPlan(
+                name: "New Kitchen Appliances",
+                store: "Jula",
+                totalAmount: "28 500 SEK",
+                paidAmount: "25 650 SEK",
+                progress: 0.9,
+                dueDate: "1 payment left",
+                monthlyAmount: "2 850 SEK/month",
+                icon: "doc.text.fill",
+                color: .green
+            )
+        ]
+    }
     
     func addPaymentPlan(name: String, startingAmount: String, store: String) {
         let newPaymentPlan = PaymentPlan(

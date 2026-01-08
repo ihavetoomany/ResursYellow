@@ -464,6 +464,7 @@ struct WalletView: View {
     private let dateService = DateService.shared
     @StateObject private var localizationService = LocalizationService.shared
     
+    
     @State private var navigationPath = NavigationPath()
     @State private var showProfile = false
     
@@ -530,7 +531,7 @@ struct WalletView: View {
     }
     
     private var allPurchases: [PurchaseItem] {
-        dataManager.transactions.compactMap { transaction in
+        return dataManager.transactions.compactMap { transaction in
             guard let transactionData = transaction.toTransactionData(dateService: dateService) else {
                 return nil
             }
@@ -773,6 +774,9 @@ struct WalletView: View {
             }
             .sheet(isPresented: $showProfile) {
                 AISupportChatView()
+                    .presentationBackground {
+                        AdaptiveSheetBackground()
+                    }
             }
         }
     }
@@ -952,7 +956,9 @@ struct AISupportChatView: View {
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
-        .presentationBackground(.ultraThinMaterial)
+        .presentationBackground {
+            AdaptiveSheetBackground()
+        }
     }
     
     private func sendMessage(_ text: String) {
@@ -1914,6 +1920,7 @@ struct InvoicesList: View {
             Spacer(minLength: 12)
         }
         .padding(.horizontal, 4)
+        .padding(.top, 24)
     }
     
     private func header(scrollProgress: CGFloat) -> some View {
@@ -2202,7 +2209,7 @@ private struct SummaryBox: View {
 
 #Preview {
     WalletView()
-        .environmentObject(PaymentPlansManager())
+        .environmentObject(PaymentPlansManager.shared)
         .preferredColorScheme(.dark)
 }
 

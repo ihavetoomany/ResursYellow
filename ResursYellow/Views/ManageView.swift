@@ -263,7 +263,9 @@ struct ManageView: View {
             .sheet(isPresented: $showCallSupport) {
                 CallSupportView()
                     .presentationDragIndicator(.visible)
-                    .presentationBackground(.ultraThinMaterial)
+                    .presentationBackground {
+                        AdaptiveSheetBackground()
+                    }
             }
             .confirmationDialog("Log out", isPresented: $showLogoutConfirmation, titleVisibility: .visible) {
                 Button("Log out", role: .destructive) {
@@ -457,7 +459,9 @@ struct CallSupportView: View {
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
-        .presentationBackground(.ultraThinMaterial)
+        .presentationBackground {
+            AdaptiveSheetBackground()
+        }
     }
 }
 

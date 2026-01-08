@@ -12,7 +12,8 @@ struct InvoiceAccountDetailView: View {
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var dataManager = DataManager.shared
     private let dateService = DateService.shared
-    @State private var showActionsMenu = false
+    @State private var cachedInvoices: [InvoiceItem] = []
+    @State private var cachedTransactions: [TransactionItem] = []
     
     let account: PartPaymentItem
     
@@ -37,17 +38,26 @@ struct InvoiceAccountDetailView: View {
                         Color.clear.frame(height: 60)
                     
                         VStack(spacing: 24) {
-                            // Next Payment Card
-                            nextPaymentCard
+                            // Account description text
+                            Text("This account is the main account of the Resurs Gold product. Every month, around the 5th, a new invoice is created reflecting the balance of the previous month. Due date is always the last day of the month and there are always options to part pay on the invoice.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             
                             // Account Info Section
                             accountInfoSection
+                            
+                            // Next Payment Card
+                            nextPaymentCard
                             
                             // Transactions Section
                             transactionsSection
                             
                             // Invoice History Section
                             invoiceHistorySection
+                            
+                            // Actions Section
+                            actionsSection
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)
@@ -75,15 +85,6 @@ struct InvoiceAccountDetailView: View {
                                 .clipShape(Circle())
                         }
                         Spacer()
-                        
-                        Button(action: { showActionsMenu = true }) {
-                            Image(systemName: "ellipsis")
-                                .font(.title3)
-                                .foregroundColor(.blue)
-                                .frame(width: 32, height: 32)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                        }
                     }
                     
                     // Always show minimized title
@@ -100,20 +101,13 @@ struct InvoiceAccountDetailView: View {
             .background(.ultraThinMaterial)
         }
         .navigationBarHidden(true)
-        .sheet(isPresented: $showActionsMenu) {
-            ActionsSheet(
-                onPayExtra: {
-                    showActionsMenu = false
-                    // Handle pay extra action
-                },
-                onMakeEndPayment: {
-                    showActionsMenu = false
-                    // Handle make end payment action
-                }
-            )
-            .presentationDetents([.height(200), .medium])
-            .presentationDragIndicator(.visible)
-            .presentationBackground(.ultraThinMaterial)
+        .onAppear {
+            if cachedInvoices.isEmpty {
+                cachedInvoices = generateInvoices()
+            }
+            if cachedTransactions.isEmpty {
+                cachedTransactions = loadTransactions()
+            }
         }
     }
     
@@ -129,36 +123,28 @@ struct InvoiceAccountDetailView: View {
                     .foregroundColor(.blue)
             }
             
-            Divider()
-            
-            HStack {
-                Text("Amount")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text(account.installmentAmount.isEmpty ? account.amount : account.installmentAmount)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-            }
-            
-            HStack {
-                Text("Invoice created")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text("Nov 10, 2025")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-            }
-            
-            HStack {
-                Text("Invoice due")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text("Nov 30, 2025")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+            VStack(spacing: 8) {
+                HStack {
+                    Text("To pay by \(formatDueDate(account.nextDueDate))")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(account.installmentAmount.isEmpty ? account.amount : account.installmentAmount)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Divider()
+                
+                HStack {
+                    Text("Received amount")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("0 kr")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
             }
         }
         .padding(20)
@@ -181,11 +167,23 @@ struct InvoiceAccountDetailView: View {
             
             VStack(spacing: 8) {
                 HStack {
+                    Text("Account Number")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text(generateAccountNumber())
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Divider()
+                
+                HStack {
                     Text("Type")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(account.title == "Main Account" ? "Account" : account.title == "Flex August" ? "Flex" : "Invoice Account")
+                    Text(account.title == "Main Account" ? "Credit Account" : account.title == "Flex August" ? "Flex" : "Invoice Account")
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -193,11 +191,11 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Credit")
+                    Text("Credit Limit")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text("Mastercard")
+                    Text("80 000 kr")
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -205,7 +203,7 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Current debt")
+                    Text("Utilized Credit")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -233,7 +231,7 @@ struct InvoiceAccountDetailView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text("540-1234")
+                    Text("123-456")
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -248,12 +246,22 @@ struct InvoiceAccountDetailView: View {
     
     // MARK: - Transactions Section
     private var transactionsSection: some View {
-        let transactions = sampleTransactions
+        let transactions = cachedTransactions
         
         return VStack(alignment: .leading, spacing: 16) {
-            Text("Transactions")
-                .font(.headline)
-                .fontWeight(.semibold)
+            HStack {
+                Text("Transactions")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+                Button(action: {
+                    // Handle view all transactions
+                }) {
+                    Text("View all")
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                }
+            }
             
             if transactions.isEmpty {
                 Text("No transactions yet")
@@ -262,7 +270,7 @@ struct InvoiceAccountDetailView: View {
                     .padding(.vertical, 8)
             } else {
                 VStack(spacing: 12) {
-                    ForEach(transactions, id: \.id) { transaction in
+                    ForEach(Array(transactions.prefix(8)), id: \.id) { transaction in
                         TransactionRow(
                             date: transaction.date,
                             description: transaction.description,
@@ -273,55 +281,103 @@ struct InvoiceAccountDetailView: View {
                 }
             }
         }
+        .padding(.top, 24)
     }
     
     // MARK: - Invoice History Section
     private var invoiceHistorySection: some View {
-        InvoiceHistorySection(
-            invoices: invoiceHistoryItems
-        )
-    }
-    
-    private var invoiceHistoryItems: [InvoiceHistorySection.InvoiceHistoryItem] {
-        // Find the InvoiceAccount that matches this PartPaymentItem
-        guard let invoiceAccount = dataManager.invoiceAccounts.first(where: { $0.id == account.id }) else {
-            return []
-        }
-        
-        // Extract merchant name from account title or autopaySource
-        let merchantName = invoiceAccount.autopaySource.isEmpty ? 
-            invoiceAccount.title.components(separatedBy: " - ").first ?? invoiceAccount.title :
-            invoiceAccount.autopaySource
-        
-        // Get invoices for this merchant from DataManager
-        let accountInvoices = dataManager.invoices.filter { invoice in
-            invoice.merchant.lowercased().contains(merchantName.lowercased()) ||
-            merchantName.lowercased().contains(invoice.merchant.lowercased())
-        }
-        
-        // Convert to InvoiceHistoryItem format
-        return accountInvoices.map { invoice in
-            let isPaid = invoice.status.lowercased().contains("paid") || invoice.category == .handledPaid
-            let status: String
-            if isPaid {
-                status = "Paid"
-            } else if invoice.status.lowercased().contains("overdue") || invoice.isOverdue {
-                status = "Overdue"
-            } else {
-                status = invoice.status
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Invoices")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+                Button(action: {
+                    // Handle view all invoices
+                }) {
+                    Text("View all")
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                }
             }
             
-            return InvoiceHistorySection.InvoiceHistoryItem(
-                invoiceNumber: invoice.invoiceNumber,
-                date: dateService.formatDateOffset(invoice.issueDateOffset),
-                amount: invoice.amount,
-                status: status,
-                isPaid: isPaid
-            )
-        }.sorted { item1, item2 in
-            // Sort by date (newest first) - simple string comparison for dates
-            item1.date > item2.date
+            VStack(spacing: 12) {
+                ForEach(Array(generatedInvoices.prefix(8))) { invoice in
+                    InvoiceRow(
+                        title: invoice.merchant,
+                        subtitle: invoice.subtitle,
+                        amount: invoice.amount,
+                        icon: invoice.icon,
+                        color: invoice.color,
+                        isOverdue: invoice.isOverdue,
+                        statusOverride: invoice.statusOverride
+                    )
+                }
+            }
         }
+        .padding(.top, 24)
+    }
+    
+    private var generatedInvoices: [InvoiceItem] {
+        cachedInvoices
+    }
+    
+    private func generateInvoices() -> [InvoiceItem] {
+        // Static list of 8 invoices for the last 8 months (optimized for performance)
+        let monthNames = ["DEC", "NOV", "OCT", "SEP", "AUG", "JUL", "JUN", "MAY"]
+        let amounts = [12345, 10232, 3453, 5678, 8901, 2345, 6789, 4567]
+        let issueDates = ["2026-01-05", "2025-12-05", "2025-11-05", "2025-10-05", "2025-09-05", "2025-08-05", "2025-07-05", "2025-06-05"]
+        let dueDates = ["Jan 31, 2026", "Dec 31, 2025", "Nov 30, 2025", "Oct 31, 2025", "Sep 30, 2025", "Aug 31, 2025", "Jul 31, 2025", "Jun 30, 2025"]
+        let invoiceNumbers = ["RG-DEC-2025", "RG-NOV-2025", "RG-OCT-2025", "RG-SEP-2025", "RG-AUG-2025", "RG-JUL-2025", "RG-JUN-2025", "RG-MAY-2025"]
+        
+        // Create NumberFormatter once
+        let amountFormatter = NumberFormatter()
+        amountFormatter.numberStyle = .decimal
+        amountFormatter.groupingSeparator = " "
+        amountFormatter.maximumFractionDigits = 0
+        amountFormatter.minimumFractionDigits = 0
+        
+        var invoices: [InvoiceItem] = []
+        
+        for i in 0..<8 {
+            let isPaid = i > 0 // All except current month are paid
+            let amountString = (amountFormatter.string(from: NSNumber(value: amounts[i])) ?? "\(amounts[i])") + " kr"
+            let merchantName = "Resurs Gold - \(monthNames[i])"
+            let statusText = isPaid ? "Paid" : "Due soon"
+            
+            let invoice = InvoiceItem(
+                merchant: merchantName,
+                subtitle: issueDates[i],
+                amount: amountString,
+                icon: "doc.text.fill",
+                color: isPaid ? .green : .blue,
+                isOverdue: false,
+                statusOverride: isPaid ? statusText : nil,
+                category: isPaid ? .handledPaid : .dueSoon,
+                detail: InvoiceData(
+                    merchant: merchantName,
+                    amount: amountString,
+                    dueDate: dueDates[i],
+                    invoiceNumber: invoiceNumbers[i],
+                    issueDate: issueDates[i],
+                    status: statusText,
+                    color: isPaid ? .green : .blue
+                )
+            )
+            
+            invoices.append(invoice)
+        }
+        
+        return invoices
+    }
+    
+    private func formatAmount(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = " "
+        formatter.maximumFractionDigits = 0
+        formatter.minimumFractionDigits = 0
+        return (formatter.string(from: NSNumber(value: value)) ?? "\(Int(value))") + " kr"
     }
     
     // MARK: - Actions Section
@@ -330,77 +386,123 @@ struct InvoiceAccountDetailView: View {
             Text("Actions")
                 .font(.headline)
                 .fontWeight(.semibold)
+                .padding(.top, 24)
             
-            VStack(spacing: 12) {
+            VStack(spacing: 0) {
                 Button {
                     // Handle pay extra action
                 } label: {
                     HStack {
-                        Spacer()
                         Text("Pay Extra")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.blue)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
                         Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundColor(.secondary)
                     }
-                    .padding(.vertical, 16)
-                    .background(Color.clear)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.blue, lineWidth: 1.5)
-                    )
+                    .padding(16)
                 }
+                .buttonStyle(.plain)
+                
+                Divider()
+                    .padding(.leading, 16)
                 
                 Button {
                     // Handle make end payment action
                 } label: {
                     HStack {
-                        Spacer()
                         Text("Make end payment")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.blue)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
                         Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundColor(.secondary)
                     }
-                    .padding(.vertical, 16)
-                    .background(Color.clear)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.blue, lineWidth: 1.5)
-                    )
+                    .padding(16)
                 }
+                .buttonStyle(.plain)
+                
+                Divider()
+                    .padding(.leading, 16)
+                
+                Button {
+                    // Handle close account action
+                } label: {
+                    HStack {
+                        Text("Close account")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.red)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(16)
+                }
+                .buttonStyle(.plain)
             }
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
     
     // MARK: - Helper Methods
+    private func generateAccountNumber() -> String {
+        // Generate account number based on account ID
+        let hash = abs(account.id.hashValue) % 1000000000
+        return String(format: "%09d", hash)
+    }
+    
     private func generateOCR() -> String {
         // Generate a simple OCR number based on account title
         let hash = abs(account.title.hashValue) % 10000000
         return String(format: "%07d", hash)
     }
     
-    private var sampleTransactions: [TransactionItem] {
+    private func formatDueDate(_ dateString: String) -> String {
+        // Parse date string (format: "Nov 30, 2025") and format as "Nov 30"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy"
+        
+        if let date = formatter.date(from: dateString) {
+            let outputFormatter = DateFormatter()
+            outputFormatter.dateFormat = "MMM d"
+            return outputFormatter.string(from: date)
+        }
+        
+        // Fallback: return original string if parsing fails
+        return dateString
+    }
+    
+    private func loadTransactions() -> [TransactionItem] {
         // Find the InvoiceAccount that matches this PartPaymentItem
         guard let invoiceAccount = dataManager.invoiceAccounts.first(where: { $0.id == account.id }) else {
             return []
         }
         
-        // Get transactions for this account
+        // Get transactions for this account and sort by dateOffset first (before conversion)
         let accountTransactions = dataManager.transactionsForAccount(invoiceAccount.id)
+            .sorted { $0.dateOffset > $1.dateOffset } // Newest first
         
-        // Convert to TransactionItem and sort by date (newest first)
-        return accountTransactions
-            .map { $0.toTransactionItem(dateService: dateService) }
-            .sorted { date1, date2 in
-                // Parse dates and compare (simplified - assumes format "MMM d, yyyy")
-                // For simplicity, we'll sort by transaction date offset
-                let t1 = dataManager.transactions.first(where: { $0.id == date1.id })
-                let t2 = dataManager.transactions.first(where: { $0.id == date2.id })
-                let offset1 = t1?.dateOffset ?? 0
-                let offset2 = t2?.dateOffset ?? 0
-                return offset1 > offset2 // Newest first
+        return accountTransactions.map { transaction in
+            let item = transaction.toTransactionItem(dateService: dateService)
+            // Change red amounts to white
+            if transaction.amountColorName.lowercased() == "red" {
+                return TransactionItem(
+                    id: item.id,
+                    date: item.date,
+                    description: item.description,
+                    amount: item.amount,
+                    amountColor: .white
+                )
             }
+            return item
+        }
     }
 }
 

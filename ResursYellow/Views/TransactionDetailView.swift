@@ -300,7 +300,9 @@ struct TransactionDetailView: View {
             )
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
-            .presentationBackground(.ultraThinMaterial)
+            .presentationBackground {
+                AdaptiveSheetBackground()
+            }
         }
     }
 }
@@ -904,7 +906,9 @@ struct NewPaymentPlanSheet: View {
                 }
             }
         }
-        .presentationBackground(.ultraThinMaterial)
+        .presentationBackground {
+            AdaptiveSheetBackground()
+        }
     }
 }
 
@@ -916,7 +920,7 @@ struct NewPaymentPlanSheet: View {
         time: "5:15 PM",
         paymentMethod: .swish
     )
-    .environmentObject(PaymentPlansManager())
+    .environmentObject(PaymentPlansManager.shared)
     .preferredColorScheme(.dark)
 }
 

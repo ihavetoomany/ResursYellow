@@ -97,6 +97,7 @@ struct JulaDetailView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
+                .padding(.top, 24)
             VStack(spacing: 12) {
                 ForEach(purchases) { purchase in
                     HStack(spacing: 16) {
@@ -130,10 +131,11 @@ struct JulaDetailView: View {
     
     private var partPaymentsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Invoice accounts")
+            Text("Active accounts")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
+                .padding(.top, 24)
             VStack(spacing: 12) {
                 ForEach(partPayments, id: \.title) { plan in
                     VStack(alignment: .leading, spacing: 8) {
@@ -169,6 +171,7 @@ struct JulaDetailView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
+                .padding(.top, 24)
             VStack(spacing: 12) {
                 ForEach(benefits, id: \.title) { benefit in
                     HStack(spacing: 16) {

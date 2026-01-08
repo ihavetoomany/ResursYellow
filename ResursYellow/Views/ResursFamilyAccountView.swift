@@ -69,6 +69,7 @@ struct ResursFamilyAccountView: View {
                             Spacer()
                         }
                         .padding(.horizontal)
+                        .padding(.top, 24)
                         
                         VStack(spacing: 12) {
                             CreditCardMini(
@@ -98,6 +99,7 @@ struct ResursFamilyAccountView: View {
                             Spacer()
                         }
                         .padding(.horizontal)
+                        .padding(.top, 24)
                         
                         VStack(spacing: 12) {
                             PurchaseRow(
@@ -157,12 +159,13 @@ struct ResursFamilyAccountView: View {
                     // Invoice Accounts Section
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Invoice accounts")
+                            Text("Active accounts")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
                         }
                         .padding(.horizontal)
+                        .padding(.top, 24)
                         
                         VStack(spacing: 12) {
                             ForEach(invoiceAccounts) { payment in
@@ -182,6 +185,7 @@ struct ResursFamilyAccountView: View {
                             .font(.headline)
                             .fontWeight(.semibold)
                             .padding(.horizontal, 4)
+                            .padding(.top, 24)
                         VStack(spacing: 12) {
                             ForEach(benefits, id: \.title) { benefit in
                                 HStack(spacing: 16) {

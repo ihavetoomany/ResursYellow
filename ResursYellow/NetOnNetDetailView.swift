@@ -172,6 +172,7 @@ struct NetOnNetDetailView: View {
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
+                .padding(.top, 24)
             VStack(spacing: 12) {
                 ForEach(purchases) { purchase in
                     HStack(spacing: 16) {
@@ -205,10 +206,11 @@ struct NetOnNetDetailView: View {
     
     private var partPaymentsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Invoice accounts")
+            Text("Active accounts")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
+                .padding(.top, 24)
             
             VStack(spacing: 12) {
                 // Get Main Account for Netonnet from DataManager
@@ -248,6 +250,7 @@ struct NetOnNetDetailView: View {
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Benefits and services")
+                .padding(.top, 24)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
