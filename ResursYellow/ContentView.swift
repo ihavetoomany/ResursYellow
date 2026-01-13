@@ -29,7 +29,7 @@ struct ContentView: View {
             walletLabel: "Wallet",
             bankingLabel: "Banking",
             merchantsLabel: "Merchants",
-            manageLabel: "Manage"
+            manageLabel: "My Resurs"
         )
         .onAppear {
             hasAppeared = true

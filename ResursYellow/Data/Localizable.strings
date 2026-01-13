@@ -78,6 +78,10 @@
 "All purchases are paid" = "All purchases are paid";
 "No invoice until you make a purchase" = "No invoice until you make a purchase";
 
+/* Prototype */
+"Switch Persona" = "Switch Persona";
+"Change user" = "Change user";
+
 /* Actions */
 "Reset Data" = "Reset Data";
 "Reset all data to defaults?" = "Reset all data to defaults?";
@@ -90,14 +94,15 @@
 "Svenska" = "Swedish";
 "English" = "English";
 
-/* Manage / Settings */
-"Manage" = "Manage";
+/* My Resurs / Settings */
+"My Resurs" = "My Resurs";
 "Support, profile & settings" = "Support, profile & settings";
 "Support" = "Support";
 "Profile" = "Profile";
 "Settings" = "Settings";
+"Prototype" = "Prototype";
 "Report issue" = "Report issue";
-"Messages from the bank" = "Messages from the bank";
+"Messages" = "Messages";
 "View bank notifications" = "View bank notifications";
 "Live chat" = "Live chat";
 "FAQ" = "FAQ";
@@ -114,7 +119,7 @@
 "Credit utilization" = "Credit utilization";
 "Spending trends" = "Spending trends";
 "Gamification" = "Gamification";
-"Connect bank account" = "Connect bank account";
+"Payment method" = "Payment method";
 "Link external accounts" = "Link external accounts";
 "Notification settings" = "Notification settings";
 "Communication, Marketing" = "Communication, Marketing";

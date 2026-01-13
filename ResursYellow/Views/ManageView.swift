@@ -14,6 +14,7 @@ struct ManageView: View {
     @State private var showCallSupport = false
     @State private var showLogoutConfirmation = false
     @State private var showResetConfirmation = false
+    @State private var selectedPersonaId: String = DataManager.shared.currentPersona.id
     
     // Helper to ensure views update when language changes
     private var currentLanguage: Language {
@@ -29,7 +30,7 @@ struct ManageView: View {
         let _ = currentLanguage // Ensure view updates when language changes
         return NavigationStack(path: $navigationPath) {
             StickyHeaderView(
-                title: localized("Manage"),
+                title: localized("My Resurs"),
                 subtitle: localized("Support, profile & settings"),
                 trailingButton: "phone.fill",
                 trailingButtonTint: .blue,
@@ -49,7 +50,7 @@ struct ManageView: View {
                             color: .red
                         )
                         ContactMethodRow(
-                            title: localized("Messages from the bank"),
+                            title: localized("Messages"),
                             subtitle: localized("View bank notifications"),
                             icon: "envelope.fill",
                             color: .blue
@@ -65,12 +66,6 @@ struct ManageView: View {
                             subtitle: "Zendesk",
                             icon: "questionmark.circle.fill",
                             color: .orange
-                        )
-                        ContactMethodRow(
-                            title: "Aktiv låneansökan?",
-                            subtitle: localized("Check loan application status"),
-                            icon: "doc.text.fill",
-                            color: .purple
                         )
                     }
                     
@@ -113,26 +108,6 @@ struct ManageView: View {
                             )
                         }
                         
-                        NavigationLink(value: "ChartOfExpenses") {
-                            ProfileRow(
-                                title: localized("Chart of expenses"),
-                                subtitle: localized("View spending breakdown"),
-                                icon: "chart.pie.fill",
-                                color: .red,
-                                showChevron: true
-                            )
-                        }
-                        
-                        NavigationLink(value: "ChartOfAvailableCredit") {
-                            ProfileRow(
-                                title: localized("Chart of available credit"),
-                                subtitle: localized("Credit utilization"),
-                                icon: "chart.bar.fill",
-                                color: .blue,
-                                showChevron: true
-                            )
-                        }
-                        
                         NavigationLink(value: "SpendingTrends") {
                             ProfileRow(
                                 title: localized("Spending trends"),
@@ -148,7 +123,7 @@ struct ManageView: View {
                     ProfileSection(title: localized("Settings")) {
                         NavigationLink(value: "ConnectBankAccount") {
                             ProfileRow(
-                                title: localized("Connect bank account"),
+                                title: localized("Payment method"),
                                 subtitle: localized("Link external accounts"),
                                 icon: "building.columns.fill",
                                 color: .blue,
@@ -205,29 +180,6 @@ struct ManageView: View {
                                 showChevron: true
                             )
                         }
-                        
-                        NavigationLink(value: "ChangeShortcuts") {
-                            ProfileRow(
-                                title: localized("Change shortcuts on homepage"),
-                                subtitle: localized("Customize homepage"),
-                                icon: "square.grid.2x2.fill",
-                                color: .pink,
-                                showChevron: true
-                            )
-                        }
-                        
-                        Button {
-                            showResetConfirmation = true
-                        } label: {
-                            ProfileRow(
-                                title: localized("Reset Data"),
-                                subtitle: localized("Restore default data"),
-                                icon: "arrow.counterclockwise",
-                                color: .orange,
-                                showChevron: false
-                            )
-                        }
-                        .buttonStyle(PlainButtonStyle())
                     }
                     
                     // Log out Section
@@ -244,6 +196,62 @@ struct ManageView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                     .padding(.top, 8)
+                    
+                    // Prototype Section
+                    ProfileSection(title: localized("Prototype")) {
+                        // Persona Picker
+                        HStack(spacing: 16) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.purple.opacity(0.15))
+                                    .frame(width: 40, height: 40)
+                                Image(systemName: "person.2.fill")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.purple)
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(localized("Switch Persona"))
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                Text(localized("Change user"))
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Picker("", selection: $selectedPersonaId) {
+                                ForEach(Persona.allPersonas) { persona in
+                                    Text(persona.displayName).tag(persona.id)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .onChange(of: selectedPersonaId) { oldValue, newValue in
+                                if let persona = Persona.persona(withId: newValue) {
+                                    dataManager.switchPersona(persona)
+                                }
+                            }
+                        }
+                        .padding(16)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        
+                        Button {
+                            showResetConfirmation = true
+                        } label: {
+                            ProfileRow(
+                                title: localized("Reset Data"),
+                                subtitle: localized("Restore default data"),
+                                icon: "arrow.counterclockwise",
+                                color: .orange,
+                                showChevron: false
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    .padding(.top, 40)
                 }
                 .padding(.horizontal)
                 .padding(.top, 24)
@@ -303,10 +311,6 @@ struct ManageView: View {
             KYCView()
         case "MyDocuments":
             MyDocumentsView()
-        case "ChartOfExpenses":
-            ChartOfExpensesView()
-        case "ChartOfAvailableCredit":
-            ChartOfAvailableCreditView()
         case "SpendingTrends":
             SpendingTrendsView()
         case "ConnectBankAccount":
@@ -321,8 +325,6 @@ struct ManageView: View {
             AccessibilitySettingsView()
         case "Autopay":
             AutopaySettingsView()
-        case "ChangeShortcuts":
-            ChangeShortcutsView()
         default:
             Text("Coming soon")
                 .navigationTitle(destination)

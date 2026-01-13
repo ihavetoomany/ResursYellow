@@ -102,7 +102,7 @@ struct ProfileView: View {
                             ProfileSection(title: "Settings") {
                                 NavigationLink(value: "ConnectBankAccount") {
                                     ProfileRow(
-                                        title: "Connect bank account",
+                                        title: "Payment method",
                                         subtitle: "Link external accounts",
                                         icon: "building.columns.fill",
                                         color: .blue,

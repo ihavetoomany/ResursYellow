@@ -9,9 +9,22 @@ import Foundation
 import SwiftUI
 import Combine
 
+/// Data structure for loading persona JSON files
+struct PersonaData: Codable {
+    let id: String
+    let name: String
+    let displayName: String
+    let creditAccounts: [CreditAccount]
+    let invoices: [Invoice]
+    let transactions: [Transaction]
+    let invoiceAccounts: [InvoiceAccount]
+}
+
 class DataManager: ObservableObject {
     static let shared = DataManager()
     
+    @Published var currentPersona: Persona = .john
+    @Published var creditAccounts: [CreditAccount] = []
     @Published var invoices: [Invoice] = []
     @Published var transactions: [Transaction] = []
     @Published var invoiceAccounts: [InvoiceAccount] = []
@@ -19,63 +32,75 @@ class DataManager: ObservableObject {
     private let dateService = DateService.shared
     
     // UserDefaults keys
+    private let personaKey = "current_persona_id"
     private let invoicesKey = "override_invoices"
     private let transactionsKey = "override_transactions"
     private let invoiceAccountsKey = "override_invoice_accounts"
     
     private init() {
+        loadSavedPersona()
+        loadData()
+    }
+    
+    // MARK: - Persona Management
+    
+    private func loadSavedPersona() {
+        if let savedPersonaId = UserDefaults.standard.string(forKey: personaKey),
+           let persona = Persona.persona(withId: savedPersonaId) {
+            currentPersona = persona
+        } else {
+            currentPersona = .john
+        }
+    }
+    
+    func switchPersona(_ persona: Persona) {
+        // Clear any overrides when switching personas
+        UserDefaults.standard.removeObject(forKey: invoicesKey)
+        UserDefaults.standard.removeObject(forKey: transactionsKey)
+        UserDefaults.standard.removeObject(forKey: invoiceAccountsKey)
+        
+        // Save the new persona selection
+        UserDefaults.standard.set(persona.id, forKey: personaKey)
+        
+        // Update current persona and reload data
+        currentPersona = persona
         loadData()
     }
     
     // MARK: - Data Loading
     
     func loadData() {
-        loadDefaultData()
+        loadPersonaData()
         applyOverrides()
     }
     
-    private func loadDefaultData() {
-        // Load invoices
-        if let invoicesData = loadJSONFile(named: "default_invoices") {
-            do {
-                let decoder = JSONDecoder()
-                let dataStore = try decoder.decode(DataStore.self, from: invoicesData)
-                self.invoices = dataStore.invoices
-            } catch {
-                print("Error loading default invoices: \(error)")
-                self.invoices = []
-            }
-        } else {
-            self.invoices = []
-        }
+    private func loadPersonaData() {
+        let filename = "persona_\(currentPersona.name)"
         
-        // Load transactions
-        if let transactionsData = loadJSONFile(named: "default_transactions") {
+        if let personaData = loadJSONFile(named: filename) {
             do {
                 let decoder = JSONDecoder()
-                let dataStore = try decoder.decode(DataStore.self, from: transactionsData)
-                self.transactions = dataStore.transactions
+                let data = try decoder.decode(PersonaData.self, from: personaData)
+                
+                self.creditAccounts = data.creditAccounts
+                self.invoices = data.invoices
+                self.transactions = data.transactions
+                self.invoiceAccounts = data.invoiceAccounts
             } catch {
-                print("Error loading default transactions: \(error)")
-                self.transactions = []
+                print("Error loading persona data from \(filename): \(error)")
+                clearAllData()
             }
         } else {
-            self.transactions = []
+            print("Could not find persona file: \(filename).json")
+            clearAllData()
         }
-        
-        // Load invoice accounts
-        if let accountsData = loadJSONFile(named: "default_invoice_accounts") {
-            do {
-                let decoder = JSONDecoder()
-                let dataStore = try decoder.decode(DataStore.self, from: accountsData)
-                self.invoiceAccounts = dataStore.invoiceAccounts
-            } catch {
-                print("Error loading default invoice accounts: \(error)")
-                self.invoiceAccounts = []
-            }
-        } else {
-            self.invoiceAccounts = []
-        }
+    }
+    
+    private func clearAllData() {
+        self.creditAccounts = []
+        self.invoices = []
+        self.transactions = []
+        self.invoiceAccounts = []
     }
     
     private func loadJSONFile(named filename: String) -> Data? {
@@ -190,13 +215,13 @@ class DataManager: ObservableObject {
     // MARK: - Reset
     
     func reset() {
-        // Clear UserDefaults
+        // Clear UserDefaults overrides
         UserDefaults.standard.removeObject(forKey: invoicesKey)
         UserDefaults.standard.removeObject(forKey: transactionsKey)
         UserDefaults.standard.removeObject(forKey: invoiceAccountsKey)
         
-        // Reload from JSON files
-        loadDefaultData()
+        // Reload persona data
+        loadPersonaData()
     }
     
     // MARK: - Query Methods
@@ -213,4 +238,3 @@ class DataManager: ObservableObject {
         return invoiceAccounts.first { $0.id == id }
     }
 }
-

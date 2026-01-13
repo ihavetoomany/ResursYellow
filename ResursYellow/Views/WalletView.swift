@@ -40,27 +40,6 @@ private func formattedSEK(_ value: Double) -> String {
     return "\(formatted) SEK"
 }
 
-struct CreditAccount: Identifiable {
-    let id = UUID()
-    let name: String
-    let available: Double
-    let limit: Double
-    
-    var availableLabel: String {
-        formattedSEK(available)
-    }
-    
-    var limitLabel: String {
-        formattedSEK(limit)
-    }
-}
-
-extension CreditAccount {
-    static let sampleAccounts: [CreditAccount] = [
-        CreditAccount(name: "Resurs Gold", available: 15_000, limit: 30_000)
-    ]
-}
-
 struct ActionItem: Identifiable {
     let id = UUID()
     let title: String
@@ -592,8 +571,8 @@ struct WalletView: View {
     }
 
     private var availableFamilyCreditLabel: String {
-        // Use CreditAccount.sampleAccounts and show available from the Resurs Gold account if present
-        let accounts = CreditAccount.sampleAccounts
+        // Use dataManager.creditAccounts and show available from the Resurs Gold account if present
+        let accounts = dataManager.creditAccounts
         let family = accounts.first { $0.name.lowercased().contains("family") }
         let available = family?.available ?? accounts.first?.available ?? 0
         return formattedSEK(available)
@@ -602,7 +581,7 @@ struct WalletView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
-                title: "John",
+                title: dataManager.currentPersona.displayName,
                 subtitle: greeting,
                 minimizedTitle: "Wallet",
                 trailingButton: availableSymbol("sparkle2", fallback: "sparkle"),

@@ -78,6 +78,10 @@
 "All purchases are paid" = "Alla köp är betalda";
 "No invoice until you make a purchase" = "Ingen faktura förrän du gör ett köp";
 
+/* Prototype */
+"Switch Persona" = "Byt persona";
+"Change user" = "Ändra användare";
+
 /* Actions */
 "Reset Data" = "Återställ data";
 "Reset all data to defaults?" = "Återställa all data till standard?";
@@ -90,14 +94,15 @@
 "Svenska" = "Svenska";
 "English" = "Engelska";
 
-/* Manage / Settings */
-"Manage" = "Hantera";
+/* My Resurs / Settings */
+"My Resurs" = "Mitt Resurs";
 "Support, profile & settings" = "Support, profil & inställningar";
 "Support" = "Support";
 "Profile" = "Profil";
 "Settings" = "Inställningar";
+"Prototype" = "Prototyp";
 "Report issue" = "Rapportera problem";
-"Messages from the bank" = "Meddelanden från banken";
+"Messages" = "Meddelanden";
 "View bank notifications" = "Visa banknotifikationer";
 "Live chat" = "Livechatt";
 "FAQ" = "Vanliga frågor";
@@ -114,7 +119,7 @@
 "Credit utilization" = "Kreditanvändning";
 "Spending trends" = "Utgiftstrender";
 "Gamification" = "Spelifiering";
-"Connect bank account" = "Anslut bankkonto";
+"Payment method" = "Betalningsmetod";
 "Link external accounts" = "Länka externa konton";
 "Notification settings" = "Notifikationsinställningar";
 "Communication, Marketing" = "Kommunikation, Marknadsföring";
