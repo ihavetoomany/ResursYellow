@@ -10,12 +10,17 @@ import SwiftUI
 struct AccountsView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showAddAccount = false
+    @StateObject private var dataManager = DataManager.shared
+    
+    private var hasAccounts: Bool {
+        !dataManager.creditAccounts.isEmpty
+    }
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
                 title: "Banking",
-                subtitle: "Your engagements",
+                subtitle: hasAccounts ? "Your engagements" : "Get started",
                 trailingButton: "plus",
                 trailingButtonTint: .blue,
                 trailingButtonSize: 52,
@@ -25,46 +30,87 @@ struct AccountsView: View {
                 }
             ) {
                 VStack(spacing: 16) {
-                    // Account Cards
-                    VStack(spacing: 16) {
-                        // My Accounts Items
-                        Button {
-                            navigationPath.append("ResursFamily")
-                        } label: {
-                            AccountCard(
-                                title: "Resurs Gold",
-                                accountType: "Credit Account",
-                                accountNumber: "**** 1234",
-                                balance: "56 005 SEK",
-                                icon: "heart.fill",
-                                color: .blue,
-                                balanceLabel: "Available credit"
-                            )
+                    if hasAccounts {
+                        // Account Cards
+                        VStack(spacing: 16) {
+                            // My Accounts Items
+                            Button {
+                                navigationPath.append("ResursFamily")
+                            } label: {
+                                AccountCard(
+                                    title: "Resurs Gold",
+                                    accountType: "Credit Account",
+                                    accountNumber: "**** 1234",
+                                    balance: "\(dataManager.creditAccounts.first?.availableLabel ?? "0 SEK")",
+                                    icon: "heart.fill",
+                                    color: .blue,
+                                    balanceLabel: "Available credit"
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .accessibilityLabel("Resurs Gold credit account. Available credit.")
+                            .accessibilityHint("Opens detailed view.")
+                            
+                            Button {
+                                navigationPath.append("SavingsAccount")
+                            } label: {
+                                AccountCard(
+                                    title: "Goal Saver",
+                                    accountType: "Savings Account",
+                                    accountNumber: "**** 5678",
+                                    balance: "120 450 SEK",
+                                    icon: "banknote.fill",
+                                    color: .mint,
+                                    balanceLabel: "Savings Balance"
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .accessibilityLabel("Goal Saver savings account. 120 450 kronor saved.")
+                            .accessibilityHint("Shows savings account activity.")
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        .accessibilityLabel("Resurs Gold credit account. 56 005 kronor available.")
-                        .accessibilityHint("Opens detailed view.")
-                        
-                        Button {
-                            navigationPath.append("SavingsAccount")
-                        } label: {
-                            AccountCard(
-                                title: "Goal Saver",
-                                accountType: "Savings Account",
-                                accountNumber: "**** 5678",
-                                balance: "120 450 SEK",
-                                icon: "banknote.fill",
-                                color: .mint,
-                                balanceLabel: "Savings Balance"
-                            )
+                        .padding(.horizontal)
+                        .padding(.top, 24)
+                        .padding(.bottom, 16)
+                    } else {
+                        // Empty state
+                        VStack(spacing: 20) {
+                            Spacer()
+                                .frame(height: 40)
+                            
+                            Image(systemName: "building.columns")
+                                .font(.system(size: 56))
+                                .foregroundColor(.secondary.opacity(0.4))
+                            
+                            Text("No products yet")
+                                .font(.title3.weight(.semibold))
+                                .foregroundColor(.secondary)
+                            
+                            Text("Apply for a credit card, savings account, or loan to get started.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary.opacity(0.8))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 40)
+                            
+                            Button {
+                                showAddAccount = true
+                            } label: {
+                                Text("Explore")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 10)
+                                    .background(Color.secondary.opacity(0.12))
+                                    .clipShape(Capsule())
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .padding(.top, 4)
+                            
+                            Spacer()
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        .accessibilityLabel("Goal Saver savings account. 120 450 kronor saved.")
-                        .accessibilityHint("Shows savings account activity.")
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 24)
+                        .padding(.bottom, 16)
                     }
-                    .padding(.horizontal)
-                    .padding(.top, 24)
-                    .padding(.bottom, 16)
                 }
             }
             .navigationBarHidden(true)
@@ -153,6 +199,43 @@ struct AccountCard: View {
                 Text(balance)
                     .font(.system(size: 20, weight: .bold))
             }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+struct CrossSellCard: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.title2.weight(.semibold))
+                .foregroundColor(color)
+                .frame(width: 48, height: 48)
+                .background(color.opacity(0.18))
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.title3.weight(.semibold))
+                    .foregroundColor(.primary)
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
@@ -324,41 +407,55 @@ struct SavingsAccountDetailView: View {
 
 struct AddAccountView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var accountName: String = ""
-    @State private var accountType: String = "Credit"
-    @State private var initialLimit: String = ""
-
-    private let accountTypes = ["Credit", "Savings", "Loan", "Checking"]
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section(header: Text("Account Details")) {
-                    TextField("Account name", text: $accountName)
-                    Picker("Type", selection: $accountType) {
-                        ForEach(accountTypes, id: \.self) { type in
-                            Text(type).tag(type)
-                        }
-                    }
-                    TextField("Initial limit (optional)", text: $initialLimit)
-                        .keyboardType(.numberPad)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 16) {
+                    Text("Choose a product to apply for")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 8)
+                    
+                    CrossSellCard(
+                        title: "Get a credit card",
+                        subtitle: "Up to 80 000 SEK credit",
+                        icon: "creditcard.fill",
+                        color: .blue
+                    )
+                    
+                    CrossSellCard(
+                        title: "Start saving",
+                        subtitle: "Earn up to 3.25% interest",
+                        icon: "banknote.fill",
+                        color: .mint
+                    )
+                    
+                    CrossSellCard(
+                        title: "Apply for a loan",
+                        subtitle: "Borrow up to 500 000 SEK",
+                        icon: "building.columns.fill",
+                        color: .purple
+                    )
                 }
-
-                Section(footer: Text("You can edit these details later in account settings.")) {
+                .padding(.horizontal)
+                .padding(.bottom, 24)
+            }
+            .background(Color(uiColor: .systemGroupedBackground))
+            .navigationTitle("Add Product")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        // TODO: Persist new account in data model
                         dismiss()
                     } label: {
-                        Text("Create Account")
-                            .frame(maxWidth: .infinity, alignment: .center)
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundColor(.gray)
                     }
-                    .disabled(accountName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-            }
-            .navigationTitle("Add Account")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    .buttonStyle(.plain)
                 }
             }
         }

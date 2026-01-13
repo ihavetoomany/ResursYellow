@@ -14,7 +14,15 @@
 "Invoices" = "Fakturor";
 "Purchases" = "Köp";
 "No unpaid invoices" = "Inga obetalda fakturor";
+"No invoices" = "Inga fakturor";
+"Your invoices will appear here" = "Dina fakturor visas här";
+"invoices overdue" = "fakturor förfallna";
+"invoices due" = "fakturor att betala";
+"Get a credit card" = "Skaffa kreditkort";
+"Available credit" = "Tillgänglig kredit";
+"Up to 80 000 SEK credit" = "Upp till 80 000 SEK kredit";
 "You're all caught up for now" = "Du är allt ikapp för tillfället";
+"Did you expect something here? Sometimes it takes a few days until an invoice is generated. You can also look in the purchases list for your purchase." = "Förväntade du dig något här? Ibland tar det några dagar innan en faktura genereras. Du kan också titta i köplistan efter ditt köp.";
 "No recent purchases" = "Inga senaste köp";
 "Your recent activity will appear here" = "Din senaste aktivitet visas här";
 "Actions" = "Åtgärder";

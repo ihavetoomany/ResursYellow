@@ -14,7 +14,15 @@
 "Invoices" = "Invoices";
 "Purchases" = "Purchases";
 "No unpaid invoices" = "No unpaid invoices";
+"No invoices" = "No invoices";
+"Your invoices will appear here" = "Your invoices will appear here";
+"invoices overdue" = "invoices overdue";
+"invoices due" = "invoices due";
+"Get a credit card" = "Get a credit card";
+"Available credit" = "Available credit";
+"Up to 80 000 SEK credit" = "Up to 80 000 SEK credit";
 "You're all caught up for now" = "You're all caught up for now";
+"Did you expect something here? Sometimes it takes a few days until an invoice is generated. You can also look in the purchases list for your purchase." = "Did you expect something here? Sometimes it takes a few days until an invoice is generated. You can also look in the purchases list for your purchase.";
 "No recent purchases" = "No recent purchases";
 "Your recent activity will appear here" = "Your recent activity will appear here";
 "Actions" = "Actions";

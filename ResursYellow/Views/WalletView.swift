@@ -569,13 +569,51 @@ struct WalletView: View {
         let total = toPayInvoices.reduce(0.0) { $0 + $1.numericAmount }
         return formattedSEK(total)
     }
+    
+    private var invoiceSubtitleLabel: String {
+        if toPayInvoices.isEmpty {
+            return localized("No unpaid invoices")
+        }
+        let overdueCount = dataManager.invoicesForCategory(.overdue).count
+        if overdueCount > 0 {
+            return "\(overdueCount) \(localized("invoices overdue"))"
+        }
+        return "\(unpaidCount) \(localized("invoices due"))"
+    }
+    
+    private var hasOverdueInvoices: Bool {
+        !dataManager.invoicesForCategory(.overdue).isEmpty
+    }
 
-    private var availableFamilyCreditLabel: String {
-        // Use dataManager.creditAccounts and show available from the Resurs Gold account if present
-        let accounts = dataManager.creditAccounts
-        let family = accounts.first { $0.name.lowercased().contains("family") }
-        let available = family?.available ?? accounts.first?.available ?? 0
-        return formattedSEK(available)
+    private var hasCreditAccount: Bool {
+        !dataManager.creditAccounts.isEmpty
+    }
+    
+    private var creditCardHeadline: String {
+        if hasCreditAccount {
+            let accounts = dataManager.creditAccounts
+            let family = accounts.first { $0.name.lowercased().contains("family") }
+            let available = family?.available ?? accounts.first?.available ?? 0
+            return formattedSEK(available)
+        } else {
+            return localized("Get a credit card")
+        }
+    }
+    
+    private var creditCardSubtitle: String {
+        if hasCreditAccount {
+            return localized("Available credit")
+        } else {
+            return localized("Up to 80 000 SEK credit")
+        }
+    }
+    
+    private var creditCardIcon: String {
+        hasCreditAccount ? "creditcard.fill" : "plus"
+    }
+    
+    private var creditCardTint: Color {
+        hasCreditAccount ? .green : .blue
     }
 
     var body: some View {
@@ -599,7 +637,7 @@ struct WalletView: View {
                                 navigationPath.append(WalletDestination.invoices)
                             } label: {
                                 ZStack(alignment: .leading) {
-                                    SummaryBox(title: "To Pay", headline: totalUnpaidAmountLabel, subtitle: "2 invoices overdue", icon: "doc.text.fill", tint: .orange)
+                                    SummaryBox(title: "To Pay", headline: totalUnpaidAmountLabel, subtitle: invoiceSubtitleLabel, icon: "doc.text.fill", tint: hasOverdueInvoices ? .orange : .green)
                                     Color.clear.frame(width: 1)
                                         .accessibilityHidden(true)
                                         .id("summaryAnchor0")
@@ -621,7 +659,7 @@ struct WalletView: View {
                                 NotificationCenter.default.post(name: .switchToBanking, object: nil, userInfo: ["destination": "ResursFamilyAccountView"])
                             } label: {
                                 ZStack(alignment: .leading) {
-                                    SummaryBox(title: "Resurs Gold", headline: availableFamilyCreditLabel, subtitle: "Avaliable credit", icon: "creditcard.fill", tint: .green)
+                                    SummaryBox(title: "Resurs Gold", headline: creditCardHeadline, subtitle: creditCardSubtitle, icon: creditCardIcon, tint: creditCardTint)
                                     Color.clear.frame(width: 1)
                                         .accessibilityHidden(true)
                                         .id("summaryAnchor1")
@@ -695,7 +733,7 @@ struct WalletView: View {
                         if selectedSegment == .invoices {
                             VStack(spacing: 12) {
                                 if allInvoices.isEmpty {
-                                    EmptyStateRow(title: self.localized("No unpaid invoices"), subtitle: self.localized("You're all caught up for now"))
+                                    EmptyStateRow(title: self.localized("No unpaid invoices"), subtitle: self.localized("Did you expect something here? Sometimes it takes a few days until an invoice is generated. You can also look in the purchases list for your purchase."))
                                 } else {
                                     ForEach(allInvoices) { invoice in
                                         Button {
@@ -1795,10 +1833,42 @@ struct InvoicesList: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var localizationService = LocalizationService.shared
-    @State private var overdueInvoices = InvoiceItem.overdueSamples
-    @State private var dueSoonInvoices = InvoiceItem.dueSoonSamples
-    @State private var scheduledInvoices = InvoiceItem.handledScheduledSamples
-    @State private var paidInvoices = InvoiceItem.handledPaidSamples
+    @StateObject private var dataManager = DataManager.shared
+    private let dateService = DateService.shared
+    
+    @State private var selectedIds: Set<UUID> = []
+    
+    private var overdueInvoices: [InvoiceItem] {
+        dataManager.invoicesForCategory(.overdue).map { invoiceToItem($0) }
+    }
+    
+    private var dueSoonInvoices: [InvoiceItem] {
+        dataManager.invoicesForCategory(.dueSoon).map { invoiceToItem($0) }
+    }
+    
+    private var scheduledInvoices: [InvoiceItem] {
+        dataManager.invoicesForCategory(.handledScheduled).map { invoiceToItem($0) }
+    }
+    
+    private var paidInvoices: [InvoiceItem] {
+        dataManager.invoicesForCategory(.handledPaid).map { invoiceToItem($0) }
+    }
+    
+    private func invoiceToItem(_ invoice: Invoice) -> InvoiceItem {
+        InvoiceItem(
+            id: invoice.id,
+            merchant: invoice.merchant,
+            subtitle: invoice.subtitle(dateService: dateService),
+            amount: invoice.amount,
+            icon: invoice.icon,
+            color: invoice.color,
+            isOverdue: invoice.isOverdue,
+            statusOverride: invoice.statusOverride,
+            category: invoice.category.toInvoiceCategory(),
+            detail: invoice.toInvoiceData(dateService: dateService),
+            isSelected: selectedIds.contains(invoice.id)
+        )
+    }
     
     private var outstandingPool: [InvoiceItem] {
         overdueInvoices + dueSoonInvoices
@@ -1833,22 +1903,42 @@ struct InvoicesList: View {
                             Color.clear.frame(height: 120)
                             
                             VStack(spacing: 20) {
-                                sectionHeader("TO PAY")
-                                ForEach(overdueInvoices) { invoice in
-                                    invoiceButton(for: invoice, allowBatching: true)
-                                }
-                                
-                                ForEach(dueSoonInvoices) { invoice in
-                                    invoiceButton(for: invoice, allowBatching: true)
-                                }
-                                
-                                sectionHeader("Handled")
-                                ForEach(scheduledInvoices) { invoice in
-                                    invoiceButton(for: invoice, allowBatching: false)
-                                }
-                                
-                                ForEach(paidInvoices) { invoice in
-                                    invoiceButton(for: invoice, allowBatching: false)
+                                if dataManager.invoices.isEmpty {
+                                    VStack(spacing: 16) {
+                                        Image(systemName: "doc.text")
+                                            .font(.system(size: 48))
+                                            .foregroundColor(.secondary.opacity(0.5))
+                                        Text(localizationService.localizedString("No invoices", fallback: "No invoices"))
+                                            .font(.headline)
+                                            .foregroundColor(.secondary)
+                                        Text(localizationService.localizedString("Your invoices will appear here", fallback: "Your invoices will appear here"))
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary.opacity(0.7))
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.top, 60)
+                                } else {
+                                    if !overdueInvoices.isEmpty || !dueSoonInvoices.isEmpty {
+                                        sectionHeader("TO PAY")
+                                        ForEach(overdueInvoices) { invoice in
+                                            invoiceButton(for: invoice, allowBatching: true)
+                                        }
+                                        
+                                        ForEach(dueSoonInvoices) { invoice in
+                                            invoiceButton(for: invoice, allowBatching: true)
+                                        }
+                                    }
+                                    
+                                    if !scheduledInvoices.isEmpty || !paidInvoices.isEmpty {
+                                        sectionHeader("Handled")
+                                        ForEach(scheduledInvoices) { invoice in
+                                            invoiceButton(for: invoice, allowBatching: false)
+                                        }
+                                        
+                                        ForEach(paidInvoices) { invoice in
+                                            invoiceButton(for: invoice, allowBatching: false)
+                                        }
+                                    }
                                 }
                             }
                             .padding(.horizontal)
@@ -1893,17 +1983,10 @@ struct InvoicesList: View {
     }
     
     private func toggleSelection(for invoice: InvoiceItem) {
-        switch invoice.category {
-        case .overdue:
-            if let index = overdueInvoices.firstIndex(where: { $0.id == invoice.id }) {
-                overdueInvoices[index].isSelected.toggle()
-            }
-        case .dueSoon:
-            if let index = dueSoonInvoices.firstIndex(where: { $0.id == invoice.id }) {
-                dueSoonInvoices[index].isSelected.toggle()
-            }
-        default:
-            break
+        if selectedIds.contains(invoice.id) {
+            selectedIds.remove(invoice.id)
+        } else {
+            selectedIds.insert(invoice.id)
         }
     }
     
@@ -2191,7 +2274,7 @@ private struct SummaryBox: View {
                     .foregroundColor(.primary)
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundColor(title == "To Pay" && subtitle == "2 invoices overdue" ? .orange : .secondary)
+                    .foregroundColor(tint == .orange ? .orange : (tint == .green && title == "To Pay" ? .green : .secondary))
             }
         }
         .frame(width: 200, alignment: .leading)
