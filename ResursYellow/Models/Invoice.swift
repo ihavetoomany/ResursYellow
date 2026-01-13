@@ -12,6 +12,7 @@ struct Invoice: Identifiable, Codable, Hashable {
     let id: UUID
     let merchant: String
     let amount: String
+    let detailAmount: String? // Optional: different amount to show in detail view (e.g. for partial payments)
     let dueDateOffset: Int // Days from Nov 20, 2025
     let invoiceNumber: String
     let issueDateOffset: Int // Days from Nov 20, 2025
@@ -45,6 +46,7 @@ struct Invoice: Identifiable, Codable, Hashable {
         id: UUID = UUID(),
         merchant: String,
         amount: String,
+        detailAmount: String? = nil,
         dueDateOffset: Int,
         invoiceNumber: String,
         issueDateOffset: Int,
@@ -58,6 +60,7 @@ struct Invoice: Identifiable, Codable, Hashable {
         self.id = id
         self.merchant = merchant
         self.amount = amount
+        self.detailAmount = detailAmount
         self.dueDateOffset = dueDateOffset
         self.invoiceNumber = invoiceNumber
         self.issueDateOffset = issueDateOffset

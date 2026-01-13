@@ -388,6 +388,25 @@ extension InvoiceItem {
     static var handledPaidSamples: [InvoiceItem] {
         [
             InvoiceItem(
+                merchant: "Netonnet",
+                subtitle: "Oct 27, 2025",
+                amount: "600 SEK",
+                icon: "checkmark",
+                color: .green,
+                isOverdue: false,
+                statusOverride: "of 3 600 SEK",
+                category: .handledPaid,
+                detail: InvoiceData(
+                    merchant: "Netonnet",
+                    amount: "3 600 SEK",
+                    dueDate: "Nov 10, 2025",
+                    invoiceNumber: "INV-2025-10-071",
+                    issueDate: "Oct 27, 2025",
+                    status: "Part payment - 600 SEK paid",
+                    color: .green
+                )
+            ),
+            InvoiceItem(
                 merchant: "Stadium",
                 subtitle: "Oct 25, 2025",
                 amount: "2 340 SEK",

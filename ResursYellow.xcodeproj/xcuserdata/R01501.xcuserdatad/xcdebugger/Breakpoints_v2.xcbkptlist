@@ -18,36 +18,6 @@
             endingLineNumber = "48"
             landmarkName = "body"
             landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "A1344859-A18A-431C-A280-D494EDCF1415 - 61dd6b5b7e378ea0"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 (Swift.Int, Swift.Int) -&gt; () in ResursYellow.ContentView.body.getter : some"
-                  moduleName = "ResursYellow.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/ContentView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "50"
-                  endingLineNumber = "50">
-               </Location>
-               <Location
-                  uuid = "A1344859-A18A-431C-A280-D494EDCF1415 - f007e754cfbf3bce"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 (Foundation.Notification) -&gt; () in ResursYellow.ContentView.body.getter : some"
-                  moduleName = "ResursYellow.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/ContentView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "48"
-                  endingLineNumber = "48">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

@@ -18,7 +18,7 @@ extension Invoice {
         
         return InvoiceData(
             merchant: merchant,
-            amount: amount,
+            amount: detailAmount ?? amount,
             dueDate: dueDate,
             invoiceNumber: invoiceNumber,
             issueDate: issueDate,

@@ -71,6 +71,21 @@
       "category": "handledScheduled"
     },
     {
+      "id": "00000000-0000-0000-0000-000000000009",
+      "merchant": "Netonnet",
+      "amount": "600 SEK",
+      "detailAmount": "3 600 SEK",
+      "dueDateOffset": -10,
+      "invoiceNumber": "INV-2025-10-071",
+      "issueDateOffset": -24,
+      "status": "Part payment - 600 SEK paid",
+      "colorName": "green",
+      "icon": "checkmark",
+      "isOverdue": false,
+      "statusOverride": "of 3 600 SEK",
+      "category": "handledPaid"
+    },
+    {
       "id": "00000000-0000-0000-0000-000000000006",
       "merchant": "Stadium",
       "amount": "2 340 SEK",
