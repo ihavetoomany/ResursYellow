@@ -343,16 +343,16 @@ extension InvoiceItem {
     static var handledScheduledSamples: [InvoiceItem] {
         [
             InvoiceItem(
-                merchant: "Clas Ohlson",
+                merchant: "Resurs-OCT",
                 subtitle: "Nov 1, 2025",
                 amount: "785 SEK",
                 icon: "checkmark",
                 color: .cyan,
                 isOverdue: false,
-                statusOverride: nil,
+                statusOverride: "785 scheduled",
                 category: .handledScheduled,
                 detail: InvoiceData(
-                    merchant: "Clas Ohlson",
+                    merchant: "Resurs-OCT",
                     amount: "785 SEK",
                     dueDate: "Nov 15, 2025",
                     invoiceNumber: "INV-2025-11-002",
@@ -369,11 +369,11 @@ extension InvoiceItem {
             InvoiceItem(
                 merchant: "Netonnet",
                 subtitle: "Oct 27, 2025",
-                amount: "600 SEK",
+                amount: "3 600 SEK",
                 icon: "checkmark",
                 color: .green,
                 isOverdue: false,
-                statusOverride: "of 3 600 SEK",
+                statusOverride: "600 paid",
                 category: .handledPaid,
                 detail: InvoiceData(
                     merchant: "Netonnet",
@@ -386,7 +386,7 @@ extension InvoiceItem {
                 )
             ),
             InvoiceItem(
-                merchant: "Stadium",
+                merchant: "ResursFLEX-SEP",
                 subtitle: "Oct 25, 2025",
                 amount: "2 340 SEK",
                 icon: "checkmark",
@@ -395,7 +395,7 @@ extension InvoiceItem {
                 statusOverride: nil,
                 category: .handledPaid,
                 detail: InvoiceData(
-                    merchant: "Stadium",
+                    merchant: "ResursFLEX-SEP",
                     amount: "2 340 SEK",
                     dueDate: "Nov 8, 2025",
                     invoiceNumber: "INV-2025-10-058",
@@ -405,7 +405,7 @@ extension InvoiceItem {
                 )
             ),
             InvoiceItem(
-                merchant: "ICA",
+                merchant: "Resurs-SEP",
                 subtitle: "Oct 20, 2025",
                 amount: "452 SEK",
                 icon: "checkmark",
@@ -414,7 +414,7 @@ extension InvoiceItem {
                 statusOverride: nil,
                 category: .handledPaid,
                 detail: InvoiceData(
-                    merchant: "ICA",
+                    merchant: "Resurs-SEP",
                     amount: "452 SEK",
                     dueDate: "Nov 3, 2025",
                     invoiceNumber: "INV-2025-10-045",
@@ -621,7 +621,7 @@ struct WalletView: View {
             StickyHeaderView(
                 title: dataManager.currentPersona.displayName,
                 subtitle: greeting,
-                minimizedTitle: "Wallet",
+                minimizedTitle: "Overview",
                 trailingButton: availableSymbol("sparkle2", fallback: "sparkle"),
                 trailingButtonTint: .primary,
                 trailingButtonSize: 52,
@@ -655,11 +655,11 @@ struct WalletView: View {
                             )
                             
                             Button {
-                                // Switch to Banking tab and request deep link to Resurs Gold account view
+                                // Switch to Banking tab and request deep link to Resurs Family account view
                                 NotificationCenter.default.post(name: .switchToBanking, object: nil, userInfo: ["destination": "ResursFamilyAccountView"])
                             } label: {
                                 ZStack(alignment: .leading) {
-                                    SummaryBox(title: "Resurs Gold", headline: creditCardHeadline, subtitle: creditCardSubtitle, icon: creditCardIcon, tint: creditCardTint)
+                                    SummaryBox(title: "Resurs Family", headline: creditCardHeadline, subtitle: creditCardSubtitle, icon: creditCardIcon, tint: creditCardTint)
                                     Color.clear.frame(width: 1)
                                         .accessibilityHidden(true)
                                         .id("summaryAnchor1")

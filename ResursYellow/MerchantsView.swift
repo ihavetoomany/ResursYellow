@@ -1,5 +1,209 @@
 import SwiftUI
 
+// Custom Bauhaus icon view matching the favicon design
+struct BauhausIconView: View {
+    let color: Color
+    
+    var body: some View {
+        ZStack {
+            // Main square background (red)
+            RoundedRectangle(cornerRadius: 3)
+                .fill(color)
+            
+            // Three overlapping house shapes with shadows
+            GeometryReader { geometry in
+                let size = geometry.size
+                let shadowOffset: CGFloat = 1.5
+                
+                // Top-left house (largest)
+                ZStack {
+                    // Shadow
+                    Path { path in
+                        let baseWidth: CGFloat = size.width * 0.5
+                        let baseHeight: CGFloat = size.height * 0.35
+                        let roofHeight: CGFloat = size.height * 0.25
+                        let x: CGFloat = size.width * 0.05
+                        let y: CGFloat = size.height * 0.15
+                        
+                        // Base rectangle
+                        path.move(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + baseHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + baseHeight + shadowOffset))
+                        path.closeSubpath()
+                        
+                        // Roof triangle
+                        path.move(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth / 2 + shadowOffset, y: y + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.closeSubpath()
+                    }
+                    .fill(Color.black)
+                    
+                    // White house
+                    Path { path in
+                        let baseWidth: CGFloat = size.width * 0.5
+                        let baseHeight: CGFloat = size.height * 0.35
+                        let roofHeight: CGFloat = size.height * 0.25
+                        let x: CGFloat = size.width * 0.05
+                        let y: CGFloat = size.height * 0.15
+                        
+                        // Base rectangle
+                        path.move(to: CGPoint(x: x, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight + baseHeight))
+                        path.addLine(to: CGPoint(x: x, y: y + roofHeight + baseHeight))
+                        path.closeSubpath()
+                        
+                        // Roof triangle
+                        path.move(to: CGPoint(x: x, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth / 2, y: y))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight))
+                        path.closeSubpath()
+                    }
+                    .fill(Color.white)
+                }
+                
+                // Middle-right house (medium)
+                ZStack {
+                    // Shadow
+                    Path { path in
+                        let baseWidth: CGFloat = size.width * 0.42
+                        let baseHeight: CGFloat = size.height * 0.3
+                        let roofHeight: CGFloat = size.height * 0.2
+                        let x: CGFloat = size.width * 0.35
+                        let y: CGFloat = size.height * 0.25
+                        
+                        // Base rectangle
+                        path.move(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + baseHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + baseHeight + shadowOffset))
+                        path.closeSubpath()
+                        
+                        // Roof triangle
+                        path.move(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth / 2 + shadowOffset, y: y + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.closeSubpath()
+                    }
+                    .fill(Color.black)
+                    
+                    // White house
+                    Path { path in
+                        let baseWidth: CGFloat = size.width * 0.42
+                        let baseHeight: CGFloat = size.height * 0.3
+                        let roofHeight: CGFloat = size.height * 0.2
+                        let x: CGFloat = size.width * 0.35
+                        let y: CGFloat = size.height * 0.25
+                        
+                        // Base rectangle
+                        path.move(to: CGPoint(x: x, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight + baseHeight))
+                        path.addLine(to: CGPoint(x: x, y: y + roofHeight + baseHeight))
+                        path.closeSubpath()
+                        
+                        // Roof triangle
+                        path.move(to: CGPoint(x: x, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth / 2, y: y))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight))
+                        path.closeSubpath()
+                    }
+                    .fill(Color.white)
+                }
+                
+                // Bottom-right house (smallest)
+                ZStack {
+                    // Shadow
+                    Path { path in
+                        let baseWidth: CGFloat = size.width * 0.35
+                        let baseHeight: CGFloat = size.height * 0.25
+                        let roofHeight: CGFloat = size.height * 0.18
+                        let x: CGFloat = size.width * 0.55
+                        let y: CGFloat = size.height * 0.45
+                        
+                        // Base rectangle
+                        path.move(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + baseHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + baseHeight + shadowOffset))
+                        path.closeSubpath()
+                        
+                        // Roof triangle
+                        path.move(to: CGPoint(x: x + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth / 2 + shadowOffset, y: y + shadowOffset))
+                        path.addLine(to: CGPoint(x: x + baseWidth + shadowOffset, y: y + roofHeight + shadowOffset))
+                        path.closeSubpath()
+                    }
+                    .fill(Color.black)
+                    
+                    // White house
+                    Path { path in
+                        let baseWidth: CGFloat = size.width * 0.35
+                        let baseHeight: CGFloat = size.height * 0.25
+                        let roofHeight: CGFloat = size.height * 0.18
+                        let x: CGFloat = size.width * 0.55
+                        let y: CGFloat = size.height * 0.45
+                        
+                        // Base rectangle
+                        path.move(to: CGPoint(x: x, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight + baseHeight))
+                        path.addLine(to: CGPoint(x: x, y: y + roofHeight + baseHeight))
+                        path.closeSubpath()
+                        
+                        // Roof triangle
+                        path.move(to: CGPoint(x: x, y: y + roofHeight))
+                        path.addLine(to: CGPoint(x: x + baseWidth / 2, y: y))
+                        path.addLine(to: CGPoint(x: x + baseWidth, y: y + roofHeight))
+                        path.closeSubpath()
+                    }
+                    .fill(Color.white)
+                }
+            }
+        }
+        .frame(width: 24, height: 24)
+    }
+}
+
+// Custom Netonnet icon view matching the favicon design
+struct NetonnetIconView: View {
+    let color: Color
+    
+    var body: some View {
+        ZStack {
+            // White background with rounded corners
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.white)
+            
+            // "netonnet" wordmark
+            HStack(spacing: 2) {
+                // First "net" in blue
+                Text("net")
+                    .font(.system(size: 7, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color(red: 0.2, green: 0.4, blue: 0.8))
+                
+                // "on" in white inside red circle
+                ZStack {
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 10, height: 10)
+                    Text("on")
+                        .font(.system(size: 5, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                }
+                
+                // Second "net" in blue
+                Text("net")
+                    .font(.system(size: 7, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color(red: 0.2, green: 0.4, blue: 0.8))
+            }
+        }
+        .frame(width: 24, height: 24)
+    }
+}
+
 // Styled like AccountCard from AccountsView
 struct MerchantCard: View {
     let title: String
@@ -8,40 +212,62 @@ struct MerchantCard: View {
     let icon: String
     let color: Color
     var titleColor: Color = .primary
-    var iconFont: Font = .title
+    var useCustomIcon: Bool = false
 
     var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(iconFont)
-                .foregroundColor(color)
-                .frame(width: 48, height: 48)
-                .background(color.opacity(0.2))
-                .clipShape(Circle())
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .foregroundColor(titleColor)
-                if let subtitle {
-                    Text(subtitle)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+        VStack(alignment: .leading, spacing: 12) {
+            // Icon + merchant name on one row
+            HStack(alignment: .center, spacing: 10) {
+                Group {
+                    if useCustomIcon {
+                        if title == "Bauhaus" {
+                            BauhausIconView(color: color)
+                        } else if title == "Netonnet" {
+                            NetonnetIconView(color: color)
+                        } else {
+                            Image(systemName: icon)
+                                .font(.title3.weight(.semibold))
+                                .foregroundColor(color)
+                        }
+                    } else {
+                        Image(systemName: icon)
+                            .font(.title3.weight(.semibold))
+                            .foregroundColor(color)
+                    }
                 }
-                if let amount {
-                    Text(amount)
-                        .font(.footnote)
-                        .fontWeight(.bold)
-                        .foregroundColor(color)
+                .frame(width: 40, height: 40)
+                .background(
+                    useCustomIcon && title == "Bauhaus" ? color :
+                    useCustomIcon && title == "Netonnet" ? Color.white :
+                    color.opacity(0.18)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                
+                Text(title)
+                    .font(.title2.weight(.semibold))
+                    .foregroundColor(.primary)
+                Spacer(minLength: 0)
+            }
+            
+            Spacer()
+                .frame(height: 2)
+            
+            // Available credit at bottom
+            if let amount {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Available credit")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(amount.replacingOccurrences(of: "Available credit: ", with: ""))
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.primary)
                 }
             }
-
-            Spacer()
         }
-        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
@@ -130,7 +356,7 @@ struct MerchantsView: View {
                                             icon: card.icon,
                                             color: card.color,
                                             titleColor: card.titleColor,
-                                            iconFont: card.iconFont
+                                            useCustomIcon: merchant == "Bauhaus" || merchant == "Netonnet"
                                         )
                                     }
                                     .buttonStyle(.plain)
@@ -175,7 +401,6 @@ private extension MerchantsView {
         let icon: String
         let color: Color
         let titleColor: Color
-        let iconFont: Font
     }
     
     func cardConfig(for merchant: String) -> MerchantCardConfig {
@@ -183,29 +408,26 @@ private extension MerchantsView {
         case "Bauhaus":
             return MerchantCardConfig(
                 subtitle: "Store Credit and Invoice available",
-                amount: "Available credit: 14 500 kr",
+                amount: "14 500 kr",
                 icon: "hammer.fill",
                 color: .red,
-                titleColor: .primary,
-                iconFont: .title2
+                titleColor: .primary
             )
         case "Netonnet":
             return MerchantCardConfig(
                 subtitle: "Store Credit available",
-                amount: "Available credit: 20 000 kr",
+                amount: "20 000 kr",
                 icon: "shippingbox.fill",
                 color: .green,
-                titleColor: .primary,
-                iconFont: .title
+                titleColor: .primary
             )
         case "Jula":
             return MerchantCardConfig(
                 subtitle: "Pay later active in-store",
-                amount: "Available credit: 9 200 kr",
+                amount: "9 200 kr",
                 icon: "hammer.circle.fill",
                 color: .red,
-                titleColor: .primary,
-                iconFont: .title
+                titleColor: .primary
             )
         default:
             return MerchantCardConfig(
@@ -213,8 +435,7 @@ private extension MerchantsView {
                 amount: nil,
                 icon: "link.circle.fill",
                 color: .green,
-                titleColor: .primary,
-                iconFont: .title
+                titleColor: .primary
             )
         }
     }

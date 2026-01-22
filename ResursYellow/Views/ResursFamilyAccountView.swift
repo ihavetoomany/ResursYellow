@@ -24,10 +24,10 @@ struct ResursFamilyAccountView: View {
             .map { $0.toPartPaymentItem() }
     }
     
-    // Benefits for Resurs Gold
+    // Benefits for Resurs Family
     private let benefits: [(icon: String, title: String, desc: String)] = [
         ("calendar.badge.clock", "Flexible Payments", "Choose flexible part payment plans for large purchases."),
-        ("creditcard.fill", "Easy Checkout", "Use your Resurs Gold card for quick and secure payments."),
+        ("creditcard.fill", "Easy Checkout", "Use your Resurs Family card for quick and secure payments."),
         ("heart.fill", "Family Sharing", "Share your credit account with family members."),
         ("shield.checkerboard", "Payment Protection", "Protect your purchases with optional payment insurance.")
     ]
@@ -243,7 +243,7 @@ struct ResursFamilyAccountView: View {
                     
                     // Minimized title - centered in view
                     if scrollProgress > 0.5 {
-                        Text("Resurs Gold")
+                        Text("Resurs Family")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
@@ -263,7 +263,7 @@ struct ResursFamilyAccountView: View {
                             .opacity(1.0 - scrollProgress * 2)
                         
                         // Title
-                        Text("Resurs Gold")
+                        Text("Resurs Family")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)

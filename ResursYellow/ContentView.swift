@@ -26,7 +26,7 @@ struct ContentView: View {
             hasAppeared: $hasAppeared,
             paymentPlansManager: paymentPlansManager,
             localizationService: localizationService,
-            walletLabel: "Wallet",
+            walletLabel: "Overview",
             bankingLabel: "Banking",
             merchantsLabel: "Merchants",
             manageLabel: "My Resurs"

@@ -38,34 +38,36 @@ struct AccountsView: View {
                                 navigationPath.append("ResursFamily")
                             } label: {
                                 AccountCard(
-                                    title: "Resurs Gold",
-                                    accountType: "Credit Account",
+                                    title: "Resurs Family",
+                                    accountType: "Resurs Family",
                                     accountNumber: "**** 1234",
                                     balance: "\(dataManager.creditAccounts.first?.availableLabel ?? "0 SEK")",
                                     icon: "heart.fill",
                                     color: .blue,
-                                    balanceLabel: "Available credit"
+                                    balanceLabel: "Available credit",
+                                    hideTitle: true
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("Resurs Gold credit account. Available credit.")
+                            .accessibilityLabel("Resurs Family credit account. Available credit.")
                             .accessibilityHint("Opens detailed view.")
                             
                             Button {
                                 navigationPath.append("SavingsAccount")
                             } label: {
                                 AccountCard(
-                                    title: "Goal Saver",
-                                    accountType: "Savings Account",
+                                    title: "Senior Savings",
+                                    accountType: "Senior Savings",
                                     accountNumber: "**** 5678",
                                     balance: "120 450 SEK",
-                                    icon: "banknote.fill",
+                                    icon: "star.fill",
                                     color: .mint,
-                                    balanceLabel: "Savings Balance"
+                                    balanceLabel: "Savings Balance",
+                                    hideTitle: true
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("Goal Saver savings account. 120 450 kronor saved.")
+                            .accessibilityLabel("Senior Savings savings account. 120 450 kronor saved.")
                             .accessibilityHint("Shows savings account activity.")
                         }
                         .padding(.horizontal)
@@ -127,7 +129,7 @@ struct AccountsView: View {
             .onReceive(NotificationCenter.default.publisher(for: .switchToBanking)) { notification in
                 if let destination = notification.userInfo?["destination"] as? String,
                    destination == "ResursFamilyAccountView" {
-                    // Ensure we are at root, then navigate to Resurs Gold detail
+                    // Ensure we are at root, then navigate to Resurs Family detail
                     if !navigationPath.isEmpty {
                         navigationPath.removeLast(navigationPath.count)
                     }
@@ -161,6 +163,7 @@ struct AccountCard: View {
     let icon: String
     let color: Color
     let balanceLabel: String
+    var hideTitle: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -175,17 +178,18 @@ struct AccountCard: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     if let accountType {
                         Text(accountType)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.secondary)
+                            .font(.title2.weight(.semibold))
+                            .foregroundColor(.primary)
                     }
                     Spacer(minLength: 0)
                 }
                 
-                Text(title)
-                    .font(.title2.weight(.semibold))
-                    .foregroundColor(.primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                if !hideTitle {
+                    Text(title)
+                        .font(.title2.weight(.semibold))
+                        .foregroundColor(.primary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
             
             Spacer()
@@ -269,7 +273,7 @@ struct SavingsAccountDetailView: View {
             .padding(.vertical, 24)
         }
         .background(Color(uiColor: .systemGroupedBackground))
-        .navigationTitle("Goal Saver")
+        .navigationTitle("Senior Savings")
         .navigationBarTitleDisplayMode(.large)
     }
     
@@ -287,7 +291,7 @@ struct SavingsAccountDetailView: View {
                 
                 Spacer()
                 
-                Image(systemName: "banknote.fill")
+                Image(systemName: "star.fill")
                     .font(.title2)
                     .foregroundColor(.mint)
                     .frame(width: 56, height: 56)
@@ -328,7 +332,7 @@ struct SavingsAccountDetailView: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Goal Saver savings balance. 120 450 kronor saved. Interest rate 3.25 percent. Next deposit 1 500 kronor on 15 December.")
+        .accessibilityLabel("Senior Savings savings balance. 120 450 kronor saved. Interest rate 3.25 percent. Next deposit 1 500 kronor on 15 December.")
     }
     
     private var progressCard: some View {

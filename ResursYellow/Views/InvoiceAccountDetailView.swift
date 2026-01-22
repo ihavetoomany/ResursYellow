@@ -39,7 +39,7 @@ struct InvoiceAccountDetailView: View {
                     
                         VStack(spacing: 24) {
                             // Account description text
-                            Text("This account is the main account of the Resurs Gold product. Every month, around the 5th, a new invoice is created reflecting the balance of the previous month. Due date is always the last day of the month and there are always options to part pay on the invoice.")
+                            Text("This account is the main account of the Resurs Family product. Every month, around the 5th, a new invoice is created reflecting the balance of the previous month. Due date is always the last day of the month and there are always options to part pay on the invoice.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -342,7 +342,7 @@ struct InvoiceAccountDetailView: View {
         for i in 0..<8 {
             let isPaid = i > 0 // All except current month are paid
             let amountString = (amountFormatter.string(from: NSNumber(value: amounts[i])) ?? "\(amounts[i])") + " kr"
-            let merchantName = "Resurs Gold - \(monthNames[i])"
+            let merchantName = "Resurs Family - \(monthNames[i])"
             let statusText = isPaid ? "Paid" : "Due soon"
             
             let invoice = InvoiceItem(

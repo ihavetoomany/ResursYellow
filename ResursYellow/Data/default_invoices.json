@@ -58,7 +58,7 @@
     },
     {
       "id": "00000000-0000-0000-0000-000000000005",
-      "merchant": "Clas Ohlson",
+      "merchant": "Resurs-OCT",
       "amount": "785 SEK",
       "dueDateOffset": -5,
       "invoiceNumber": "INV-2025-11-002",
@@ -67,14 +67,13 @@
       "colorName": "cyan",
       "icon": "checkmark",
       "isOverdue": false,
-      "statusOverride": null,
+      "statusOverride": "785 scheduled",
       "category": "handledScheduled"
     },
     {
       "id": "00000000-0000-0000-0000-000000000009",
       "merchant": "Netonnet",
-      "amount": "600 SEK",
-      "detailAmount": "3 600 SEK",
+      "amount": "3 600 SEK",
       "dueDateOffset": -10,
       "invoiceNumber": "INV-2025-10-071",
       "issueDateOffset": -24,
@@ -82,12 +81,12 @@
       "colorName": "green",
       "icon": "checkmark",
       "isOverdue": false,
-      "statusOverride": "of 3 600 SEK",
+      "statusOverride": "600 paid",
       "category": "handledPaid"
     },
     {
       "id": "00000000-0000-0000-0000-000000000006",
-      "merchant": "Stadium",
+      "merchant": "ResursFLEX-SEP",
       "amount": "2 340 SEK",
       "dueDateOffset": -12,
       "invoiceNumber": "INV-2025-10-058",
@@ -101,7 +100,7 @@
     },
     {
       "id": "00000000-0000-0000-0000-000000000007",
-      "merchant": "ICA",
+      "merchant": "Resurs-SEP",
       "amount": "452 SEK",
       "dueDateOffset": -17,
       "invoiceNumber": "INV-2025-10-045",
