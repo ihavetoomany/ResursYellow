@@ -25,79 +25,103 @@ struct JulaDetailView: View {
         ("tray.and.arrow.down.fill", "Service Booking", "Book assembly and service through the same connected account.")
     ]
     
+    private let documents: [(icon: String, titleKey: String, descKey: String)] = [
+        ("doc.text.fill", "Credit Agreement", "View your Jula credit account terms and conditions"),
+        ("doc.text", "Terms and Conditions", "Read the terms and conditions for Jula"),
+        ("hand.raised.fill", "Privacy Policy", "Review how we handle your personal information"),
+        ("doc.on.doc.fill", "Payment Plan Agreement", "View your active payment plan agreements")
+    ]
+    
     private let partPayments: [PartPaymentItem] = [
         PartPaymentItem(id: UUID(), title: "Garden Upgrade", subtitle: "2 of 5 payments done", amount: "720 kr / 3 600 kr", progress: 0.4),
         PartPaymentItem(id: UUID(), title: "Workshop Refresh", subtitle: "1 of 4 payments done", amount: "500 kr / 2 000 kr", progress: 0.25)
     ]
     
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
-                heroIcon
-                infoCard
+                summaryCard
                 purchasesSection
                 partPaymentsSection
                 benefitsSection
+                documentsSection
             }
-            .padding(.top, 16)
+            .padding(.horizontal)
+            .padding(.vertical, 24)
         }
+        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Jula")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
     }
     
-    private var heroIcon: some View {
-        Image(systemName: "hammer.circle.fill")
-            .font(.system(size: 54))
-            .foregroundColor(.red)
-            .padding(28)
-            .background(Circle().fill(Color.red.opacity(0.15)))
-            .frame(maxWidth: .infinity)
-    }
-    
-    private var infoCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Keep every project moving")
-                .font(.headline)
-                .fontWeight(.semibold)
-            Text("Connect Jula to track purchases, manage seasonal offers and unlock pay-later options that fit your renovation timeline.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            
-            Divider()
-            
-            HStack(spacing: 32) {
-                VStack(alignment: .leading, spacing: 4) {
+    private var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text("Available Credit")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(availableCredit)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.system(size: 34, weight: .bold))
+                        .minimumScaleFactor(0.8)
                 }
+                
+                Spacer()
+                
+                Image(systemName: "hammer.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.red)
+                    .frame(width: 56, height: 56)
+                    .background(Color.red.opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+            }
+            
+            Divider()
+                .background(Color.primary.opacity(0.1))
+            
+            HStack(alignment: .center, spacing: 18) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Credit Limit")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(creditLimit)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
                 }
-                Spacer()
+                
+                Divider()
+                    .frame(height: 32)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Used Credit")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("10 800 kr")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                
+                Spacer(minLength: 0)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .padding(.horizontal)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Jula available credit \(availableCredit). Credit limit \(creditLimit). Used credit 10 800 kronor.")
     }
     
     private var purchasesSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Recent Jula Purchases")
-                .font(.headline)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 4)
-                .padding(.top, 24)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Recent Jula Purchases")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.top, 12)
+            
             VStack(spacing: 12) {
                 ForEach(purchases) { purchase in
                     HStack(spacing: 16) {
@@ -126,16 +150,19 @@ struct JulaDetailView: View {
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.bottom, 16)
     }
     
     private var partPaymentsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Active accounts")
-                .font(.headline)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 4)
-                .padding(.top, 24)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Active accounts")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.top, 12)
+            
             VStack(spacing: 12) {
                 ForEach(partPayments, id: \.title) { plan in
                     VStack(alignment: .leading, spacing: 8) {
@@ -162,7 +189,7 @@ struct JulaDetailView: View {
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.bottom, 16)
     }
     
     private var benefitsSection: some View {
@@ -170,8 +197,7 @@ struct JulaDetailView: View {
             Text("Why connect Jula")
                 .font(.headline)
                 .fontWeight(.semibold)
-                .padding(.horizontal, 4)
-                .padding(.top, 24)
+                .padding(.top, 12)
             VStack(spacing: 12) {
                 ForEach(benefits, id: \.title) { benefit in
                     HStack(spacing: 16) {
@@ -197,8 +223,49 @@ struct JulaDetailView: View {
                 }
             }
         }
-        .padding(.horizontal)
-        .padding(.bottom, 32)
+        .padding(.bottom, 16)
+    }
+    
+    private var documentsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Documents".localized)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .padding(.top, 12)
+            VStack(spacing: 12) {
+                ForEach(Array(documents.enumerated()), id: \.offset) { index, document in
+                    Button(action: {
+                        // Handle document tap - could navigate to document detail view
+                    }) {
+                        HStack(spacing: 16) {
+                            Image(systemName: document.icon)
+                                .font(.title3)
+                                .foregroundColor(.red)
+                                .frame(width: 36, height: 36)
+                                .background(Color.red.opacity(0.15))
+                                .clipShape(Circle())
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(document.titleKey.localized)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                Text(document.descKey.localized)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(16)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 }
 

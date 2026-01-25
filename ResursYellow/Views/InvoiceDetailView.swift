@@ -1132,7 +1132,7 @@ struct PaymentSheet: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         if !isProcessing {
                             dismiss()
@@ -1550,7 +1550,7 @@ struct PlanOptionsListSheet: View {
             .navigationTitle("Select Payment Option")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         dismiss()
                     } label: {
@@ -1621,7 +1621,7 @@ By proceeding, you acknowledge that:
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         onCancel()
                     } label: {

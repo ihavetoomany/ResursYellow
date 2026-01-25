@@ -147,6 +147,17 @@
 "Banking" = "Banking";
 "Merchants" = "Merchants";
 
+/* Resurs Family Documents */
+"Documents" = "Documents";
+"Credit Agreement" = "Credit Agreement";
+"View your credit account terms and conditions" = "View your credit account terms and conditions";
+"Terms and Conditions" = "Terms and Conditions";
+"Read the terms and conditions for Resurs Family" = "Read the terms and conditions for Resurs Family";
+"Privacy Policy" = "Privacy Policy";
+"Review how we handle your personal information" = "Review how we handle your personal information";
+"Payment Plan Agreement" = "Payment Plan Agreement";
+"View your active payment plan agreements" = "View your active payment plan agreements";
+
 /* AI Support Chat */
 "AI Bank Support" = "AI Bank Support";
 "How can I help you today?" = "How can I help you today?";

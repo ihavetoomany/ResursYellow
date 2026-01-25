@@ -978,7 +978,7 @@ struct AISupportChatView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         dismiss()
                     } label: {

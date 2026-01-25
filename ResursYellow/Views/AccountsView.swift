@@ -69,9 +69,27 @@ struct AccountsView: View {
                             .buttonStyle(PlainButtonStyle())
                             .accessibilityLabel("Senior Savings savings account. 120 450 kronor saved.")
                             .accessibilityHint("Shows savings account activity.")
+                            
+                            Button {
+                                navigationPath.append("HouseRenovationLoan")
+                            } label: {
+                                AccountCard(
+                                    title: "House Renovation",
+                                    accountType: "House Renovation",
+                                    accountNumber: "**** 9012",
+                                    balance: "255 000 SEK",
+                                    icon: "house.fill",
+                                    color: .orange,
+                                    balanceLabel: "Remaining Balance",
+                                    hideTitle: true
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .accessibilityLabel("House Renovation loan. 255 000 kronor remaining balance.")
+                            .accessibilityHint("Opens loan details and payment schedule.")
                         }
                         .padding(.horizontal)
-                        .padding(.top, 24)
+                        .padding(.top, 12)
                         .padding(.bottom, 16)
                     } else {
                         // Empty state
@@ -110,7 +128,7 @@ struct AccountsView: View {
                             Spacer()
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.top, 24)
+                        .padding(.top, 12)
                         .padding(.bottom, 16)
                     }
                 }
@@ -122,6 +140,8 @@ struct AccountsView: View {
                     ResursFamilyAccountView()
                 case "SavingsAccount":
                     SavingsAccountDetailView()
+                case "HouseRenovationLoan":
+                    HouseRenovationLoanView()
                 default:
                     EmptyView()
                 }
@@ -254,20 +274,40 @@ struct SavingsAccountDetailView: View {
         let title: String
         let date: String
         let amount: String
+        let icon: String
+        let color: Color
     }
     
     private let contributions: [Contribution] = [
-        .init(title: "Monthly deposit", date: "30 Nov · Automatic", amount: "+1 500 SEK"),
-        .init(title: "Rounding transfer", date: "28 Nov · Purchases", amount: "+225 SEK"),
-        .init(title: "New sofa purchase", date: "22 Nov · Part Pay", amount: "-4 800 SEK")
+        .init(title: "Monthly deposit", date: "30 Nov · Automatic", amount: "+1 500 SEK", icon: "calendar.badge.clock", color: .mint),
+        .init(title: "Rounding transfer", date: "28 Nov · Purchases", amount: "+225 SEK", icon: "arrow.up.arrow.down", color: .blue),
+        .init(title: "Withdrawal", date: "22 Nov · Part Pay", amount: "-4 800 SEK", icon: "sofa.fill", color: .purple)
+    ]
+    
+    // Benefits for Senior Savings
+    private let benefits: [(icon: String, title: String, desc: String)] = [
+        ("percent", "Competitive Interest Rate", "Earn 3.25% annual interest on your savings."),
+        ("arrow.up.circle.fill", "Automatic Deposits", "Set up recurring monthly deposits to grow your savings."),
+        ("chart.line.uptrend.xyaxis", "Goal Tracking", "Track your progress toward your savings goals."),
+        ("shield.checkerboard", "Secure Savings", "Your savings are protected and secure.")
+    ]
+    
+    // Documents for Senior Savings
+    private let documents: [(icon: String, titleKey: String, descKey: String)] = [
+        ("doc.text.fill", "Savings Agreement", "View your savings account terms and conditions"),
+        ("doc.text", "Terms and Conditions", "Read the terms and conditions for Senior Savings"),
+        ("hand.raised.fill", "Privacy Policy", "Review how we handle your personal information"),
+        ("doc.on.doc.fill", "Interest Rate Information", "View current interest rates and calculations")
     ]
     
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
                 summaryCard
-                progressCard
-                recentActivityCard
+                accountsSection
+                recentActivitySection
+                benefitsSection
+                documentsSection
             }
             .padding(.horizontal)
             .padding(.vertical, 24)
@@ -365,15 +405,75 @@ struct SavingsAccountDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
     
-    private var recentActivityCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Recent activity")
-                .font(.headline)
-                .fontWeight(.semibold)
+    private var accountsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Accounts")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+                Button(action: {
+                    // Handle "View all" tap
+                }) {
+                    Text("View all")
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding(.top, 12)
+            
+            VStack(spacing: 12) {
+                SavingsAccountRow(
+                    title: "Emergency Fund",
+                    subtitle: "Savings account · •••• 5678",
+                    amount: "45 230 SEK",
+                    progress: 0.6,
+                    monthlyAmount: "1 500 SEK monthly",
+                    nextDueDate: "15 Jan"
+                )
+                
+                SavingsAccountRow(
+                    title: "Grandchildren Gift",
+                    subtitle: "Savings account · •••• 9012",
+                    amount: "75 220 SEK",
+                    progress: 0.75,
+                    monthlyAmount: "2 000 SEK monthly",
+                    nextDueDate: "20 Jan"
+                )
+            }
+        }
+        .padding(.bottom, 16)
+    }
+    
+    private var recentActivitySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Recent activity")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+                Button(action: {
+                    // Handle "View all" tap
+                }) {
+                    Text("View all")
+                        .font(.subheadline)
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding(.top, 12)
             
             VStack(spacing: 12) {
                 ForEach(contributions) { contribution in
-                    HStack(alignment: .center) {
+                    HStack(spacing: 16) {
+                        Image(systemName: contribution.icon)
+                            .font(.title3)
+                            .foregroundColor(contribution.color)
+                            .frame(width: 40, height: 40)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(contribution.color.opacity(0.2))
+                            )
+                        
                         VStack(alignment: .leading, spacing: 4) {
                             Text(contribution.title)
                                 .font(.subheadline)
@@ -390,17 +490,137 @@ struct SavingsAccountDetailView: View {
                             .fontWeight(.semibold)
                             .foregroundColor(contribution.amount.contains("-") ? .red : .green)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(16)
                     .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
+        .padding(.bottom, 16)
+    }
+    
+    private var benefitsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Benefits and services")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .padding(.top, 12)
+            VStack(spacing: 12) {
+                ForEach(benefits, id: \.title) { benefit in
+                    HStack(spacing: 16) {
+                        Image(systemName: benefit.icon)
+                            .font(.title3)
+                            .foregroundColor(.blue)
+                            .frame(width: 36, height: 36)
+                            .background(Color.blue.opacity(0.15))
+                            .clipShape(Circle())
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(benefit.title)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Text(benefit.desc)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                    }
+                    .padding(16)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+        .padding(.bottom, 16)
+    }
+    
+    private var documentsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Documents".localized)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .padding(.top, 12)
+            VStack(spacing: 12) {
+                ForEach(Array(documents.enumerated()), id: \.offset) { index, document in
+                    Button(action: {
+                        // Handle document tap - could navigate to document detail view
+                    }) {
+                        HStack(spacing: 16) {
+                            Image(systemName: document.icon)
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                                .frame(width: 36, height: 36)
+                                .background(Color.blue.opacity(0.15))
+                                .clipShape(Circle())
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(document.titleKey.localized)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                Text(document.descKey.localized)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(16)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+}
+
+struct SavingsAccountRow: View {
+    let title: String
+    let subtitle: String
+    let amount: String
+    let progress: Double
+    let monthlyAmount: String
+    let nextDueDate: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundColor(.secondary)
+            }
+            
+            Text(amount)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            
+            ProgressView(value: progress)
+                .tint(.mint)
+            
+            HStack {
+                Text(monthlyAmount)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(nextDueDate)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(16)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
@@ -454,12 +674,11 @@ struct AddAccountView: View {
                     Button {
                         dismiss()
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title2)
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundColor(.gray)
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
                     }
-                    .buttonStyle(.plain)
+                    .tint(.primary)
                 }
             }
         }

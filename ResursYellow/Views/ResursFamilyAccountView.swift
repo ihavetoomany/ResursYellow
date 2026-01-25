@@ -9,8 +9,6 @@ import SwiftUI
 import Combine
 
 struct ResursFamilyAccountView: View {
-    @Environment(\.dismiss) var dismiss
-    @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var dataManager = DataManager.shared
     
     // Invoice Accounts - Resurs Gold's own payment plans (filtered from DataManager)
@@ -32,36 +30,25 @@ struct ResursFamilyAccountView: View {
         ("shield.checkerboard", "Payment Protection", "Protect your purchases with optional payment insurance.")
     ]
     
+    // Documents for Resurs Family
+    private let documents: [(icon: String, titleKey: String, descKey: String)] = [
+        ("doc.text.fill", "Credit Agreement", "View your credit account terms and conditions"),
+        ("doc.text", "Terms and Conditions", "Read the terms and conditions for Resurs Family"),
+        ("hand.raised.fill", "Privacy Policy", "Review how we handle your personal information"),
+        ("doc.on.doc.fill", "Payment Plan Agreement", "View your active payment plan agreements")
+    ]
+    
     var body: some View {
-        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
-        
-        ZStack(alignment: .top) {
-            // Scrollable Content
-            ScrollViewReader { proxy in
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        // Tracking element
-                        GeometryReader { geometry in
-                            Color.clear
-                                .onChange(of: geometry.frame(in: .named("scroll")).minY) { oldValue, newValue in
-                                    scrollObserver.offset = max(0, -newValue)
-                                }
-                        }
-                        .frame(height: 0)
-                        .id("scrollTop") // ID for scroll to top
-                        
-                        // Account for header height
-                        Color.clear.frame(height: 80)
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 16) {
+                // Account Overview Card
+                AccountOverviewCard()
+                    .padding(.horizontal)
+                    .padding(.top, 4)
+                    .padding(.bottom, 16)
                     
-                    VStack(spacing: 16) {
-                    // Account Overview Card
-                    AccountOverviewCard()
-                        .padding(.horizontal)
-                        .padding(.top, 36)
-                        .padding(.bottom, 16)
-                    
-                    // Credit Cards Section
-                    VStack(alignment: .leading, spacing: 12) {
+                // Credit Cards Section
+                VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("Cards")
                                 .font(.headline)
@@ -69,7 +56,7 @@ struct ResursFamilyAccountView: View {
                             Spacer()
                         }
                         .padding(.horizontal)
-                        .padding(.top, 24)
+                        .padding(.top, 12)
                         
                         VStack(spacing: 12) {
                             CreditCardMini(
@@ -90,16 +77,23 @@ struct ResursFamilyAccountView: View {
                     }
                     .padding(.bottom, 16)
                     
-                    // Purchases Section
-                    VStack(alignment: .leading, spacing: 12) {
+                // Purchases Section
+                VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("Purchases")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
+                            Button(action: {
+                                // Handle "View all" tap
+                            }) {
+                                Text("View all")
+                                    .font(.subheadline)
+                                    .foregroundColor(.blue)
+                            }
                         }
                         .padding(.horizontal)
-                        .padding(.top, 24)
+                        .padding(.top, 12)
                         
                         VStack(spacing: 12) {
                             PurchaseRow(
@@ -156,16 +150,23 @@ struct ResursFamilyAccountView: View {
                     }
                     .padding(.bottom, 16)
                     
-                    // Invoice Accounts Section
-                    VStack(alignment: .leading, spacing: 12) {
+                // Invoice Accounts Section
+                VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Active accounts")
+                            Text("Accounts")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
+                            Button(action: {
+                                // Handle "View all" tap
+                            }) {
+                                Text("View all")
+                                    .font(.subheadline)
+                                    .foregroundColor(.blue)
+                            }
                         }
                         .padding(.horizontal)
-                        .padding(.top, 24)
+                        .padding(.top, 12)
                         
                         VStack(spacing: 12) {
                             ForEach(invoiceAccounts) { payment in
@@ -179,13 +180,13 @@ struct ResursFamilyAccountView: View {
                     }
                     .padding(.bottom, 16)
                     
-                    // Benefits Section
-                    VStack(alignment: .leading, spacing: 16) {
+                // Benefits Section
+                VStack(alignment: .leading, spacing: 16) {
                         Text("Benefits and services")
                             .font(.headline)
                             .fontWeight(.semibold)
                             .padding(.horizontal, 4)
-                            .padding(.top, 24)
+                            .padding(.top, 12)
                         VStack(spacing: 12) {
                             ForEach(benefits, id: \.title) { benefit in
                                 HStack(spacing: 16) {
@@ -212,72 +213,55 @@ struct ResursFamilyAccountView: View {
                         }
                     }
                     .padding(.horizontal)
-                }
-                .padding(.top, 20)
-                .padding(.bottom, 24)
-                }
-                }
-                .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                        proxy.scrollTo("scrollTop", anchor: .top)
-                    }
-                }
-            }
-            .coordinateSpace(name: "scroll")
-            
-            // Sticky Header (overlays the content)
-            VStack(spacing: 0) {
-                ZStack {
-                    // Back button (always visible) - on the left
-                    HStack {
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "chevron.left")
-                                .font(.title3)
-                                .foregroundColor(.blue)
-                                .frame(width: 32, height: 32)
-                                .background(.ultraThinMaterial) // Liquid glass style
-                                .clipShape(Circle())
-                        }
-                        Spacer()
-                    }
                     
-                    // Minimized title - centered in view
-                    if scrollProgress > 0.5 {
-                        Text("Resurs Family")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
+                // Documents Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Documents".localized)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 4)
+                        .padding(.top, 12)
+                    VStack(spacing: 12) {
+                        ForEach(Array(documents.enumerated()), id: \.offset) { index, document in
+                            Button(action: {
+                                // Handle document tap - could navigate to document detail view
+                            }) {
+                                HStack(spacing: 16) {
+                                    Image(systemName: document.icon)
+                                        .font(.title3)
+                                        .foregroundColor(.blue)
+                                        .frame(width: 36, height: 36)
+                                        .background(Color.blue.opacity(0.15))
+                                        .clipShape(Circle())
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(document.titleKey.localized)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.primary)
+                                        Text(document.descKey.localized)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.footnote.weight(.semibold))
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(16)
+                                .background(.ultraThinMaterial)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                 }
                 .padding(.horizontal)
-                .padding(.top, 8)
-                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-                
-                // Title and subtitle - only shown when not minimized
-                if scrollProgress <= 0.5 {
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Subtitle
-                        Text("Credit Account")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .opacity(1.0 - scrollProgress * 2)
-                        
-                        // Title
-                        Text("Resurs Family")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
-                }
             }
-            .background(Color(uiColor: .systemBackground).opacity(0.95))
-            .background(.ultraThinMaterial)
-            .animation(.easeInOut(duration: 0.2), value: scrollProgress)
+            .padding(.vertical, 24)
         }
-        .navigationBarHidden(true)
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Resurs Family")
+        .navigationBarTitleDisplayMode(.large)
         .navigationDestination(for: PartPaymentItem.self) { account in
             InvoiceAccountDetailView(account: account)
         }

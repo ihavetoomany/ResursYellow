@@ -147,6 +147,17 @@
 "Banking" = "Bank";
 "Merchants" = "Handlare";
 
+/* Resurs Family Documents */
+"Documents" = "Dokument";
+"Credit Agreement" = "Kreditavtal";
+"View your credit account terms and conditions" = "Visa dina kreditkontos villkor";
+"Terms and Conditions" = "Villkor";
+"Read the terms and conditions for Resurs Family" = "Läs villkoren för Resurs Family";
+"Privacy Policy" = "Integritetspolicy";
+"Review how we handle your personal information" = "Granska hur vi hanterar din personliga information";
+"Payment Plan Agreement" = "Betalningsplanavtal";
+"View your active payment plan agreements" = "Visa dina aktiva betalningsplanavtal";
+
 /* AI Support Chat */
 "AI Bank Support" = "AI Banksupport";
 "How can I help you today?" = "Hur kan jag hjälpa dig idag?";

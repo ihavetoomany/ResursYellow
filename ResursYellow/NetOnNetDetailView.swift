@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct NetOnNetDetailView: View {
-    @Environment(\.dismiss) var dismiss
-    @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var dataManager = DataManager.shared
     
     private let availableCredit = "20 000 kr"
@@ -28,151 +26,99 @@ struct NetOnNetDetailView: View {
         ("creditcard.and.123", "Flexible PNPL", "Split large electronics into monthly payments with instant approval.")
     ]
     
+    private let documents: [(icon: String, titleKey: String, descKey: String)] = [
+        ("doc.text.fill", "Credit Agreement", "View your NetOnNet credit account terms and conditions"),
+        ("doc.text", "Terms and Conditions", "Read the terms and conditions for NetOnNet"),
+        ("hand.raised.fill", "Privacy Policy", "Review how we handle your personal information"),
+        ("doc.on.doc.fill", "Payment Plan Agreement", "View your active payment plan agreements")
+    ]
+    
     
     var body: some View {
-        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
-        
-        ZStack(alignment: .top) {
-            // Scrollable Content
-            ScrollViewReader { proxy in
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        // Tracking element
-                        GeometryReader { geometry in
-                            Color.clear
-                                .onChange(of: geometry.frame(in: .named("scroll")).minY) { oldValue, newValue in
-                                    scrollObserver.offset = max(0, -newValue)
-                                }
-                        }
-                        .frame(height: 0)
-                        .id("scrollTop")
-                        
-                        // Account for header height
-                        Color.clear.frame(height: 120)
-                    
-                    VStack(spacing: 24) {
-                        infoCard
-                            .padding(.top, 20)
-                        purchasesSection
-                        partPaymentsSection
-                        benefitsSection
-                    }
-                    .padding(.bottom, 24)
-                    }
-                }
-                .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                        proxy.scrollTo("scrollTop", anchor: .top)
-                    }
-                }
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                summaryCard
+                purchasesSection
+                partPaymentsSection
+                benefitsSection
+                documentsSection
             }
-            .coordinateSpace(name: "scroll")
-            
-            // Sticky Header (overlays the content)
-            VStack(spacing: 0) {
-                ZStack {
-                    // Back button (always visible) - on the left
-                    HStack {
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "chevron.left")
-                                .font(.title3)
-                                .foregroundColor(.blue)
-                                .frame(width: 32, height: 32)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                        }
-                        Spacer()
-                    }
-                    
-                    // Minimized title - centered in view
-                    if scrollProgress > 0.5 {
-                        Text("Netonnet")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-                
-                // Title and subtitle - only shown when not minimized
-                if scrollProgress <= 0.5 {
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Subtitle
-                        Text("Store Credit available")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .opacity(1.0 - scrollProgress * 2)
-                        
-                        // Title
-                        Text("Netonnet")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
-                }
-            }
-            .background(Color(uiColor: .systemBackground).opacity(0.95))
-            .background(.ultraThinMaterial)
-            .animation(.easeInOut(duration: 0.2), value: scrollProgress)
+            .padding(.horizontal)
+            .padding(.vertical, 24)
         }
-        .navigationBarHidden(true)
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Netonnet")
+        .navigationBarTitleDisplayMode(.large)
     }
     
-    private var heroIcon: some View {
-        Image(systemName: "shippingbox.fill")
-            .font(.system(size: 54))
-            .foregroundColor(.green)
-            .padding(28)
-            .background(Circle().fill(Color.green.opacity(0.12)))
-            .frame(maxWidth: .infinity)
-    }
-    
-    private var infoCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("NetOnNet customers can link their Resurs credit to enjoy instant checkout, delivery tracking and flexible financing for every gadget.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            
-            Divider()
-            
-            HStack(spacing: 32) {
-                VStack(alignment: .leading, spacing: 4) {
+    private var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text("Available Credit")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(availableCredit)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.system(size: 34, weight: .bold))
+                        .minimumScaleFactor(0.8)
                 }
+                
+                Spacer()
+                
+                Image(systemName: "shippingbox.fill")
+                    .font(.title2)
+                    .foregroundColor(.green)
+                    .frame(width: 56, height: 56)
+                    .background(Color.green.opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+            }
+            
+            Divider()
+                .background(Color.primary.opacity(0.1))
+            
+            HStack(alignment: .center, spacing: 18) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Credit Limit")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(creditLimit)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
                 }
-                Spacer()
+                
+                Divider()
+                    .frame(height: 32)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Used Credit")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("0 kr")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                
+                Spacer(minLength: 0)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .padding(.horizontal)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Netonnet available credit \(availableCredit). Credit limit \(creditLimit). No credit used.")
     }
     
     private var purchasesSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Purchases")
-                .font(.headline)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 4)
-                .padding(.top, 24)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Purchases")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.top, 12)
+            
             VStack(spacing: 12) {
                 ForEach(purchases) { purchase in
                     HStack(spacing: 16) {
@@ -201,16 +147,18 @@ struct NetOnNetDetailView: View {
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.bottom, 16)
     }
     
     private var partPaymentsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Active accounts")
-                .font(.headline)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 4)
-                .padding(.top, 24)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Active accounts")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.top, 12)
             
             VStack(spacing: 12) {
                 // Get Main Account for Netonnet from DataManager
@@ -244,16 +192,15 @@ struct NetOnNetDetailView: View {
                 }
             }
         }
-        .padding(.horizontal)
+        .padding(.bottom, 16)
     }
     
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Benefits and services")
-                .padding(.top, 24)
                 .font(.headline)
                 .fontWeight(.semibold)
-                .padding(.horizontal, 4)
+                .padding(.top, 12)
             VStack(spacing: 12) {
                 ForEach(benefits, id: \.title) { benefit in
                     HStack(spacing: 16) {
@@ -279,8 +226,49 @@ struct NetOnNetDetailView: View {
                 }
             }
         }
-        .padding(.horizontal)
-        .padding(.bottom, 32)
+        .padding(.bottom, 16)
+    }
+    
+    private var documentsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Documents".localized)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .padding(.top, 12)
+            VStack(spacing: 12) {
+                ForEach(Array(documents.enumerated()), id: \.offset) { index, document in
+                    Button(action: {
+                        // Handle document tap - could navigate to document detail view
+                    }) {
+                        HStack(spacing: 16) {
+                            Image(systemName: document.icon)
+                                .font(.title3)
+                                .foregroundColor(.green)
+                                .frame(width: 36, height: 36)
+                                .background(Color.green.opacity(0.15))
+                                .clipShape(Circle())
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(document.titleKey.localized)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                Text(document.descKey.localized)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(16)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 }
 

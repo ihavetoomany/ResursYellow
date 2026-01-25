@@ -570,10 +570,6 @@ struct AddMerchantView: View {
                                     }
                                     
                                     Spacer()
-                                    
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.title3)
-                                        .foregroundColor(.blue)
                                 }
                                 .padding(12)
                                 .background(.ultraThinMaterial)
@@ -594,12 +590,11 @@ struct AddMerchantView: View {
                     Button {
                         dismiss()
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title2)
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundColor(.gray)
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
                     }
-                    .buttonStyle(.plain)
+                    .tint(.primary)
                 }
             }
         }

@@ -6,8 +6,6 @@
 import SwiftUI
 
 struct BauhausDetailView: View {
-    @Environment(\.dismiss) var dismiss
-    @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var dataManager = DataManager.shared
     
     // Example credit info
@@ -42,6 +40,13 @@ struct BauhausDetailView: View {
         ("tag.fill", "Exclusive Deals", "Get access to member prices and special offers."),
         ("giftcard.fill", "Kickback", "Earn kickback on every purchase at Bauhaus."),
         ("shield.checkerboard", "Payment Insurance", "Protect your purchases with optional payment insurance.")
+    ]
+    
+    private let documents: [(icon: String, titleKey: String, descKey: String)] = [
+        ("doc.text.fill", "Credit Agreement", "View your Bauhaus credit account terms and conditions"),
+        ("doc.text", "Terms and Conditions", "Read the terms and conditions for Bauhaus"),
+        ("hand.raised.fill", "Privacy Policy", "Review how we handle your personal information"),
+        ("doc.on.doc.fill", "Payment Plan Agreement", "View your active payment plan agreements")
     ]
     
     // Part payments from DataManager (filtered for Bauhaus)
@@ -138,233 +143,233 @@ struct BauhausDetailView: View {
     ]
     
     var body: some View {
-        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
-        
-        ZStack(alignment: .top) {
-            // Scrollable Content
-            ScrollViewReader { proxy in
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        // Tracking element
-                        GeometryReader { geometry in
-                            Color.clear
-                                .onChange(of: geometry.frame(in: .named("scroll")).minY) { oldValue, newValue in
-                                    scrollObserver.offset = max(0, -newValue)
-                                }
-                        }
-                        .frame(height: 0)
-                        .id("scrollTop")
-                        
-                        // Account for header height
-                        Color.clear.frame(height: 120)
-                    
-                    VStack(spacing: 24) {
-                        
-                        // Top info box
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack(alignment: .top) {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Bauhaus offers Purchase Now, Pay Later (PNPL) with several part payment options.")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                    Text("You can also open a credit account for easy checkout and part payment at Bauhaus stores and online.")
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                }
-                                Spacer()
-                            }
-                            Divider()
-                            HStack(spacing: 32) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Available Credit")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    Text(availableCredit)
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                }
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Credit Limit")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    Text(creditLimit)
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                }
-                                Spacer()
-                            }
-                        }
-                        .padding(20)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                        .padding(.horizontal)
-                        .padding(.top, 20)
-                        
-                        // Purchases
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Purchases")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 4)
-                            VStack(spacing: 12) {
-                                ForEach(purchases) { item in
-                                    HStack(spacing: 16) {
-                                        Image(systemName: item.icon)
-                                            .font(.title3)
-                                            .foregroundColor(item.color)
-                                            .frame(width: 36, height: 36)
-                                            .background(item.color.opacity(0.2))
-                                            .clipShape(Circle())
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(item.title)
-                                                .font(.subheadline)
-                                                .fontWeight(.medium)
-                                            Text(item.subtitle)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                        Spacer()
-                                        Text(item.amount)
-                                            .font(.subheadline)
-                                            .fontWeight(.semibold)
-                                    }
-                                    .padding(16)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        
-                        // Open Accounts Section
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Active accounts")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 4)
-                            VStack(spacing: 12) {
-                                ForEach(partPayments, id: \.title) { payment in
-                                    if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
-                                        NavigationLink {
-                                            PaintProjectSplitDetailView(plan: payment, invoices: paintProjectInvoices)
-                                        } label: {
-                                            PartPaymentRow(payment: payment, showsDisclosure: true)
-                                        }
-                                        .buttonStyle(.plain)
-                                    } else if payment.title == "Bauhaus - September" && payment.totalAmount == "1 500 kr" {
-                                        NavigationLink {
-                                            PaintProjectSplitDetailView(plan: payment, invoices: gardenSuppliesInvoices)
-                                        } label: {
-                                            PartPaymentRow(payment: payment, showsDisclosure: true)
-                                        }
-                                        .buttonStyle(.plain)
-                                    } else {
-                                        PartPaymentRow(payment: payment, showsDisclosure: false)
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        
-                        // Benefits
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Benefits and services")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 4)
-                                .padding(.top, 24)
-                            VStack(spacing: 12) {
-                                ForEach(benefits, id: \.title) { benefit in
-                                    HStack(spacing: 16) {
-                                        Image(systemName: benefit.icon)
-                                            .font(.title3)
-                                            .foregroundColor(.red)
-                                            .frame(width: 36, height: 36)
-                                            .background(Color.red.opacity(0.15))
-                                            .clipShape(Circle())
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(benefit.title)
-                                                .font(.subheadline)
-                                                .fontWeight(.medium)
-                                            Text(benefit.desc)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                        Spacer()
-                                    }
-                                    .padding(16)
-                                    .background(.ultraThinMaterial)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        Spacer(minLength: 40)
-                    }
-                    .padding(.bottom, 24)
-                    }
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 24) {
+                summaryCard
+                purchasesSection
+                partPaymentsSection
+                benefitsSection
+                documentsSection
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 24)
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Bauhaus")
+        .navigationBarTitleDisplayMode(.large)
+        .navigationDestination(for: PartPaymentItem.self) { payment in
+            if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
+                PaintProjectSplitDetailView(plan: payment, invoices: paintProjectInvoices)
+            } else if payment.title == "Bauhaus - September" && payment.totalAmount == "1 500 kr" {
+                PaintProjectSplitDetailView(plan: payment, invoices: gardenSuppliesInvoices)
+            }
+        }
+    }
+    
+    private var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Available Credit")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(availableCredit)
+                        .font(.system(size: 34, weight: .bold))
+                        .minimumScaleFactor(0.8)
                 }
-                .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                        proxy.scrollTo("scrollTop", anchor: .top)
+                
+                Spacer()
+                
+                Image(systemName: "paintbrush.pointed.fill")
+                    .font(.title2)
+                    .foregroundColor(.red)
+                    .frame(width: 56, height: 56)
+                    .background(Color.red.opacity(0.2))
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+            }
+            
+            Divider()
+                .background(Color.primary.opacity(0.1))
+            
+            HStack(alignment: .center, spacing: 18) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Credit Limit")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(creditLimit)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                
+                Divider()
+                    .frame(height: 32)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Used Credit")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("5 500 kr")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+                
+                Spacer(minLength: 0)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Bauhaus available credit \(availableCredit). Credit limit \(creditLimit). Used credit 5 500 kronor.")
+    }
+    
+    private var purchasesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Purchases")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.top, 12)
+            
+            VStack(spacing: 12) {
+                ForEach(purchases) { item in
+                    HStack(spacing: 16) {
+                        Image(systemName: item.icon)
+                            .font(.title3)
+                            .foregroundColor(item.color)
+                            .frame(width: 36, height: 36)
+                            .background(item.color.opacity(0.2))
+                            .clipShape(Circle())
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(item.title)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Text(item.subtitle)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Text(item.amount)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                    }
+                    .padding(16)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+        .padding(.bottom, 16)
+    }
+    
+    private var partPaymentsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Active accounts")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                Spacer()
+            }
+            .padding(.top, 12)
+            
+            VStack(spacing: 12) {
+                ForEach(partPayments, id: \.title) { payment in
+                    if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
+                        NavigationLink(value: payment) {
+                            PartPaymentRow(payment: payment, showsDisclosure: true)
+                        }
+                        .buttonStyle(.plain)
+                    } else if payment.title == "Bauhaus - September" && payment.totalAmount == "1 500 kr" {
+                        NavigationLink(value: payment) {
+                            PartPaymentRow(payment: payment, showsDisclosure: true)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        PartPaymentRow(payment: payment, showsDisclosure: false)
                     }
                 }
             }
-            .coordinateSpace(name: "scroll")
-            
-            // Sticky Header (overlays the content)
-            VStack(spacing: 0) {
-                ZStack {
-                    // Back button (always visible) - on the left
-                    HStack {
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "chevron.left")
-                                .font(.title3)
-                                .foregroundColor(.blue)
-                                .frame(width: 32, height: 32)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
+        }
+        .padding(.bottom, 16)
+    }
+    
+    private var benefitsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Benefits and services")
+                .font(.headline)
+                .fontWeight(.semibold)
+                .padding(.top, 12)
+            VStack(spacing: 12) {
+                ForEach(benefits, id: \.title) { benefit in
+                    HStack(spacing: 16) {
+                        Image(systemName: benefit.icon)
+                            .font(.title3)
+                            .foregroundColor(.red)
+                            .frame(width: 36, height: 36)
+                            .background(Color.red.opacity(0.15))
+                            .clipShape(Circle())
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(benefit.title)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            Text(benefit.desc)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                         Spacer()
                     }
-                    
-                    // Minimized title - centered in view
-                    if scrollProgress > 0.5 {
-                        Text("Bauhaus")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-                
-                // Title and subtitle - only shown when not minimized
-                if scrollProgress <= 0.5 {
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Subtitle
-                        Text("Store Credit and Invoice available")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .opacity(1.0 - scrollProgress * 2)
-                        
-                        // Title
-                        Text("Bauhaus")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
+                    .padding(16)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
-            .background(Color(uiColor: .systemBackground).opacity(0.95))
-            .background(.ultraThinMaterial)
-            .animation(.easeInOut(duration: 0.2), value: scrollProgress)
         }
-        .navigationBarHidden(true)
+        .padding(.bottom, 16)
+    }
+    
+    private var documentsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Documents".localized)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .padding(.top, 12)
+            VStack(spacing: 12) {
+                ForEach(Array(documents.enumerated()), id: \.offset) { index, document in
+                    Button(action: {
+                        // Handle document tap - could navigate to document detail view
+                    }) {
+                        HStack(spacing: 16) {
+                            Image(systemName: document.icon)
+                                .font(.title3)
+                                .foregroundColor(.red)
+                                .frame(width: 36, height: 36)
+                                .background(Color.red.opacity(0.15))
+                                .clipShape(Circle())
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(document.titleKey.localized)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                Text(document.descKey.localized)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(16)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 }
 
