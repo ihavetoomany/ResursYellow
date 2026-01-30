@@ -1,5 +1,5 @@
 //
-//  WalletView.swift
+//  PaymentsView.swift
 //  ResursYellow
 //
 //  Created by Bjarne Werner on 2025-10-04.
@@ -7,18 +7,6 @@
 
 import SwiftUI
 import UIKit
-
-private struct VisibleCardInfo: Equatable {
-    let index: Int
-    let minX: CGFloat
-}
-
-private struct VisibleCardPreferenceKey: PreferenceKey {
-    static var defaultValue: [VisibleCardInfo] = []
-    static func reduce(value: inout [VisibleCardInfo], nextValue: () -> [VisibleCardInfo]) {
-        value.append(contentsOf: nextValue())
-    }
-}
 
 private func availableSymbol(_ preferred: String, fallback: String) -> String {
     if UIImage(systemName: preferred) != nil {
@@ -457,7 +445,7 @@ enum WalletSegment: String, CaseIterable {
     case purchases = "Purchases"
 }
 
-struct WalletView: View {
+struct PaymentsView: View {
     @StateObject private var dataManager = DataManager.shared
     private let dateService = DateService.shared
     @StateObject private var localizationService = LocalizationService.shared
@@ -465,8 +453,7 @@ struct WalletView: View {
     
     @State private var navigationPath = NavigationPath()
     @State private var showProfile = false
-    
-    @State private var currentSummaryIndex: Int = 0
+    @State private var showNotifications = false
     @State private var selectedSegment: WalletSegment = .invoices
     
     // Helper to ensure views update when language changes
@@ -584,36 +571,16 @@ struct WalletView: View {
     private var hasOverdueInvoices: Bool {
         !dataManager.invoicesForCategory(.overdue).isEmpty
     }
-
-    private var hasCreditAccount: Bool {
-        !dataManager.creditAccounts.isEmpty
-    }
     
-    private var creditCardHeadline: String {
-        if hasCreditAccount {
-            let accounts = dataManager.creditAccounts
-            let family = accounts.first { $0.name.lowercased().contains("family") }
-            let available = family?.available ?? accounts.first?.available ?? 0
-            return formattedSEK(available)
-        } else {
-            return localized("Get a credit card")
+    private var unreadNotificationCount: Int {
+        var count = 0
+        if !dataManager.invoicesForCategory(.overdue).isEmpty {
+            count += 1
         }
-    }
-    
-    private var creditCardSubtitle: String {
-        if hasCreditAccount {
-            return localized("Available credit")
-        } else {
-            return localized("Up to 80 000 SEK credit")
+        if !dataManager.invoicesForCategory(.dueSoon).isEmpty {
+            count += 1
         }
-    }
-    
-    private var creditCardIcon: String {
-        hasCreditAccount ? "creditcard.fill" : "plus"
-    }
-    
-    private var creditCardTint: Color {
-        hasCreditAccount ? .green : .blue
+        return count
     }
 
     var body: some View {
@@ -621,104 +588,34 @@ struct WalletView: View {
             StickyHeaderView(
                 title: dataManager.currentPersona.displayName,
                 subtitle: greeting,
-                minimizedTitle: "Overview",
-                trailingButton: availableSymbol("sparkle2", fallback: "sparkle"),
+                minimizedTitle: "Payments",
+                trailingButton: "",
                 trailingButtonTint: .primary,
-                trailingButtonSize: 52,
-                trailingButtonIconScale: 0.6,
-                trailingButtonAction: { showProfile = true }
+                trailingButtonSize: 44,
+                trailingButtonIconScale: 0.5,
+                trailingButtonAction: {},
+                showBellIcon: true,
+                bellIconAction: { showNotifications = true },
+                bellBadgeCount: unreadNotificationCount
             ) {
                 // Content: keep existing sections in order
                 VStack(spacing: 24) {
-                    // Horizontal summary boxes
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            Button {
-                                navigationPath.append(WalletDestination.invoices)
-                            } label: {
-                                ZStack(alignment: .leading) {
-                                    SummaryBox(title: "To Pay", headline: totalUnpaidAmountLabel, subtitle: invoiceSubtitleLabel, icon: "doc.text.fill", tint: hasOverdueInvoices ? .orange : .green)
-                                    Color.clear.frame(width: 1)
-                                        .accessibilityHidden(true)
-                                        .id("summaryAnchor0")
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .background(
-                                GeometryReader { geo in
-                                    Color.clear
-                                        .preference(
-                                            key: VisibleCardPreferenceKey.self,
-                                            value: [VisibleCardInfo(index: 0, minX: geo.frame(in: .named("summaryScroll")).minX)]
-                                        )
-                                }
-                            )
-                            
-                            Button {
-                                // Switch to Banking tab and request deep link to Resurs Family account view
-                                NotificationCenter.default.post(name: .switchToBanking, object: nil, userInfo: ["destination": "ResursFamilyAccountView"])
-                            } label: {
-                                ZStack(alignment: .leading) {
-                                    SummaryBox(title: "Resurs Family", headline: creditCardHeadline, subtitle: creditCardSubtitle, icon: creditCardIcon, tint: creditCardTint)
-                                    Color.clear.frame(width: 1)
-                                        .accessibilityHidden(true)
-                                        .id("summaryAnchor1")
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .background(
-                                GeometryReader { geo in
-                                    Color.clear
-                                        .preference(
-                                            key: VisibleCardPreferenceKey.self,
-                                            value: [VisibleCardInfo(index: 1, minX: geo.frame(in: .named("summaryScroll")).minX)]
-                                        )
-                                }
-                            )
-                            
-                            Button {
-                                // Navigate to Merchants tab to add merchant
-                                NotificationCenter.default.post(name: .switchToMerchants, object: nil)
-                            } label: {
-                                ZStack(alignment: .leading) {
-                                    SummaryBox(
-                                        title: "Connect",
-                                        headline: "Add Merchant",
-                                        subtitle: "Find your favorite stores",
-                                        icon: "plus",
-                                        tint: .blue
-                                    )
-                                    Color.clear.frame(width: 1)
-                                        .accessibilityHidden(true)
-                                        .id("summaryAnchor2")
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .background(
-                                GeometryReader { geo in
-                                    Color.clear
-                                        .preference(
-                                            key: VisibleCardPreferenceKey.self,
-                                            value: [VisibleCardInfo(index: 2, minX: geo.frame(in: .named("summaryScroll")).minX)]
-                                        )
-                                }
+                    // Notification Center
+                    VStack(spacing: 0) {
+                        Button {
+                            navigationPath.append(WalletDestination.invoices)
+                        } label: {
+                            NotificationCard(
+                                title: "To Pay",
+                                headline: totalUnpaidAmountLabel,
+                                subtitle: invoiceSubtitleLabel,
+                                icon: "bell.fill",
+                                tint: hasOverdueInvoices ? .orange : .green
                             )
                         }
-                        .scrollTargetLayout()
-                        .padding(.horizontal)
+                        .buttonStyle(.plain)
                     }
-                    .scrollTargetBehavior(.viewAligned)
-                    .coordinateSpace(name: "summaryScroll")
-                    .onPreferenceChange(VisibleCardPreferenceKey.self) { infos in
-                        guard !infos.isEmpty else { return }
-                        // Find the card with minX closest to the ScrollView's leading edge (0)
-                        let newIndex = infos.min(by: { abs($0.minX) < abs($1.minX) })?.index ?? currentSummaryIndex
-                        if newIndex != currentSummaryIndex {
-                            currentSummaryIndex = newIndex
-                            let impact = UIImpactFeedbackGenerator(style: .light)
-                            impact.impactOccurred()
-                        }
-                    }
+                    .padding(.horizontal)
 
                     // Segmented Control for Invoices/Purchases
                     Picker("Content", selection: $selectedSegment) {
@@ -810,6 +707,14 @@ struct WalletView: View {
             }
             .sheet(isPresented: $showProfile) {
                 AISupportChatView()
+                    .presentationBackground {
+                        AdaptiveSheetBackground()
+                    }
+            }
+            .sheet(isPresented: $showNotifications) {
+                NotificationsOverlayView()
+                    .presentationDetents([.height(320)])
+                    .presentationDragIndicator(.visible)
                     .presentationBackground {
                         AdaptiveSheetBackground()
                     }
@@ -2251,6 +2156,53 @@ struct EmptyStateRow: View {
     }
 }
 
+// MARK: - Notification Card (Full Width)
+private struct NotificationCard: View {
+    let title: String
+    let headline: String
+    let subtitle: String
+    let icon: String
+    let tint: Color
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Left-aligned icon
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(tint)
+                .frame(width: 44, height: 44)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(tint.opacity(0.20))
+                )
+            
+            // Content
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title.uppercased())
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .tracking(0.6)
+                Text(headline)
+                    .font(.system(.title3, design: .rounded).weight(.bold))
+                    .foregroundColor(.primary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(tint == .orange ? .orange : (tint == .green && title == "To Pay" ? .green : .secondary))
+            }
+            
+            Spacer()
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(tint.opacity(0.20))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+        )
+    }
+}
+
 private struct SummaryBox: View {
     let title: String
     let headline: String
@@ -2288,9 +2240,203 @@ private struct SummaryBox: View {
     }
 }
 
-#Preview {
-    WalletView()
+// MARK: - Notifications Overlay View
+
+struct NotificationItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
+    let time: String
+    let icon: String
+    let color: Color
+    let isRead: Bool
+}
+
+struct NotificationsOverlayView: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var dataManager = DataManager.shared
+    
+    private var notifications: [NotificationItem] {
+        var items: [NotificationItem] = []
+        
+        // Add payment reminders
+        let overdueInvoices = dataManager.invoicesForCategory(.overdue)
+        if !overdueInvoices.isEmpty {
+            items.append(NotificationItem(
+                title: "Payment Overdue",
+                message: "\(overdueInvoices.count) invoice\(overdueInvoices.count > 1 ? "s" : "") overdue",
+                time: "Today",
+                icon: "exclamationmark.circle.fill",
+                color: .red,
+                isRead: false
+            ))
+        }
+        
+        let upcomingInvoices = dataManager.invoicesForCategory(.dueSoon)
+        if !upcomingInvoices.isEmpty {
+            items.append(NotificationItem(
+                title: "Payment Due Soon",
+                message: "\(upcomingInvoices.count) invoice\(upcomingInvoices.count > 1 ? "s" : "") due soon",
+                time: "2 days ago",
+                icon: "bell.fill",
+                color: .orange,
+                isRead: false
+            ))
+        }
+        
+        // Add some sample notifications
+        items.append(NotificationItem(
+            title: "Payment Confirmed",
+            message: "Your payment of 2,450 SEK has been processed",
+            time: "1 week ago",
+            icon: "checkmark.circle.fill",
+            color: .green,
+            isRead: true
+        ))
+        
+        items.append(NotificationItem(
+            title: "New Merchant Connected",
+            message: "Bauhaus has been added to your merchants",
+            time: "2 weeks ago",
+            icon: "storefront.fill",
+            color: .blue,
+            isRead: true
+        ))
+        
+        return items
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 12) {
+                    if notifications.isEmpty {
+                        // Empty state
+                        VStack(spacing: 20) {
+                            Spacer()
+                                .frame(height: 60)
+                            
+                            Image(systemName: "bell.slash.fill")
+                                .font(.system(size: 56))
+                                .foregroundColor(.secondary.opacity(0.4))
+                            
+                            Text("No notifications")
+                                .font(.title3.weight(.semibold))
+                                .foregroundColor(.secondary)
+                            
+                            Text("You're all caught up!")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary.opacity(0.8))
+                            
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity)
+                    } else {
+                        ForEach(Array(notifications.prefix(2))) { notification in
+                            NotificationRow(notification: notification)
+                        }
+                        
+                        // Mark as read button
+                        Button(action: {
+                            // Handle mark as read action
+                        }) {
+                            Text("Mark as read")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.primary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.top, 4)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 24)
+            }
+            .background(Color(uiColor: .systemGroupedBackground))
+            .navigationTitle("Notifications")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                    .tint(.primary)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Notification Row
+private struct NotificationRow: View {
+    let notification: NotificationItem
+    
+    var body: some View {
+        Button(action: {
+            // Handle notification tap
+        }) {
+            HStack(spacing: 16) {
+                Image(systemName: notification.icon)
+                    .font(.title3)
+                    .foregroundColor(notification.color)
+                    .frame(width: 40, height: 40)
+                    .background(notification.color.opacity(0.15))
+                    .clipShape(Circle())
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        if !notification.isRead {
+                            Circle()
+                                .fill(Color.blue)
+                                .frame(width: 8, height: 8)
+                        }
+                        
+                        Text(notification.title)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                    }
+                    
+                    Text(notification.message)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                    
+                    Text(notification.time)
+                        .font(.caption2)
+                        .foregroundColor(.secondary.opacity(0.7))
+                }
+                
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary.opacity(0.5))
+            }
+            .padding(16)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+#Preview("Payments View") {
+    PaymentsView()
         .environmentObject(PaymentPlansManager.shared)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Notifications Overlay") {
+    NotificationsOverlayView()
         .preferredColorScheme(.dark)
 }
 

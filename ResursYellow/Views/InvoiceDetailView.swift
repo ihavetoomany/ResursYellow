@@ -138,6 +138,11 @@ struct InvoiceDetailView: View {
                                     .padding(.horizontal)
                                     .frame(width: geometry.size.width)
                                 }
+                                
+                                // Help and Support Section
+                                HelpAndSupportSection()
+                                    .padding(.horizontal)
+                                    .frame(width: geometry.size.width)
                             }
                             .padding(.top, 20)
                             .padding(.bottom, 40)
@@ -162,21 +167,22 @@ struct InvoiceDetailView: View {
                     HStack {
                         Button(action: { dismiss() }) {
                             Image(systemName: "chevron.left")
-                                .font(.title3)
-                                .foregroundColor(.blue)
-                                .frame(width: 32, height: 32)
+                                .font(.title3.weight(.semibold))
+                                .foregroundColor(.primary)
+                                .frame(width: 44, height: 44)
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
                         }
                         Spacer()
                         if shouldShowPayButton && scrollProgress > 0.5 {
                             Button(action: { showPaymentSheet = true }) {
-                                Image(systemName: "arrow.up")
-                                    .font(.headline.weight(.semibold))
+                                Text("Pay")
+                                    .font(.subheadline.weight(.semibold))
                                     .foregroundColor(.white)
-                                    .frame(width: 36, height: 36)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
                                     .background(Color.blue)
-                                    .clipShape(Circle())
+                                    .clipShape(Capsule())
                             }
                             .buttonStyle(.plain)
                         }
@@ -194,15 +200,10 @@ struct InvoiceDetailView: View {
                 .padding(.top, 8)
                 .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
 
-                // Title and subtitle
+                // Title (no subtitle)
                 if scrollProgress <= 0.5 {
                     HStack(alignment: .center) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Invoice Details")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .opacity(1.0 - scrollProgress * 2)
-
                             Text(invoice.merchant)
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
@@ -211,12 +212,13 @@ struct InvoiceDetailView: View {
                         Spacer()
                         if shouldShowPayButton {
                             Button(action: { showPaymentSheet = true }) {
-                                Image(systemName: "arrow.up")
-                                    .font(.title2.weight(.semibold))
+                                Text("Pay")
+                                    .font(.subheadline.weight(.semibold))
                                     .foregroundColor(.white)
-                                    .frame(width: 48, height: 48)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 12)
                                     .background(Color.blue)
-                                    .clipShape(Circle())
+                                    .clipShape(Capsule())
                                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                             }
                             .buttonStyle(.plain)
@@ -344,23 +346,27 @@ struct WhatIPayForCard: View {
                     .fontWeight(.semibold)
             }
             
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(explanationText)
                     .font(.subheadline)
                     .foregroundColor(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 
                 if let account = invoiceAccount {
+                    Divider()
+                        .padding(.top, 16)
+                        .padding(.bottom, 12)
+                    
                     NavigationLink(value: account.toPartPaymentItem()) {
                         HStack {
                             Text("View invoice account")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                                .foregroundColor(.blue)
+                                .foregroundColor(.white)
                             Spacer()
-                            Image(systemName: "arrow.up.right.circle")
-                                .font(.subheadline)
-                                .foregroundColor(.blue)
+                            Image(systemName: "chevron.right")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.secondary)
                         }
                     }
                     .buttonStyle(.plain)
@@ -456,8 +462,6 @@ struct PaymentInformationCard: View {
                         .buttonStyle(PlainButtonStyle())
                     }
 
-                    Divider()
-
                     HStack {
                         Text("OCR")
                             .font(.subheadline)
@@ -476,8 +480,6 @@ struct PaymentInformationCard: View {
                         .buttonStyle(PlainButtonStyle())
                     }
 
-                    Divider()
-
                     HStack {
                         Text("Bankgiro")
                             .font(.subheadline)
@@ -495,24 +497,27 @@ struct PaymentInformationCard: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
+                }
+                .padding(.bottom, 8)
 
-                    Divider()
+                Divider()
 
+                Button(action: {
+                    // Handle PDF open action
+                }) {
                     HStack {
                         Text("Invoice PDF")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
                         Spacer()
-                        HStack(spacing: 6) {
-                            Text("Open")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                            Image(systemName: "arrow.up.right.circle")
-                                .font(.subheadline)
-                                .foregroundColor(.blue)
-                        }
+                        Image(systemName: "chevron.right")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(.secondary)
                     }
                 }
+                .buttonStyle(.plain)
+                .padding(.top, 8)
             }
         }
         .padding(20)
@@ -706,6 +711,10 @@ struct PaymentOptionRow: View {
                 }
 
                 Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.secondary)
             }
             .padding(16)
             .background(isPressed ? color.opacity(0.34) : color.opacity(0.24))

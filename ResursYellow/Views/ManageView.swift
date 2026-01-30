@@ -6,12 +6,20 @@
 //
 
 import SwiftUI
+import UIKit
+
+private func availableSymbol(_ preferred: String, fallback: String) -> String {
+    if UIImage(systemName: preferred) != nil {
+        return preferred
+    }
+    return fallback
+}
 
 struct ManageView: View {
     @StateObject private var dataManager = DataManager.shared
     @StateObject private var localizationService = LocalizationService.shared
     @State private var navigationPath = NavigationPath()
-    @State private var showCallSupport = false
+    @State private var showAISupport = false
     @State private var showLogoutConfirmation = false
     @State private var showResetConfirmation = false
     @State private var selectedPersonaId: String = DataManager.shared.currentPersona.id
@@ -31,46 +39,65 @@ struct ManageView: View {
         return NavigationStack(path: $navigationPath) {
             StickyHeaderView(
                 title: localized("My Resurs"),
-                subtitle: localized("Support, profile & settings"),
-                trailingButton: "phone.fill",
-                trailingButtonTint: .blue,
-                trailingButtonSize: 52,
-                trailingButtonIconScale: 0.6,
+                subtitle: localized("Profile & settings"),
+                trailingButton: "message.fill",
+                trailingButtonTint: .secondary,
+                trailingButtonSize: 44,
+                trailingButtonIconScale: 0.5,
                 trailingButtonAction: {
-                    showCallSupport = true
+                    showAISupport = true
                 }
             ) {
                 VStack(spacing: 24) {
-                    // Support Section
-                    ProfileSection(title: localized("Support")) {
-                        ContactMethodRow(
-                            title: localized("Report issue"),
-                            subtitle: "Zendesk",
-                            icon: "exclamationmark.triangle.fill",
-                            color: .red
-                        )
-                        ContactMethodRow(
-                            title: localized("Messages"),
-                            subtitle: localized("View bank notifications"),
-                            icon: "envelope.fill",
-                            color: .blue
-                        )
-                        ContactMethodRow(
-                            title: localized("Live chat"),
-                            subtitle: "Zendesk",
-                            icon: "message.fill",
-                            color: .green
-                        )
-                        ContactMethodRow(
-                            title: localized("FAQ"),
-                            subtitle: "Zendesk",
-                            icon: "questionmark.circle.fill",
-                            color: .orange
-                        )
-                    }
-                    
                     // Profile Section
                     ProfileSection(title: localized("Profile")) {
+                        NavigationLink(value: "Notifications") {
+                            ProfileRow(
+                                title: localized("Notifications"),
+                                subtitle: localized("Messages from Resurs"),
+                                icon: "bell.fill",
+                                color: .orange,
+                                showChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        NavigationLink(value: "KYC") {
+                            ProfileRow(
+                                title: "KYC",
+                                subtitle: localized("Know Your Customer"),
+                                icon: "person.text.rectangle.fill",
+                                color: .purple,
+                                showChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        NavigationLink(value: "MyDocuments") {
+                            ProfileRow(
+                                title: localized("My documents"),
+                                subtitle: localized("Agreements, Contracts"),
+                                icon: "doc.fill",
+                                color: .orange,
+                                showChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        NavigationLink(value: "SpendingTrends") {
+                            ProfileRow(
+                                title: localized("Spending trends"),
+                                subtitle: localized("Gamification"),
+                                icon: "chart.line.uptrend.xyaxis",
+                                color: .green,
+                                showChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    
+                    // Settings Section
+                    ProfileSection(title: localized("Settings")) {
                         ProfileRow(
                             title: localized("Customer ID"),
                             subtitle: "12345678",
@@ -87,40 +114,8 @@ struct ManageView: View {
                                 showChevron: true
                             )
                         }
+                        .buttonStyle(.plain)
                         
-                        NavigationLink(value: "KYC") {
-                            ProfileRow(
-                                title: "KYC",
-                                subtitle: localized("Know Your Customer"),
-                                icon: "person.text.rectangle.fill",
-                                color: .purple,
-                                showChevron: true
-                            )
-                        }
-                        
-                        NavigationLink(value: "MyDocuments") {
-                            ProfileRow(
-                                title: localized("My documents"),
-                                subtitle: localized("Agreements, Contracts"),
-                                icon: "doc.fill",
-                                color: .orange,
-                                showChevron: true
-                            )
-                        }
-                        
-                        NavigationLink(value: "SpendingTrends") {
-                            ProfileRow(
-                                title: localized("Spending trends"),
-                                subtitle: localized("Gamification"),
-                                icon: "chart.line.uptrend.xyaxis",
-                                color: .green,
-                                showChevron: true
-                            )
-                        }
-                    }
-                    
-                    // Settings Section
-                    ProfileSection(title: localized("Settings")) {
                         NavigationLink(value: "ConnectBankAccount") {
                             ProfileRow(
                                 title: localized("Payment method"),
@@ -130,6 +125,7 @@ struct ManageView: View {
                                 showChevron: true
                             )
                         }
+                        .buttonStyle(.plain)
                         
                         NavigationLink(value: "NotificationSettings") {
                             ProfileRow(
@@ -140,6 +136,7 @@ struct ManageView: View {
                                 showChevron: true
                             )
                         }
+                        .buttonStyle(.plain)
                         
                         NavigationLink(value: "Theme") {
                             ProfileRow(
@@ -150,6 +147,7 @@ struct ManageView: View {
                                 showChevron: true
                             )
                         }
+                        .buttonStyle(.plain)
                         
                         NavigationLink(value: "Language") {
                             ProfileRow(
@@ -160,6 +158,7 @@ struct ManageView: View {
                                 showChevron: true
                             )
                         }
+                        .buttonStyle(.plain)
                         
                         NavigationLink(value: "Accessibility") {
                             ProfileRow(
@@ -170,6 +169,7 @@ struct ManageView: View {
                                 showChevron: true
                             )
                         }
+                        .buttonStyle(.plain)
                         
                         NavigationLink(value: "Autopay") {
                             ProfileRow(
@@ -180,6 +180,7 @@ struct ManageView: View {
                                 showChevron: true
                             )
                         }
+                        .buttonStyle(.plain)
                     }
                     
                     // Log out Section
@@ -268,9 +269,8 @@ struct ManageView: View {
                 }
                 // If at root, the StickyHeaderView will handle scrolling to top
             }
-            .sheet(isPresented: $showCallSupport) {
-                CallSupportView()
-                    .presentationDragIndicator(.visible)
+            .sheet(isPresented: $showAISupport) {
+                AISupportChatView()
                     .presentationBackground {
                         AdaptiveSheetBackground()
                     }
@@ -307,6 +307,8 @@ struct ManageView: View {
         switch destination {
         case "ContactInformation":
             ContactInformationView()
+        case "Notifications":
+            NotificationsView()
         case "KYC":
             KYCView()
         case "MyDocuments":

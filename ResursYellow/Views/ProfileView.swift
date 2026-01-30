@@ -43,6 +43,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "KYC") {
                                     ProfileRow(
@@ -53,6 +54,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "MyDocuments") {
                                     ProfileRow(
@@ -63,6 +65,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                             }
                             
                             // Insights Section
@@ -76,6 +79,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "ChartOfAvailableCredit") {
                                     ProfileRow(
@@ -86,6 +90,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "SpendingTrends") {
                                     ProfileRow(
@@ -96,6 +101,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                             }
                             
                             // Settings Section
@@ -109,6 +115,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "NotificationSettings") {
                                     ProfileRow(
@@ -119,6 +126,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "Theme") {
                                     ProfileRow(
@@ -129,6 +137,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "Language") {
                                     ProfileRow(
@@ -139,6 +148,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "Accessibility") {
                                     ProfileRow(
@@ -149,6 +159,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "Autopay") {
                                     ProfileRow(
@@ -159,6 +170,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 NavigationLink(value: "ChangeShortcuts") {
                                     ProfileRow(
@@ -169,6 +181,7 @@ struct ProfileView: View {
                                         showChevron: true
                                     )
                                 }
+                                .buttonStyle(.plain)
                                 
                                 Button {
                                     showResetConfirmation = true
@@ -355,6 +368,7 @@ struct ProfileRow: View {
                 Text(title)
                     .font(.subheadline)
                     .fontWeight(.medium)
+                    .foregroundStyle(.primary)
                 Text(subtitle)
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -404,6 +418,52 @@ struct ContactInformationView: View {
             }
         }
         .navigationTitle("Contact Information")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct NotificationsView: View {
+    var body: some View {
+        List {
+            Section {
+                NavigationLink("Payment Confirmation") {
+                    Text("Payment of 2,450 SEK received")
+                        .navigationTitle("Payment Confirmation")
+                }
+                
+                NavigationLink("Invoice Available") {
+                    Text("Your December invoice is ready")
+                        .navigationTitle("Invoice Available")
+                }
+                
+                NavigationLink("Account Update") {
+                    Text("Your credit limit has been increased")
+                        .navigationTitle("Account Update")
+                }
+            } header: {
+                Text("Messages")
+            }
+            
+            Section {
+                NavigationLink("Payment reminder") {
+                    Text("Payment due in 3 days")
+                        .navigationTitle("Payment Reminder")
+                }
+                
+                NavigationLink("Spending alert") {
+                    Text("You've reached 80% of your monthly budget")
+                        .navigationTitle("Spending Alert")
+                }
+                
+                NavigationLink("New offer available") {
+                    Text("Special rate on savings account")
+                        .navigationTitle("New Offer")
+                }
+            } header: {
+                Text("Notifications")
+            }
+        }
+        .navigationTitle("Messages & Notifications")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -1,13 +1,14 @@
 //
-//  AccountsView.swift
+//  ServicesView.swift
 //  ResursYellow
 //
 //  Created by Bjarne Werner on 2025-10-04.
 //
 
 import SwiftUI
+import SafariServices
 
-struct AccountsView: View {
+struct ServicesView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showAddAccount = false
     @StateObject private var dataManager = DataManager.shared
@@ -19,12 +20,12 @@ struct AccountsView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
-                title: "Banking",
-                subtitle: hasAccounts ? "Your engagements" : "Get started",
+                title: "Services",
+                subtitle: hasAccounts ? "Your banking solutions" : "Get started",
                 trailingButton: "plus",
-                trailingButtonTint: .blue,
-                trailingButtonSize: 52,
-                trailingButtonIconScale: 0.6,
+                trailingButtonTint: .primary,
+                trailingButtonSize: 44,
+                trailingButtonIconScale: 0.5,
                 trailingButtonAction: {
                     showAddAccount = true
                 }
@@ -146,7 +147,7 @@ struct AccountsView: View {
                     EmptyView()
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .switchToBanking)) { notification in
+            .onReceive(NotificationCenter.default.publisher(for: .switchToServices)) { notification in
                 if let destination = notification.userInfo?["destination"] as? String,
                    destination == "ResursFamilyAccountView" {
                     // Ensure we are at root, then navigate to Resurs Family detail
@@ -308,6 +309,7 @@ struct SavingsAccountDetailView: View {
                 recentActivitySection
                 benefitsSection
                 documentsSection
+                helpAndSupportSection
             }
             .padding(.horizontal)
             .padding(.vertical, 24)
@@ -574,6 +576,10 @@ struct SavingsAccountDetailView: View {
             }
         }
     }
+    
+    private var helpAndSupportSection: some View {
+        HelpAndSupportSection()
+    }
 }
 
 struct SavingsAccountRow: View {
@@ -625,12 +631,13 @@ struct SavingsAccountRow: View {
 }
 
 #Preview {
-    AccountsView()
+    ServicesView()
         .preferredColorScheme(.dark)
 }
 
 struct AddAccountView: View {
     @Environment(\.dismiss) private var dismiss
+    @State private var showSavingsWebView = false
 
     var body: some View {
         NavigationStack {
@@ -642,26 +649,41 @@ struct AddAccountView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 8)
                     
-                    CrossSellCard(
-                        title: "Get a credit card",
-                        subtitle: "Up to 80 000 SEK credit",
-                        icon: "creditcard.fill",
-                        color: .blue
-                    )
+                    Button {
+                        // Handle credit card tap
+                    } label: {
+                        CrossSellCard(
+                            title: "Get a credit card",
+                            subtitle: "Up to 80 000 SEK credit",
+                            icon: "creditcard.fill",
+                            color: .blue
+                        )
+                    }
+                    .buttonStyle(.plain)
                     
-                    CrossSellCard(
-                        title: "Start saving",
-                        subtitle: "Earn up to 3.25% interest",
-                        icon: "banknote.fill",
-                        color: .mint
-                    )
+                    Button {
+                        showSavingsWebView = true
+                    } label: {
+                        CrossSellCard(
+                            title: "Start saving",
+                            subtitle: "Earn up to 3.25% interest",
+                            icon: "banknote.fill",
+                            color: .mint
+                        )
+                    }
+                    .buttonStyle(.plain)
                     
-                    CrossSellCard(
-                        title: "Apply for a loan",
-                        subtitle: "Borrow up to 500 000 SEK",
-                        icon: "building.columns.fill",
-                        color: .purple
-                    )
+                    Button {
+                        // Handle loan tap
+                    } label: {
+                        CrossSellCard(
+                            title: "Apply for a loan",
+                            subtitle: "Borrow up to 500 000 SEK",
+                            icon: "building.columns.fill",
+                            color: .purple
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 24)
@@ -681,11 +703,40 @@ struct AddAccountView: View {
                     .tint(.primary)
                 }
             }
+            .fullScreenCover(isPresented: $showSavingsWebView) {
+                if let url = URL(string: "https://deposit.resursbank.se/choose-account-type") {
+                    SafariView(url: url)
+                        .ignoresSafeArea()
+                }
+            }
         }
     }
 }
 
 #Preview {
     AddAccountView()
+}
+
+// MARK: - Safari View Wrapper
+/// A SwiftUI wrapper for SFSafariViewController, following HIG for web content presentation.
+/// This provides a native iOS browsing experience with toolbar, sharing, and reader mode.
+struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+    
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        let configuration = SFSafariViewController.Configuration()
+        configuration.entersReaderIfAvailable = false // Keep original site experience
+        configuration.barCollapsingEnabled = true // Allow toolbar to collapse on scroll per HIG
+        
+        let safariVC = SFSafariViewController(url: url, configuration: configuration)
+        safariVC.preferredControlTintColor = .systemBlue // Native iOS blue for controls
+        safariVC.dismissButtonStyle = .done // HIG-compliant dismiss button
+        
+        return safariVC
+    }
+    
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {
+        // No update needed
+    }
 }
 

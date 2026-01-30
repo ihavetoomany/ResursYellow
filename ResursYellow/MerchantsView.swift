@@ -204,7 +204,7 @@ struct NetonnetIconView: View {
     }
 }
 
-// Styled like AccountCard from AccountsView
+// Styled like AccountCard from ServicesView
 struct MerchantCard: View {
     let title: String
     let subtitle: String?
@@ -290,11 +290,11 @@ struct MerchantsView: View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
                 title: "Merchants",
-                subtitle: hasMerchants ? "Connect stores you shop at" : "Get started",
+                subtitle: hasMerchants ? "Connect your favourite stores" : "Get started",
                 trailingButton: "plus",
-                trailingButtonTint: .blue,
-                trailingButtonSize: 52,
-                trailingButtonIconScale: 0.6,
+                trailingButtonTint: .primary,
+                trailingButtonSize: 44,
+                trailingButtonIconScale: 0.5,
                 trailingButtonAction: {
                     showAddMerchant = true
                 }

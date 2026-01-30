@@ -213,6 +213,11 @@ struct TransactionDetailView: View {
                                 .padding(.horizontal)
                                 .frame(width: geometry.size.width)
                         }
+                        
+                        // Help and Support Section
+                        HelpAndSupportSection()
+                            .padding(.horizontal)
+                            .frame(width: geometry.size.width)
                     }
                     .padding(.top, 20)
                     .padding(.bottom, 24)

@@ -34,7 +34,7 @@ extension Invoice {
 }
 
 extension Invoice.InvoiceCategory {
-    /// Converts Invoice.InvoiceCategory to WalletView's InvoiceCategory
+    /// Converts Invoice.InvoiceCategory to PaymentsView's InvoiceCategory
     func toInvoiceCategory() -> InvoiceCategory {
         switch self {
         case .overdue:

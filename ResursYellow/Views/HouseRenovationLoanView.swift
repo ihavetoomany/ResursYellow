@@ -212,6 +212,10 @@ struct HouseRenovationLoanView: View {
                     }
                 }
                 .padding(.horizontal)
+                
+                // Help and Support Section
+                HelpAndSupportSection()
+                    .padding(.horizontal)
             }
             .padding(.vertical, 24)
         }

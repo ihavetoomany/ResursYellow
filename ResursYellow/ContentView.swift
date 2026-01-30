@@ -10,7 +10,7 @@ import SwiftUI
 // Notification for scroll to top
 extension Notification.Name {
     static let scrollToTop = Notification.Name("scrollToTop")
-    static let switchToBanking = Notification.Name("switchToBanking")
+    static let switchToServices = Notification.Name("switchToServices")
     static let switchToMerchants = Notification.Name("switchToMerchants")
 }
 
@@ -26,8 +26,8 @@ struct ContentView: View {
             hasAppeared: $hasAppeared,
             paymentPlansManager: paymentPlansManager,
             localizationService: localizationService,
-            walletLabel: "Overview",
-            bankingLabel: "Banking",
+            walletLabel: "Payments",
+            bankingLabel: "Services",
             merchantsLabel: "Merchants",
             manageLabel: "My Resurs"
         )
@@ -44,7 +44,7 @@ struct ContentView: View {
                 NotificationCenter.default.post(name: .scrollToTop, object: nil)
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .switchToBanking)) { notification in
+        .onReceive(NotificationCenter.default.publisher(for: .switchToServices)) { notification in
             selectedTab = 1
         }
         .onReceive(NotificationCenter.default.publisher(for: .switchToMerchants)) { _ in
@@ -66,23 +66,19 @@ struct MainTabView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            // Wallet Tab
-            NavigationStack {
-                WalletView()
-            }
-            .tabItem {
-                Label(walletLabel, systemImage: selectedTab == 0 ? "wallet.bifold.fill" : "wallet.bifold")
-            }
-            .tag(0)
+            // Payments Tab
+            PaymentsView()
+                .tabItem {
+                    Label(walletLabel, systemImage: selectedTab == 0 ? "wallet.bifold.fill" : "wallet.bifold")
+                }
+                .tag(0)
             
-            // Accounts Tab (lazy loaded)
-            NavigationStack {
-                Group {
-                    if hasAppeared || selectedTab == 1 {
-                        AccountsView()
-                    } else {
-                        Color.clear
-                    }
+            // Services Tab (lazy loaded)
+            Group {
+                if hasAppeared || selectedTab == 1 {
+                    ServicesView()
+                } else {
+                    Color.clear
                 }
             }
             .tabItem {
@@ -91,13 +87,11 @@ struct MainTabView: View {
             .tag(1)
             
             // Merchants Tab (lazy loaded)
-            NavigationStack {
-                Group {
-                    if hasAppeared || selectedTab == 2 {
-                        MerchantsView()
-                    } else {
-                        Color.clear
-                    }
+            Group {
+                if hasAppeared || selectedTab == 2 {
+                    MerchantsView()
+                } else {
+                    Color.clear
                 }
             }
             .tabItem {
@@ -106,17 +100,15 @@ struct MainTabView: View {
             .tag(2)
             
             // Manage Tab (lazy loaded)
-            NavigationStack {
-                Group {
-                    if hasAppeared || selectedTab == 3 {
-                        ManageView()
-                    } else {
-                        Color.clear
-                    }
+            Group {
+                if hasAppeared || selectedTab == 3 {
+                    ManageView()
+                } else {
+                    Color.clear
                 }
             }
             .tabItem {
-                Label(manageLabel, systemImage: selectedTab == 3 ? "gearshape.fill" : "gearshape")
+                Label(manageLabel, systemImage: selectedTab == 3 ? "person.fill" : "person")
             }
             .tag(3)
         }

@@ -150,6 +150,7 @@ struct BauhausDetailView: View {
                 partPaymentsSection
                 benefitsSection
                 documentsSection
+                helpAndSupportSection
             }
             .padding(.horizontal)
             .padding(.vertical, 24)
@@ -370,6 +371,10 @@ struct BauhausDetailView: View {
                 }
             }
         }
+    }
+    
+    private var helpAndSupportSection: some View {
+        HelpAndSupportSection()
     }
 }
 

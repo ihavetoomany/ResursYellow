@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Adaptive sheet background that matches the carousel cards (SummaryBox) in WalletView.
+/// Adaptive sheet background that matches the carousel cards (SummaryBox) in PaymentsView.
 /// Uses solid color (no transparency) matching the shade of `.thinMaterial` used in SummaryBox cards.
 struct AdaptiveSheetBackground: View {
     @Environment(\.colorScheme) var colorScheme

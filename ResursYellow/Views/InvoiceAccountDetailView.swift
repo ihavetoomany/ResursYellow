@@ -58,6 +58,9 @@ struct InvoiceAccountDetailView: View {
                             
                             // Actions Section
                             actionsSection
+                            
+                            // Help and Support Section
+                            HelpAndSupportSection()
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)
