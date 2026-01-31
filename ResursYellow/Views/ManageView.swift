@@ -40,7 +40,7 @@ struct ManageView: View {
             StickyHeaderView(
                 title: localized("My Resurs"),
                 subtitle: localized("Profile & settings"),
-                trailingButton: "message.fill",
+                trailingButton: "questionmark.message.fill",
                 trailingButtonTint: .secondary,
                 trailingButtonSize: 44,
                 trailingButtonIconScale: 0.5,
@@ -51,10 +51,21 @@ struct ManageView: View {
                 VStack(spacing: 24) {
                     // Profile Section
                     ProfileSection(title: localized("Profile")) {
+                        NavigationLink(value: "ContactInformation") {
+                            ProfileRow(
+                                title: localized("Account"),
+                                subtitle: localized("Email, Phone, Customer ID"),
+                                icon: "person.fill",
+                                color: .green,
+                                showChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
                         NavigationLink(value: "Notifications") {
                             ProfileRow(
-                                title: localized("Notifications"),
-                                subtitle: localized("Messages from Resurs"),
+                                title: localized("Inbox"),
+                                subtitle: localized("Notifications and messages"),
                                 icon: "bell.fill",
                                 color: .orange,
                                 showChevron: true
@@ -75,21 +86,10 @@ struct ManageView: View {
                         
                         NavigationLink(value: "MyDocuments") {
                             ProfileRow(
-                                title: localized("My documents"),
+                                title: localized("Documents"),
                                 subtitle: localized("Agreements, Contracts"),
                                 icon: "doc.fill",
                                 color: .orange,
-                                showChevron: true
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        
-                        NavigationLink(value: "SpendingTrends") {
-                            ProfileRow(
-                                title: localized("Spending trends"),
-                                subtitle: localized("Gamification"),
-                                icon: "chart.line.uptrend.xyaxis",
-                                color: .green,
                                 showChevron: true
                             )
                         }
@@ -98,24 +98,6 @@ struct ManageView: View {
                     
                     // Settings Section
                     ProfileSection(title: localized("Settings")) {
-                        ProfileRow(
-                            title: localized("Customer ID"),
-                            subtitle: "12345678",
-                            icon: "person.fill",
-                            color: .blue
-                        )
-                        
-                        NavigationLink(value: "ContactInformation") {
-                            ProfileRow(
-                                title: localized("Contact information"),
-                                subtitle: localized("Email, Phone"),
-                                icon: "envelope.fill",
-                                color: .green,
-                                showChevron: true
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        
                         NavigationLink(value: "ConnectBankAccount") {
                             ProfileRow(
                                 title: localized("Payment method"),
@@ -166,17 +148,6 @@ struct ManageView: View {
                                 subtitle: localized("Accessibility settings"),
                                 icon: "accessibility",
                                 color: .indigo,
-                                showChevron: true
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        
-                        NavigationLink(value: "Autopay") {
-                            ProfileRow(
-                                title: localized("Autopay"),
-                                subtitle: localized("Automatic payments"),
-                                icon: "arrow.clockwise.circle.fill",
-                                color: .green,
                                 showChevron: true
                             )
                         }
@@ -313,8 +284,6 @@ struct ManageView: View {
             KYCView()
         case "MyDocuments":
             MyDocumentsView()
-        case "SpendingTrends":
-            SpendingTrendsView()
         case "ConnectBankAccount":
             ConnectBankAccountView()
         case "NotificationSettings":
@@ -325,8 +294,6 @@ struct ManageView: View {
             LanguageSettingsView()
         case "Accessibility":
             AccessibilitySettingsView()
-        case "Autopay":
-            AutopaySettingsView()
         default:
             Text("Coming soon")
                 .navigationTitle(destination)

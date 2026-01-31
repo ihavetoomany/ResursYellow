@@ -2165,36 +2165,21 @@ private struct NotificationCard: View {
     let tint: Color
     
     var body: some View {
-        HStack(spacing: 16) {
-            // Left-aligned icon
-            Image(systemName: icon)
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(tint)
-                .frame(width: 44, height: 44)
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(tint.opacity(0.20))
-                )
-            
-            // Content
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title.uppercased())
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .tracking(0.6)
-                Text(headline)
-                    .font(.system(.title3, design: .rounded).weight(.bold))
-                    .foregroundColor(.primary)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(tint == .orange ? .orange : (tint == .green && title == "To Pay" ? .green : .secondary))
-            }
-            
-            Spacer()
+        VStack(alignment: .center, spacing: 4) {
+            Text(title.uppercased())
+                .font(.caption)
+                .foregroundColor(.white)
+                .tracking(0.6)
+            Text(headline)
+                .font(.system(.title3, design: .rounded).weight(.bold))
+                .foregroundColor(.primary)
+            Text(subtitle)
+                .font(.caption)
+                .foregroundColor(tint == .orange ? .white : (tint == .green && title == "To Pay" ? .green : .secondary))
         }
+        .frame(maxWidth: .infinity)
         .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(tint.opacity(0.20))
+        .background(tint.opacity(0.70))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
