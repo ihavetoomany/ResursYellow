@@ -40,6 +40,7 @@ struct InvoiceDetailView: View {
     @State private var isPaid = false
     @State private var paidAmount: Double? = nil
     @State private var planSheetHeight: CGFloat = 0
+    @State private var showAISupport = false
 
     let invoice: InvoiceData
 
@@ -68,8 +69,6 @@ struct InvoiceDetailView: View {
     }
 
     var body: some View {
-        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
-
         GeometryReader { geometry in
             ZStack(alignment: .top) {
                 // Scrollable Content
@@ -87,13 +86,13 @@ struct InvoiceDetailView: View {
                             .id("scrollTop")
 
                             // Account for header height
-                            Color.clear.frame(height: 80)
+                            Color.clear.frame(height: 60)
 
                             VStack(spacing: 16) {
                                 // Invoice Details Card
                                 InvoiceDetailsCard(invoice: invoice, isPaid: isPaid || isInvoicePaid, paidAmount: paidAmount)
                                 .padding(.horizontal)
-                                .padding(.top, 36)
+                                .padding(.top, 8)
                                 .frame(width: geometry.size.width)
 
                                 // What I Pay For Card
@@ -138,11 +137,6 @@ struct InvoiceDetailView: View {
                                     .padding(.horizontal)
                                     .frame(width: geometry.size.width)
                                 }
-                                
-                                // Help and Support Section
-                                HelpAndSupportSection()
-                                    .padding(.horizontal)
-                                    .frame(width: geometry.size.width)
                             }
                             .padding(.top, 20)
                             .padding(.bottom, 40)
@@ -163,7 +157,7 @@ struct InvoiceDetailView: View {
             // Sticky Header
             VStack(spacing: 0) {
                 ZStack {
-                    // Back + Pay
+                    // Back + AI Support
                     HStack {
                         Button(action: { dismiss() }) {
                             Image(systemName: "chevron.left")
@@ -174,69 +168,40 @@ struct InvoiceDetailView: View {
                                 .clipShape(Circle())
                         }
                         Spacer()
-                        if shouldShowPayButton && scrollProgress > 0.5 {
-                            Button(action: { showPaymentSheet = true }) {
-                                Text("Pay")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 8)
-                                    .background(Color.blue)
-                                    .clipShape(Capsule())
-                            }
-                            .buttonStyle(.plain)
+                        Button(action: { showAISupport = true }) {
+                            Image(systemName: "questionmark.message.fill")
+                                .font(.title3)
+                                .foregroundColor(.secondary)
+                                .frame(width: 44, height: 44)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
                         }
+                        .buttonStyle(.plain)
                     }
 
                     // Minimized title
-                    if scrollProgress > 0.5 {
-                        Text(invoice.merchant)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
+                    Text(invoice.merchant)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
-                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-
-                // Title (no subtitle)
-                if scrollProgress <= 0.5 {
-                    HStack(alignment: .center) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(invoice.merchant)
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
-                        }
-                        Spacer()
-                        if shouldShowPayButton {
-                            Button(action: { showPaymentSheet = true }) {
-                                Text("Pay")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 20)
-                                    .padding(.vertical, 12)
-                                    .background(Color.blue)
-                                    .clipShape(Capsule())
-                                    .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
-                }
+                .padding(.bottom, 8)
             }
             .background(Color(uiColor: .systemBackground).opacity(0.95))
             .background(.ultraThinMaterial)
-            .animation(.easeInOut(duration: 0.2), value: scrollProgress)
             .frame(width: geometry.size.width)
         }
         .navigationBarHidden(true)
         .navigationDestination(for: PartPaymentItem.self) { account in
             InvoiceAccountDetailView(account: account)
+        }
+        .sheet(isPresented: $showAISupport) {
+            AISupportChatView()
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
         }
         .sheet(isPresented: $showPaymentSheet) {
             PaymentSheet(
@@ -355,7 +320,7 @@ struct WhatIPayForCard: View {
                 if let account = invoiceAccount {
                     Divider()
                         .padding(.top, 16)
-                        .padding(.bottom, 12)
+                        .padding(.bottom, 16)
                     
                     NavigationLink(value: account.toPartPaymentItem()) {
                         HStack {
@@ -374,7 +339,7 @@ struct WhatIPayForCard: View {
             }
         }
         .padding(20)
-        .background(Color.purple.opacity(0.1))
+        .background(Color.gray.opacity(0.1))
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
@@ -385,10 +350,10 @@ struct WhatIPayForCard: View {
                 // Extract period from title (e.g., "Bauhaus - October")
                 let parts = account.title.components(separatedBy: " - ")
                 if parts.count > 1 {
-                    return "This invoice is part of your \(parts[1]) purchase plan with \(merchant). It represents one installment in your payment schedule."
+                    return "This invoice is part of your \(parts[1]) purchase plan with \(merchant). It represents one installment in your payment schedule. You can see all transactions on your invoice account page."
                 }
             }
-            return "This invoice is part of your payment plan with \(merchant). It represents one installment in your payment schedule."
+            return "This invoice is part of your payment plan with \(merchant). It represents one installment in your payment schedule. You can see all transactions on your invoice account page."
         }
         return "This invoice is for purchases made at \(merchant). It represents the amount you owe for goods or services received."
     }
@@ -521,7 +486,7 @@ struct PaymentInformationCard: View {
             }
         }
         .padding(20)
-        .background((isScheduled ? Color.cyan : Color.blue).opacity(0.1))
+        .background(Color.gray.opacity(0.1))
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
@@ -717,7 +682,7 @@ struct PaymentOptionRow: View {
                     .foregroundColor(.secondary)
             }
             .padding(16)
-            .background(isPressed ? color.opacity(0.34) : color.opacity(0.24))
+            .background(isPressed ? color.opacity(0.50) : color.opacity(0.40))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .scaleEffect(isPressed ? 0.97 : 1.0)
             .overlay(

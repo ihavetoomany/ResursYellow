@@ -49,25 +49,25 @@ struct ManageView: View {
                 }
             ) {
                 VStack(spacing: 24) {
-                    // Profile Section
-                    ProfileSection(title: localized("Profile")) {
-                        NavigationLink(value: "ContactInformation") {
-                            ProfileRow(
-                                title: localized("Account"),
-                                subtitle: localized("Email, Phone, Customer ID"),
-                                icon: "person.fill",
-                                color: .green,
-                                showChevron: true
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        
+                    // Account Section
+                    ProfileSection(title: localized("Account")) {
                         NavigationLink(value: "Notifications") {
                             ProfileRow(
                                 title: localized("Inbox"),
                                 subtitle: localized("Notifications and messages"),
                                 icon: "bell.fill",
                                 color: .orange,
+                                showChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        NavigationLink(value: "ConnectBankAccount") {
+                            ProfileRow(
+                                title: localized("Payment method"),
+                                subtitle: localized("Link external accounts"),
+                                icon: "building.columns.fill",
+                                color: .blue,
                                 showChevron: true
                             )
                         }
@@ -98,12 +98,12 @@ struct ManageView: View {
                     
                     // Settings Section
                     ProfileSection(title: localized("Settings")) {
-                        NavigationLink(value: "ConnectBankAccount") {
+                        NavigationLink(value: "ContactInformation") {
                             ProfileRow(
-                                title: localized("Payment method"),
-                                subtitle: localized("Link external accounts"),
-                                icon: "building.columns.fill",
-                                color: .blue,
+                                title: localized("Profile"),
+                                subtitle: localized("Email, Phone, Customer ID"),
+                                icon: "person.fill",
+                                color: .green,
                                 showChevron: true
                             )
                         }
