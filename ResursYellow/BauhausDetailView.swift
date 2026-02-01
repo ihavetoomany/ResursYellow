@@ -7,6 +7,8 @@ import SwiftUI
 
 struct BauhausDetailView: View {
     @StateObject private var dataManager = DataManager.shared
+    @State private var showAISupport = false
+    @State private var showSettings = false
     
     // Example credit info
     let availableCredit: String = "14 500 kr"
@@ -158,6 +160,37 @@ struct BauhausDetailView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Bauhaus")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 16) {
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: { showAISupport = true }) {
+                        Image(systemName: "questionmark.message.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .sheet(isPresented: $showAISupport) {
+            AISupportChatView()
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
+        .sheet(isPresented: $showSettings) {
+            MerchantSettingsView(merchantName: "Bauhaus", merchantColor: .red)
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
         .navigationDestination(for: PartPaymentItem.self) { payment in
             if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
                 PaintProjectSplitDetailView(plan: payment, invoices: paintProjectInvoices)

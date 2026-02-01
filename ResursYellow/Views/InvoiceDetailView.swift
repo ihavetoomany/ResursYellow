@@ -118,22 +118,15 @@ struct InvoiceDetailView: View {
 
                                 // Payment Options
                                 if shouldShowPayButton {
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Text("Actions")
-                                            .font(.headline)
-                                            .fontWeight(.semibold)
-                                            .foregroundColor(.primary)
-                                            .padding(.top, 8)
-                                        PaymentOptionsCard(
-                                            onPayInFull: {
-                                                showPaymentSheet = true
-                                            },
-                                            onSnooze: {
-                                                // Handle snooze action
-                                                // Could show a date picker sheet or similar
-                                            }
-                                        )
-                                    }
+                                    PaymentOptionsCard(
+                                        onPayInFull: {
+                                            showPaymentSheet = true
+                                        },
+                                        onSnooze: {
+                                            // Handle snooze action
+                                            // Could show a date picker sheet or similar
+                                        }
+                                    )
                                     .padding(.horizontal)
                                     .frame(width: geometry.size.width)
                                 }
@@ -299,6 +292,19 @@ struct WhatIPayForCard: View {
     let merchant: String
     let invoiceAccount: InvoiceAccount?
     
+    private var sampleTransactions: [(date: String, description: String, amount: String, isPayment: Bool)] {
+        // Generate sample transactions based on merchant
+        return [
+            ("Jan 15, 2026", "\(merchant) - Purchase", "1 249 kr", false),
+            ("Jan 12, 2026", "Payment", "500 kr", true),
+            ("Jan 8, 2026", "\(merchant) - Purchase", "782 kr", false),
+            ("Jan 5, 2026", "\(merchant) - Purchase", "1 568 kr", false),
+            ("Dec 28, 2025", "Payment", "1 200 kr", true),
+            ("Dec 20, 2025", "\(merchant) - Purchase", "945 kr", false),
+            ("Dec 15, 2025", "\(merchant) - Purchase", "2 340 kr", false)
+        ]
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -317,14 +323,46 @@ struct WhatIPayForCard: View {
                     .foregroundColor(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 
+                // Transaction list
+                Divider()
+                    .padding(.top, 16)
+                    .padding(.bottom, 8)
+                
+                VStack(spacing: 8) {
+                    ForEach(sampleTransactions.indices, id: \.self) { index in
+                        let transaction = sampleTransactions[index]
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(transaction.description)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(transaction.isPayment ? .green : .primary)
+                                Text(transaction.date)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Text(transaction.isPayment ? "-\(transaction.amount)" : "+\(transaction.amount)")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(transaction.isPayment ? .green : .primary)
+                        }
+                        
+                        if index < sampleTransactions.count - 1 {
+                            Divider()
+                        }
+                    }
+                }
+                .padding(.bottom, 8)
+                
                 if let account = invoiceAccount {
                     Divider()
-                        .padding(.top, 16)
+                        .padding(.top, 8)
                         .padding(.bottom, 16)
                     
                     NavigationLink(value: account.toPartPaymentItem()) {
                         HStack {
-                            Text("View invoice account")
+                            Text("Invoice account")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                                 .foregroundColor(.white)
@@ -618,20 +656,20 @@ struct PaymentOptionsCard: View {
     var body: some View {
         VStack(spacing: 12) {
             PaymentOptionRow(
+                icon: "clock.badge.checkmark.fill",
+                title: "Snooze",
+                description: "Postpone payment to a later date",
+                color: Color(uiColor: .systemGray4),
+                action: onSnooze
+            )
+
+            PaymentOptionRow(
                 icon: "arrow.up",
                 title: "Pay Invoice",
                 description: "Pay this month's balance",
                 color: .blue,
                 isDefaultOption: false,
                 action: onPayInFull
-            )
-
-            PaymentOptionRow(
-                icon: "clock.badge.checkmark.fill",
-                title: "Snooze",
-                description: "Postpone payment to a later date",
-                color: .green,
-                action: onSnooze
             )
         }
     }
@@ -657,38 +695,17 @@ struct PaymentOptionRow: View {
                 action()
             }
         }) {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(color)
-                    .frame(width: 40, height: 40)
-                    .background(color.opacity(0.22))
-                    .clipShape(Circle())
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
-                    Text(description)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.secondary)
-            }
-            .padding(16)
-            .background(isPressed ? color.opacity(0.50) : color.opacity(0.40))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .scaleEffect(isPressed ? 0.97 : 1.0)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
-            )
+            Text(title)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .background(isPressed ? color.opacity(0.85) : color)
+                .clipShape(Capsule())
+                .scaleEffect(isPressed ? 0.97 : 1.0)
+                .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(PlainButtonStyle())
         .simultaneousGesture(

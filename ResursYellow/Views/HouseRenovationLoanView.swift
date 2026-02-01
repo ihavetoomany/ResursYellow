@@ -10,6 +10,8 @@ import SwiftUI
 
 struct HouseRenovationLoanView: View {
     @StateObject private var dataManager = DataManager.shared
+    @State private var showAISupport = false
+    @State private var showSettings = false
     
     // Loan installments - simulated data
     private var loanInstallments: [LoanInstallment] {
@@ -222,6 +224,37 @@ struct HouseRenovationLoanView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("House Renovation")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 16) {
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: { showAISupport = true }) {
+                        Image(systemName: "questionmark.message.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .sheet(isPresented: $showAISupport) {
+            AISupportChatView()
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
+        .sheet(isPresented: $showSettings) {
+            ServiceSettingsView(serviceName: "House Renovation", serviceColor: .orange)
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
     }
 }
 

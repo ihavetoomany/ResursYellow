@@ -14,6 +14,7 @@ struct InvoiceAccountDetailView: View {
     private let dateService = DateService.shared
     @State private var cachedInvoices: [InvoiceItem] = []
     @State private var cachedTransactions: [TransactionItem] = []
+    @State private var showAISupport = false
     
     let account: PartPaymentItem
     
@@ -38,12 +39,6 @@ struct InvoiceAccountDetailView: View {
                         Color.clear.frame(height: 60)
                     
                         VStack(spacing: 24) {
-                            // Account description text
-                            Text("This account is the main account of the Resurs Family product. Every month, around the 5th, a new invoice is created reflecting the balance of the previous month. Due date is always the last day of the month and there are always options to part pay on the invoice.")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            
                             // Account Info Section
                             accountInfoSection
                             
@@ -78,16 +73,26 @@ struct InvoiceAccountDetailView: View {
             // Sticky Header (always minimized)
             VStack(spacing: 0) {
                 ZStack {
+                    // Back + AI Support
                     HStack {
                         Button(action: { dismiss() }) {
                             Image(systemName: "chevron.left")
-                                .font(.title3)
-                                .foregroundColor(.blue)
-                                .frame(width: 32, height: 32)
+                                .font(.title3.weight(.semibold))
+                                .foregroundColor(.primary)
+                                .frame(width: 44, height: 44)
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
                         }
                         Spacer()
+                        Button(action: { showAISupport = true }) {
+                            Image(systemName: "questionmark.message.fill")
+                                .font(.title3)
+                                .foregroundColor(.secondary)
+                                .frame(width: 44, height: 44)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
                     }
                     
                     // Always show minimized title
@@ -104,6 +109,12 @@ struct InvoiceAccountDetailView: View {
             .background(.ultraThinMaterial)
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showAISupport) {
+            AISupportChatView()
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
         .onAppear {
             if cachedInvoices.isEmpty {
                 cachedInvoices = generateInvoices()
@@ -167,6 +178,13 @@ struct InvoiceAccountDetailView: View {
                     .font(.headline)
                     .fontWeight(.semibold)
             }
+            
+            Text("Monthly invoices created around the 5th with payment due by month end.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Divider()
             
             VStack(spacing: 8) {
                 HStack {

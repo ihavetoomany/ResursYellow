@@ -10,6 +10,8 @@ import Combine
 
 struct ResursFamilyAccountView: View {
     @StateObject private var dataManager = DataManager.shared
+    @State private var showAISupport = false
+    @State private var showSettings = false
     
     // Invoice Accounts - Resurs Gold's own payment plans (filtered from DataManager)
     private var invoiceAccounts: [PartPaymentItem] {
@@ -266,6 +268,37 @@ struct ResursFamilyAccountView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Resurs Family")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 16) {
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: { showAISupport = true }) {
+                        Image(systemName: "questionmark.message.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .sheet(isPresented: $showAISupport) {
+            AISupportChatView()
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
+        .sheet(isPresented: $showSettings) {
+            ServiceSettingsView(serviceName: "Resurs Family", serviceColor: .blue)
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
         .navigationDestination(for: PartPaymentItem.self) { account in
             InvoiceAccountDetailView(account: account)
         }

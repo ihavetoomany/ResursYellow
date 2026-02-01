@@ -270,6 +270,9 @@ struct CrossSellCard: View {
 }
 
 struct SavingsAccountDetailView: View {
+    @State private var showAISupport = false
+    @State private var showSettings = false
+    
     private struct Contribution: Identifiable {
         let id = UUID()
         let title: String
@@ -317,6 +320,37 @@ struct SavingsAccountDetailView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Senior Savings")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 16) {
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: { showAISupport = true }) {
+                        Image(systemName: "questionmark.message.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .sheet(isPresented: $showAISupport) {
+            AISupportChatView()
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
+        .sheet(isPresented: $showSettings) {
+            ServiceSettingsView(serviceName: "Senior Savings", serviceColor: .mint)
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
     }
     
     private var summaryCard: some View {

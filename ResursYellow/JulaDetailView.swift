@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct JulaDetailView: View {
+    @State private var showAISupport = false
+    @State private var showSettings = false
+    
     private let availableCredit = "9 200 kr"
     private let creditLimit = "20 000 kr"
     
@@ -53,6 +56,37 @@ struct JulaDetailView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Jula")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 16) {
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: { showAISupport = true }) {
+                        Image(systemName: "questionmark.message.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .sheet(isPresented: $showAISupport) {
+            AISupportChatView()
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
+        .sheet(isPresented: $showSettings) {
+            MerchantSettingsView(merchantName: "Jula", merchantColor: .red)
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+        }
     }
     
     private var summaryCard: some View {
