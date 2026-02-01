@@ -23,6 +23,7 @@ struct ManageView: View {
     @State private var showLogoutConfirmation = false
     @State private var showResetConfirmation = false
     @State private var selectedPersonaId: String = DataManager.shared.currentPersona.id
+    @Environment(\.colorScheme) var colorScheme
     
     // Helper to ensure views update when language changes
     private var currentLanguage: Language {
@@ -38,9 +39,15 @@ struct ManageView: View {
         let _ = currentLanguage // Ensure view updates when language changes
         return NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
-                // Light grey background for better card contrast (light mode)
-                Color(uiColor: .systemGroupedBackground)
-                    .ignoresSafeArea()
+                // Background color - warm sandy grey in light mode, black in dark mode
+                Group {
+                    if colorScheme == .light {
+                        Color(red: 0.93, green: 0.92, blue: 0.90) // Warm beige-grey
+                    } else {
+                        Color.black
+                    }
+                }
+                .ignoresSafeArea()
                 
                 // Animated blobs as background - cool purple/blue scheme for profile
                 AnimatedBlobBackground(isOverdue: false) // Use cool colors

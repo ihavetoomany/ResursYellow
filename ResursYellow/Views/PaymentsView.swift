@@ -449,6 +449,7 @@ struct PaymentsView: View {
     @StateObject private var dataManager = DataManager.shared
     private let dateService = DateService.shared
     @StateObject private var localizationService = LocalizationService.shared
+    @Environment(\.colorScheme) var colorScheme
     
     
     @State private var navigationPath = NavigationPath()
@@ -586,9 +587,15 @@ struct PaymentsView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
-                // Light grey background for better card contrast (light mode)
-                Color(uiColor: .systemGroupedBackground)
-                    .ignoresSafeArea()
+                // Background color - warm sandy grey in light mode, black in dark mode
+                Group {
+                    if colorScheme == .light {
+                        Color(red: 0.93, green: 0.92, blue: 0.90) // Warm beige-grey
+                    } else {
+                        Color.black
+                    }
+                }
+                .ignoresSafeArea()
                 
                 // Animated blobs as background for entire top area
                 AnimatedBlobBackground(isOverdue: hasOverdueInvoices)
@@ -616,7 +623,7 @@ struct PaymentsView: View {
                         HStack {
                             Text(invoiceSubtitleLabel)
                                 .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(hasOverdueInvoices ? .orange : .green)
+                                .foregroundColor(hasOverdueInvoices ? (colorScheme == .light ? Color(red: 0.8, green: 0.3, blue: 0.0) : .orange) : .green)
                             Spacer()
                         }
                         .padding(.horizontal)
@@ -1707,6 +1714,8 @@ struct ActionRow: View {
     let icon: String
     let color: Color
     
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
@@ -1734,7 +1743,16 @@ struct ActionRow: View {
                 .foregroundColor(.secondary)
         }
         .padding(16)
-        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -1969,6 +1987,7 @@ struct PurchaseRow: View {
     let showsPartPayBadge: Bool
     
     @StateObject private var localizationService = LocalizationService.shared
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack(spacing: 16) {
@@ -2014,7 +2033,16 @@ struct PurchaseRow: View {
             }
         }
         .padding(16)
-        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -2029,6 +2057,8 @@ struct InvoiceRow: View {
     var statusOverride: String? = nil
     var isSelected: Bool = false
     var onStatusTap: (() -> Void)? = nil
+    
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack(spacing: 16) {
@@ -2061,7 +2091,16 @@ struct InvoiceRow: View {
             }
         }
         .padding(16)
-        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
@@ -2146,6 +2185,8 @@ struct EmptyStateRow: View {
     let title: String
     let subtitle: String
     
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
@@ -2157,7 +2198,16 @@ struct EmptyStateRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
-        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }

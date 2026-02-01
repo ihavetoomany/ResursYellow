@@ -355,6 +355,8 @@ struct ProfileRow: View {
     let color: Color
     var showChevron: Bool = false
     
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
@@ -383,7 +385,16 @@ struct ProfileRow: View {
             }
         }
         .padding(16)
-        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

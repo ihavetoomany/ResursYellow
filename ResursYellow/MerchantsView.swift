@@ -213,6 +213,8 @@ struct MerchantCard: View {
     let color: Color
     var titleColor: Color = .primary
     var useCustomIcon: Bool = false
+    
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -266,7 +268,16 @@ struct MerchantCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
@@ -275,6 +286,7 @@ struct MerchantsView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showAddMerchant = false
     @StateObject private var dataManager = DataManager.shared
+    @Environment(\.colorScheme) var colorScheme
     
     @State private var connected: [String] = ["Bauhaus", "Netonnet"]
     
@@ -289,9 +301,15 @@ struct MerchantsView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
-                // Light grey background for better card contrast (light mode)
-                Color(uiColor: .systemGroupedBackground)
-                    .ignoresSafeArea()
+                // Background color - warm sandy grey in light mode, black in dark mode
+                Group {
+                    if colorScheme == .light {
+                        Color(red: 0.93, green: 0.92, blue: 0.90) // Warm beige-grey
+                    } else {
+                        Color.black
+                    }
+                }
+                .ignoresSafeArea()
                 
                 // Animated blobs as background - warm orange/purple scheme for merchants  
                 AnimatedBlobBackground(isOverdue: true) // Use warm colors
