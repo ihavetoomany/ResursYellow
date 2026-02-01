@@ -20,6 +20,10 @@ struct ServicesView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
+                // Light grey background for better card contrast (light mode)
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+                
                 // Animated blobs as background - cool blue/teal scheme for services
                 AnimatedBlobBackground(isOverdue: false) // Use cool colors
                     .frame(height: 300)
@@ -236,7 +240,7 @@ struct AccountCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
@@ -273,7 +277,7 @@ struct CrossSellCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }

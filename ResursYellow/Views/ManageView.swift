@@ -38,6 +38,10 @@ struct ManageView: View {
         let _ = currentLanguage // Ensure view updates when language changes
         return NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
+                // Light grey background for better card contrast (light mode)
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+                
                 // Animated blobs as background - cool purple/blue scheme for profile
                 AnimatedBlobBackground(isOverdue: false) // Use cool colors
                     .frame(height: 300)

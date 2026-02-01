@@ -586,6 +586,10 @@ struct PaymentsView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
+                // Light grey background for better card contrast (light mode)
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+                
                 // Animated blobs as background for entire top area
                 AnimatedBlobBackground(isOverdue: hasOverdueInvoices)
                     .frame(height: 300)
@@ -1730,7 +1734,7 @@ struct ActionRow: View {
                 .foregroundColor(.secondary)
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -2010,7 +2014,7 @@ struct PurchaseRow: View {
             }
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -2057,7 +2061,7 @@ struct InvoiceRow: View {
             }
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
@@ -2153,7 +2157,7 @@ struct EmptyStateRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }

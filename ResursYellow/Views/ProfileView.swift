@@ -383,7 +383,7 @@ struct ProfileRow: View {
             }
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

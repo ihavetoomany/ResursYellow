@@ -266,7 +266,7 @@ struct MerchantCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(Color(uiColor: .secondarySystemGroupedBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
@@ -289,6 +289,10 @@ struct MerchantsView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
+                // Light grey background for better card contrast (light mode)
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+                
                 // Animated blobs as background - warm orange/purple scheme for merchants  
                 AnimatedBlobBackground(isOverdue: true) // Use warm colors
                     .frame(height: 300)
