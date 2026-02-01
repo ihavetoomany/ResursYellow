@@ -19,17 +19,25 @@ struct ServicesView: View {
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
-            StickyHeaderView(
-                title: "Services",
-                subtitle: hasAccounts ? "Your banking solutions" : "Get started",
-                trailingButton: "plus",
-                trailingButtonTint: .primary,
-                trailingButtonSize: 44,
-                trailingButtonIconScale: 0.5,
-                trailingButtonAction: {
-                    showAddAccount = true
-                }
-            ) {
+            ZStack(alignment: .top) {
+                // Animated blobs as background - cool blue/teal scheme for services
+                AnimatedBlobBackground(isOverdue: false) // Use cool colors
+                    .frame(height: 300)
+                    .offset(y: -20)
+                    .ignoresSafeArea(edges: .top)
+                    .allowsHitTesting(false)
+                
+                StickyHeaderView(
+                    title: "Services",
+                    subtitle: hasAccounts ? "Your banking solutions" : "Get started",
+                    trailingButton: "plus",
+                    trailingButtonTint: .primary,
+                    trailingButtonSize: 44,
+                    trailingButtonIconScale: 0.5,
+                    trailingButtonAction: {
+                        showAddAccount = true
+                    }
+                ) {
                 VStack(spacing: 16) {
                     if hasAccounts {
                         // Account Cards
@@ -133,6 +141,7 @@ struct ServicesView: View {
                         .padding(.bottom, 16)
                     }
                 }
+            }
             }
             .navigationBarHidden(true)
             .navigationDestination(for: String.self) { value in

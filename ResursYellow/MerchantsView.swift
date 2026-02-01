@@ -288,17 +288,25 @@ struct MerchantsView: View {
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
-            StickyHeaderView(
-                title: "Merchants",
-                subtitle: hasMerchants ? "Connect your favourite stores" : "Get started",
-                trailingButton: "plus",
-                trailingButtonTint: .primary,
-                trailingButtonSize: 44,
-                trailingButtonIconScale: 0.5,
-                trailingButtonAction: {
-                    showAddMerchant = true
-                }
-            ) {
+            ZStack(alignment: .top) {
+                // Animated blobs as background - warm orange/purple scheme for merchants  
+                AnimatedBlobBackground(isOverdue: true) // Use warm colors
+                    .frame(height: 300)
+                    .offset(y: -20)
+                    .ignoresSafeArea(edges: .top)
+                    .allowsHitTesting(false)
+                
+                StickyHeaderView(
+                    title: "Merchants",
+                    subtitle: hasMerchants ? "Connect your favourite stores" : "Get started",
+                    trailingButton: "plus",
+                    trailingButtonTint: .primary,
+                    trailingButtonSize: 44,
+                    trailingButtonIconScale: 0.5,
+                    trailingButtonAction: {
+                        showAddMerchant = true
+                    }
+                ) {
                 VStack(spacing: 16) {
                     if connectedMerchants.isEmpty {
                         // Empty state
@@ -374,6 +382,7 @@ struct MerchantsView: View {
                     }
                 }
                 .padding(.horizontal)
+            }
             }
             .navigationBarHidden(true)
             .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in

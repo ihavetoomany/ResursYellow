@@ -37,17 +37,25 @@ struct ManageView: View {
     var body: some View {
         let _ = currentLanguage // Ensure view updates when language changes
         return NavigationStack(path: $navigationPath) {
-            StickyHeaderView(
-                title: localized("My Resurs"),
-                subtitle: localized("Profile & settings"),
-                trailingButton: "questionmark.message.fill",
-                trailingButtonTint: .secondary,
-                trailingButtonSize: 44,
-                trailingButtonIconScale: 0.5,
-                trailingButtonAction: {
-                    showAISupport = true
-                }
-            ) {
+            ZStack(alignment: .top) {
+                // Animated blobs as background - cool purple/blue scheme for profile
+                AnimatedBlobBackground(isOverdue: false) // Use cool colors
+                    .frame(height: 300)
+                    .offset(y: -20)
+                    .ignoresSafeArea(edges: .top)
+                    .allowsHitTesting(false)
+                
+                StickyHeaderView(
+                    title: localized("My Resurs"),
+                    subtitle: localized("Profile & settings"),
+                    trailingButton: "questionmark.message.fill",
+                    trailingButtonTint: .secondary,
+                    trailingButtonSize: 44,
+                    trailingButtonIconScale: 0.5,
+                    trailingButtonAction: {
+                        showAISupport = true
+                    }
+                ) {
                 VStack(spacing: 24) {
                     // Account Section
                     ProfileSection(title: localized("Account")) {
@@ -228,6 +236,7 @@ struct ManageView: View {
                 .padding(.horizontal)
                 .padding(.top, 24)
                 .padding(.bottom, 16)
+            }
             }
             .navigationBarHidden(true)
             .navigationDestination(for: String.self) { destination in
