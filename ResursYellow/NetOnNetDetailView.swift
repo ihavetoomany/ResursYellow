@@ -2,8 +2,9 @@ import SwiftUI
 
 struct NetOnNetDetailView: View {
     @StateObject private var dataManager = DataManager.shared
-    @State private var showAISupport = false
+    @StateObject private var scrollObserver = ScrollOffsetObserver()
     @State private var showSettings = false
+    @Environment(\.colorScheme) var colorScheme
     
     private let availableCredit = "20 000 kr"
     private let creditLimit = "20 000 kr"
@@ -37,45 +38,56 @@ struct NetOnNetDetailView: View {
     
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
+        ZStack(alignment: .top) {
+            // Extended background for navigation bar area
+            if colorScheme == .light {
+                Color(red: 0.93, green: 0.92, blue: 0.90)
+                    .ignoresSafeArea()
+            } else {
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+            }
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Scroll offset tracker
+                    GeometryReader { geo in
+                        Color.clear
+                            .onChange(of: geo.frame(in: .named("scroll")).minY) { _, newValue in
+                                scrollObserver.offset = max(0, -newValue)
+                            }
+                    }
+                    .frame(height: 0)
+                    
+                    VStack(spacing: 24) {
                 summaryCard
                 purchasesSection
                 partPaymentsSection
                 benefitsSection
                 documentsSection
-                helpAndSupportSection
+                
+                // Help and Support Section - HIG: Consistent support access
+                HelpAndSupportSection()
             }
             .padding(.horizontal)
             .padding(.vertical, 24)
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+            }
+            .coordinateSpace(name: "scroll")
+        }
         .navigationTitle("Netonnet")
         .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(scrollObserver.offset > 10 ? .visible : .hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 16) {
-                    Button(action: { showSettings = true }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: { showAISupport = true }) {
-                        Image(systemName: "questionmark.message.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
+                Button(action: { showSettings = true }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
                 }
+                .buttonStyle(.plain)
             }
-        }
-        .sheet(isPresented: $showAISupport) {
-            AISupportChatView()
-                .presentationBackground {
-                    AdaptiveSheetBackground()
-                }
         }
         .sheet(isPresented: $showSettings) {
             MerchantSettingsView(merchantName: "Netonnet", merchantColor: .green)
@@ -137,7 +149,16 @@ struct NetOnNetDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Netonnet available credit \(availableCredit). Credit limit \(creditLimit). No credit used.")
@@ -176,7 +197,16 @@ struct NetOnNetDetailView: View {
                             .fontWeight(.semibold)
                     }
                     .padding(16)
-                    .background(.ultraThinMaterial)
+                    .background {
+                        if colorScheme == .light {
+                            ZStack {
+                                Color.white.opacity(0.7)
+                                Color.clear.background(.regularMaterial)
+                            }
+                        } else {
+                            Color.clear.background(.regularMaterial)
+                        }
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
@@ -255,7 +285,16 @@ struct NetOnNetDetailView: View {
                         Spacer()
                     }
                     .padding(16)
-                    .background(.ultraThinMaterial)
+                    .background {
+                        if colorScheme == .light {
+                            ZStack {
+                                Color.white.opacity(0.7)
+                                Color.clear.background(.regularMaterial)
+                            }
+                        } else {
+                            Color.clear.background(.regularMaterial)
+                        }
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
@@ -296,17 +335,22 @@ struct NetOnNetDetailView: View {
                                 .foregroundColor(.secondary)
                         }
                         .padding(16)
-                        .background(.ultraThinMaterial)
+                        .background {
+                            if colorScheme == .light {
+                                ZStack {
+                                    Color.white.opacity(0.7)
+                                    Color.clear.background(.regularMaterial)
+                                }
+                            } else {
+                                Color.clear.background(.regularMaterial)
+                            }
+                        }
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-    }
-    
-    private var helpAndSupportSection: some View {
-        HelpAndSupportSection()
     }
 }
 

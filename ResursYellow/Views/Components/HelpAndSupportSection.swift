@@ -8,6 +8,22 @@
 
 import SwiftUI
 
+// MARK: - Adaptive Card Background for Help Section
+private struct HelpCardBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        if colorScheme == .light {
+            ZStack {
+                Color.white.opacity(0.7)
+                Color.clear.background(.regularMaterial)
+            }
+        } else {
+            Color.clear.background(.regularMaterial)
+        }
+    }
+}
+
 /// A reusable section that provides help and support options
 /// Displays contact methods and self-service resources in a consistent, accessible format
 struct HelpAndSupportSection: View {
@@ -65,7 +81,7 @@ struct HelpAndSupportSection: View {
                                 .accessibilityHidden(true)
                         }
                         .padding(16)
-                        .background(.ultraThinMaterial)
+                        .background(HelpCardBackground())
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .buttonStyle(.plain)

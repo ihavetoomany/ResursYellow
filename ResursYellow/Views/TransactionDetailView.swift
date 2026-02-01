@@ -10,6 +10,7 @@ import Combine
 
 struct TransactionDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var paymentPlansManager: PaymentPlansManager
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @State private var showNewPlanSheet = false
@@ -50,10 +51,17 @@ struct TransactionDetailView: View {
     }
     
     var body: some View {
-        let scrollProgress = min(scrollObserver.offset / 100, 1.0)
-        
         GeometryReader { geometry in
             ZStack(alignment: .top) {
+                // Extended background for consistent color
+                if colorScheme == .light {
+                    Color(red: 0.93, green: 0.92, blue: 0.90)
+                        .ignoresSafeArea()
+                } else {
+                    Color(uiColor: .systemGroupedBackground)
+                        .ignoresSafeArea()
+                }
+                
                 // Scrollable Content
                 ScrollViewReader { proxy in
                     ScrollView(.vertical, showsIndicators: false) {
@@ -69,7 +77,7 @@ struct TransactionDetailView: View {
                             .id("scrollTop") // ID for scroll to top
                             
                             // Account for header height
-                            Color.clear.frame(height: 80)
+                            Color.clear.frame(height: 60)
                         
                         VStack(spacing: 16) {
                             // Transaction Details Card
@@ -81,7 +89,7 @@ struct TransactionDetailView: View {
                                 paymentMethod: paymentMethod
                             )
                             .padding(.horizontal)
-                            .padding(.top, 36)
+                            .padding(.top, 16)
                             .frame(width: geometry.size.width)
                         
                         // Invoice Items Card
@@ -213,11 +221,6 @@ struct TransactionDetailView: View {
                                 .padding(.horizontal)
                                 .frame(width: geometry.size.width)
                         }
-                        
-                        // Help and Support Section
-                        HelpAndSupportSection()
-                            .padding(.horizontal)
-                            .frame(width: geometry.size.width)
                     }
                     .padding(.top, 20)
                     .padding(.bottom, 24)
@@ -236,54 +239,39 @@ struct TransactionDetailView: View {
                 // Sticky Header (overlays the content)
                 VStack(spacing: 0) {
                 ZStack {
-                    // Back button (always visible) - on the left
+                    // Back + Help button
                     HStack {
                         Button(action: { dismiss() }) {
                             Image(systemName: "chevron.left")
-                                .font(.title3)
-                                .foregroundColor(.blue)
-                                .frame(width: 32, height: 32)
+                                .font(.title3.weight(.semibold))
+                                .foregroundColor(.primary)
+                                .frame(width: 44, height: 44)
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
                         }
                         Spacer()
+                        Button(action: { /* TODO: Add help action */ }) {
+                            Image(systemName: "questionmark.message.fill")
+                                .font(.title3)
+                                .foregroundColor(.secondary)
+                                .frame(width: 44, height: 44)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
                     }
-                    
-                    // Minimized title - centered in view
-                    if scrollProgress > 0.5 {
-                        Text(merchant)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
+
+                    // Merchant title (always centered)
+                    Text("Purchase")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
-                .padding(.bottom, scrollProgress > 0.5 ? 8 : 12)
-                
-                // Title and subtitle - only shown when not minimized
-                if scrollProgress <= 0.5 {
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Subtitle
-                        Text("Purchase Details")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .opacity(1.0 - scrollProgress * 2)
-                        
-                        // Title
-                        Text(merchant)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
+                .padding(.bottom, 8)
                 }
-                }
-                .background(Color(uiColor: .systemBackground).opacity(0.95))
                 .background(.ultraThinMaterial)
-                .animation(.easeInOut(duration: 0.2), value: scrollProgress)
                 .frame(width: geometry.size.width)
             }
         }
@@ -355,7 +343,7 @@ struct TransactionDetailsCard: View {
             }
         }
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -397,8 +385,7 @@ struct PaymentPlansExplanationCard: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(20)
-        .background(Color.blue.opacity(0.1))
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -530,8 +517,7 @@ struct SelectedPaymentPlanCard: View {
             }
         }
         .padding(20)
-        .background(Color.green.opacity(0.1))
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -651,8 +637,7 @@ struct PartPaymentCard: View {
             }
         }
         .padding(20)
-        .background(Color.orange.opacity(0.1))
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -680,8 +665,7 @@ struct PartPaymentsExplanationCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
-        .background(Color.orange.opacity(0.1))
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -913,6 +897,22 @@ struct NewPaymentPlanSheet: View {
         }
         .presentationBackground {
             AdaptiveSheetBackground()
+        }
+    }
+}
+
+// MARK: - Adaptive Card Background
+private struct AdaptiveCardBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        if colorScheme == .light {
+            ZStack {
+                Color.white.opacity(0.7)
+                Color.clear.background(.regularMaterial)
+            }
+        } else {
+            Color.clear.background(.regularMaterial)
         }
     }
 }

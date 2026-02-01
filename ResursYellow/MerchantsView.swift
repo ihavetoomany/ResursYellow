@@ -376,9 +376,7 @@ struct MerchantsView: View {
                                 ForEach(connectedMerchants, id: \.self) { merchant in
                                     let card = cardConfig(for: merchant)
                                     
-                                    NavigationLink {
-                                        merchantDetailView(for: merchant)
-                                    } label: {
+                                    NavigationLink(value: merchant) {
                                         MerchantCard(
                                             title: merchant,
                                             subtitle: card.subtitle,
@@ -407,6 +405,26 @@ struct MerchantsView: View {
             }
             }
             .navigationBarHidden(true)
+            .navigationDestination(for: String.self) { merchant in
+                merchantDetailView(for: merchant)
+            }
+            .navigationDestination(for: PartPaymentItem.self) { payment in
+                // Handle navigation to part payment detail views from merchant detail views
+                if payment.title.contains("Bauhaus") {
+                    // Bauhaus specific payment details
+                    if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
+                        bauhausPaintProjectDetail(payment: payment, isOctober: true)
+                    } else if payment.title == "Bauhaus - September" && payment.totalAmount == "1 500 kr" {
+                        bauhausPaintProjectDetail(payment: payment, isOctober: false)
+                    } else {
+                        // Other Bauhaus accounts use default view
+                        InvoiceAccountDetailView(account: payment)
+                    }
+                } else {
+                    // Default invoice account detail view
+                    InvoiceAccountDetailView(account: payment)
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
                 if !navigationPath.isEmpty {
                     navigationPath.removeLast(navigationPath.count)
@@ -484,6 +502,92 @@ private extension MerchantsView {
             Text("Details for \(merchant)")
                 .padding()
         }
+    }
+    
+    @ViewBuilder
+    func bauhausPaintProjectDetail(payment: PartPaymentItem, isOctober: Bool) -> some View {
+        let invoices: [PartPaymentInvoice] = isOctober ? [
+            PartPaymentInvoice(
+                installment: 1,
+                dueDate: "Oct 15, 2025",
+                amount: "726 kr",
+                reference: "PP-2025-10-001",
+                status: .paid
+            ),
+            PartPaymentInvoice(
+                installment: 2,
+                dueDate: "Nov 15, 2025",
+                amount: "726 kr",
+                reference: "PP-2025-11-001",
+                status: .paid
+            ),
+            PartPaymentInvoice(
+                installment: 3,
+                dueDate: "Dec 15, 2025",
+                amount: "726 kr",
+                reference: "PP-2025-12-001",
+                status: .upcoming
+            ),
+            PartPaymentInvoice(
+                installment: 4,
+                dueDate: "Jan 15, 2026",
+                amount: "726 kr",
+                reference: "PP-2026-01-001",
+                status: .upcoming
+            ),
+            PartPaymentInvoice(
+                installment: 5,
+                dueDate: "Feb 15, 2026",
+                amount: "726 kr",
+                reference: "PP-2026-02-001",
+                status: .upcoming
+            ),
+            PartPaymentInvoice(
+                installment: 6,
+                dueDate: "Mar 15, 2026",
+                amount: "726 kr",
+                reference: "PP-2026-03-001",
+                status: .upcoming
+            )
+        ] : [
+            PartPaymentInvoice(
+                installment: 1,
+                dueDate: "Sep 30, 2025",
+                amount: "300 kr",
+                reference: "PP-2025-09-001",
+                status: .paid
+            ),
+            PartPaymentInvoice(
+                installment: 2,
+                dueDate: "Oct 30, 2025",
+                amount: "300 kr",
+                reference: "PP-2025-10-002",
+                status: .paid
+            ),
+            PartPaymentInvoice(
+                installment: 3,
+                dueDate: "Nov 30, 2025",
+                amount: "300 kr",
+                reference: "PP-2025-11-002",
+                status: .paid
+            ),
+            PartPaymentInvoice(
+                installment: 4,
+                dueDate: "Dec 30, 2025",
+                amount: "300 kr",
+                reference: "PP-2025-12-002",
+                status: .upcoming
+            ),
+            PartPaymentInvoice(
+                installment: 5,
+                dueDate: "Jan 30, 2026",
+                amount: "300 kr",
+                reference: "PP-2026-01-002",
+                status: .upcoming
+            )
+        ]
+        
+        PaintProjectSplitDetailView(plan: payment, invoices: invoices)
     }
 }
 

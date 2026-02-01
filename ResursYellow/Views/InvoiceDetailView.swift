@@ -33,6 +33,7 @@ struct InstallmentPlan: Identifiable, Equatable {
 
 struct InvoiceDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var dataManager = DataManager.shared
     @State private var showPaymentSheet = false
@@ -71,6 +72,15 @@ struct InvoiceDetailView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .top) {
+                // Extended background for consistent color
+                if colorScheme == .light {
+                    Color(red: 0.93, green: 0.92, blue: 0.90)
+                        .ignoresSafeArea()
+                } else {
+                    Color(uiColor: .systemGroupedBackground)
+                        .ignoresSafeArea()
+                }
+                
                 // Scrollable Content
                 ScrollViewReader { proxy in
                     ScrollView(.vertical, showsIndicators: false) {
@@ -173,7 +183,7 @@ struct InvoiceDetailView: View {
                     }
 
                     // Minimized title
-                    Text(invoice.merchant)
+                    Text("Invoice")
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
@@ -182,14 +192,10 @@ struct InvoiceDetailView: View {
                 .padding(.top, 8)
                 .padding(.bottom, 8)
             }
-            .background(Color(uiColor: .systemBackground).opacity(0.95))
             .background(.ultraThinMaterial)
             .frame(width: geometry.size.width)
         }
         .navigationBarHidden(true)
-        .navigationDestination(for: PartPaymentItem.self) { account in
-            InvoiceAccountDetailView(account: account)
-        }
         .sheet(isPresented: $showAISupport) {
             AISupportChatView()
                 .presentationBackground {
@@ -220,6 +226,7 @@ struct InvoiceDetailsCard: View {
     let invoice: InvoiceData
     let isPaid: Bool
     let paidAmount: Double?
+    @Environment(\.colorScheme) var colorScheme
 
     private func formatSEK(_ value: Double) -> String {
         let f = NumberFormatter()
@@ -283,7 +290,7 @@ struct InvoiceDetailsCard: View {
             }
         }
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -365,7 +372,7 @@ struct WhatIPayForCard: View {
                             Text("Invoice account")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                                .foregroundColor(.white)
+                                .foregroundColor(.primary)
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.subheadline.weight(.semibold))
@@ -377,8 +384,7 @@ struct WhatIPayForCard: View {
             }
         }
         .padding(20)
-        .background(Color.gray.opacity(0.1))
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     
@@ -512,7 +518,7 @@ struct PaymentInformationCard: View {
                         Text("Invoice PDF")
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(.white)
+                            .foregroundColor(.primary)
                         Spacer()
                         Image(systemName: "chevron.right")
                             .font(.subheadline.weight(.semibold))
@@ -524,8 +530,7 @@ struct PaymentInformationCard: View {
             }
         }
         .padding(20)
-        .background(Color.gray.opacity(0.1))
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -619,7 +624,7 @@ struct InvoiceItemsCard: View {
             }
         }
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -659,7 +664,7 @@ struct PaymentOptionsCard: View {
                 icon: "clock.badge.checkmark.fill",
                 title: "Snooze",
                 description: "Postpone payment to a later date",
-                color: Color(uiColor: .systemGray4),
+                color: Color(uiColor: .systemGray),
                 action: onSnooze
             )
 
@@ -1626,6 +1631,22 @@ By proceeding, you acknowledge that:
         }
         .presentationBackground {
             AdaptiveSheetBackground()
+        }
+    }
+}
+
+// MARK: - Adaptive Card Background
+private struct AdaptiveCardBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        if colorScheme == .light {
+            ZStack {
+                Color.white.opacity(0.7)
+                Color.clear.background(.regularMaterial)
+            }
+        } else {
+            Color.clear.background(.regularMaterial)
         }
     }
 }

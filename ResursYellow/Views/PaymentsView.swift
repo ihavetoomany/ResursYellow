@@ -718,6 +718,9 @@ struct PaymentsView: View {
             .navigationDestination(for: InvoiceData.self) { invoice in
                 InvoiceDetailView(invoice: invoice)
             }
+            .navigationDestination(for: PartPaymentItem.self) { account in
+                InvoiceAccountDetailView(account: account)
+            }
             .sheet(isPresented: $showProfile) {
                 AISupportChatView()
                     .presentationBackground {

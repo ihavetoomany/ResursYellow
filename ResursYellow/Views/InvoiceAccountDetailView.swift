@@ -9,6 +9,7 @@ import SwiftUI
 
 struct InvoiceAccountDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var dataManager = DataManager.shared
     private let dateService = DateService.shared
@@ -21,6 +22,15 @@ struct InvoiceAccountDetailView: View {
     var body: some View {
         
         ZStack(alignment: .top) {
+            // Extended background for consistent color
+            if colorScheme == .light {
+                Color(red: 0.93, green: 0.92, blue: 0.90)
+                    .ignoresSafeArea()
+            } else {
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+            }
+            
             // Scrollable Content
             ScrollViewReader { proxy in
                 ScrollView(showsIndicators: false) {
@@ -53,9 +63,6 @@ struct InvoiceAccountDetailView: View {
                             
                             // Actions Section
                             actionsSection
-                            
-                            // Help and Support Section
-                            HelpAndSupportSection()
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)
@@ -105,7 +112,6 @@ struct InvoiceAccountDetailView: View {
                 .padding(.top, 8)
                 .padding(.bottom, 8)
             }
-            .background(Color(uiColor: .systemBackground).opacity(0.95))
             .background(.ultraThinMaterial)
         }
         .navigationBarHidden(true)
@@ -162,7 +168,7 @@ struct InvoiceAccountDetailView: View {
             }
         }
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     
@@ -260,8 +266,7 @@ struct InvoiceAccountDetailView: View {
             }
         }
         .padding(20)
-        .background(Color.blue.opacity(0.1))
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     
@@ -467,7 +472,7 @@ struct InvoiceAccountDetailView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .background(.ultraThinMaterial)
+            .background(AdaptiveCardBackground())
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
@@ -553,6 +558,7 @@ struct TransactionRow: View {
     let description: String
     let amount: String
     let amountColor: Color
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack {
@@ -568,10 +574,10 @@ struct TransactionRow: View {
             Text(amount)
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundColor(amountColor)
+                .foregroundColor(colorScheme == .light ? .primary : amountColor)
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -623,6 +629,22 @@ struct ActionsSheet: View {
         .padding(.horizontal)
         .padding(.top, 8)
         .padding(.bottom, 20)
+    }
+}
+
+// MARK: - Adaptive Card Background
+private struct AdaptiveCardBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        if colorScheme == .light {
+            ZStack {
+                Color.white.opacity(0.7)
+                Color.clear.background(.regularMaterial)
+            }
+        } else {
+            Color.clear.background(.regularMaterial)
+        }
     }
 }
 

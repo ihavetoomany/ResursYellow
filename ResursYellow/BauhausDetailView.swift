@@ -7,8 +7,9 @@ import SwiftUI
 
 struct BauhausDetailView: View {
     @StateObject private var dataManager = DataManager.shared
-    @State private var showAISupport = false
+    @StateObject private var scrollObserver = ScrollOffsetObserver()
     @State private var showSettings = false
+    @Environment(\.colorScheme) var colorScheme
     
     // Example credit info
     let availableCredit: String = "14 500 kr"
@@ -145,58 +146,62 @@ struct BauhausDetailView: View {
     ]
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
+        ZStack(alignment: .top) {
+            // Extended background for navigation bar area
+            if colorScheme == .light {
+                Color(red: 0.93, green: 0.92, blue: 0.90)
+                    .ignoresSafeArea()
+            } else {
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+            }
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Scroll offset tracker
+                    GeometryReader { geo in
+                        Color.clear
+                            .onChange(of: geo.frame(in: .named("scroll")).minY) { _, newValue in
+                                scrollObserver.offset = max(0, -newValue)
+                            }
+                    }
+                    .frame(height: 0)
+                    
+                    VStack(spacing: 24) {
                 summaryCard
                 purchasesSection
                 partPaymentsSection
                 benefitsSection
                 documentsSection
-                helpAndSupportSection
+                
+                // Help and Support Section - HIG: Consistent support access
+                HelpAndSupportSection()
             }
             .padding(.horizontal)
             .padding(.vertical, 24)
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+            }
+            .coordinateSpace(name: "scroll")
+        }
         .navigationTitle("Bauhaus")
         .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(scrollObserver.offset > 10 ? .visible : .hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 16) {
-                    Button(action: { showSettings = true }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: { showAISupport = true }) {
-                        Image(systemName: "questionmark.message.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
+                Button(action: { showSettings = true }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
                 }
+                .buttonStyle(.plain)
             }
-        }
-        .sheet(isPresented: $showAISupport) {
-            AISupportChatView()
-                .presentationBackground {
-                    AdaptiveSheetBackground()
-                }
         }
         .sheet(isPresented: $showSettings) {
             MerchantSettingsView(merchantName: "Bauhaus", merchantColor: .red)
                 .presentationBackground {
                     AdaptiveSheetBackground()
                 }
-        }
-        .navigationDestination(for: PartPaymentItem.self) { payment in
-            if payment.title == "Bauhaus - October" && payment.totalAmount == "4 356 kr" {
-                PaintProjectSplitDetailView(plan: payment, invoices: paintProjectInvoices)
-            } else if payment.title == "Bauhaus - September" && payment.totalAmount == "1 500 kr" {
-                PaintProjectSplitDetailView(plan: payment, invoices: gardenSuppliesInvoices)
-            }
         }
     }
     
@@ -252,7 +257,16 @@ struct BauhausDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Bauhaus available credit \(availableCredit). Credit limit \(creditLimit). Used credit 5 500 kronor.")
@@ -291,7 +305,16 @@ struct BauhausDetailView: View {
                             .fontWeight(.semibold)
                     }
                     .padding(16)
-                    .background(.ultraThinMaterial)
+                    .background {
+                        if colorScheme == .light {
+                            ZStack {
+                                Color.white.opacity(0.7)
+                                Color.clear.background(.regularMaterial)
+                            }
+                        } else {
+                            Color.clear.background(.regularMaterial)
+                        }
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
@@ -356,7 +379,16 @@ struct BauhausDetailView: View {
                         Spacer()
                     }
                     .padding(16)
-                    .background(.ultraThinMaterial)
+                    .background {
+                        if colorScheme == .light {
+                            ZStack {
+                                Color.white.opacity(0.7)
+                                Color.clear.background(.regularMaterial)
+                            }
+                        } else {
+                            Color.clear.background(.regularMaterial)
+                        }
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
@@ -397,7 +429,16 @@ struct BauhausDetailView: View {
                                 .foregroundColor(.secondary)
                         }
                         .padding(16)
-                        .background(.ultraThinMaterial)
+                        .background {
+                            if colorScheme == .light {
+                                ZStack {
+                                    Color.white.opacity(0.7)
+                                    Color.clear.background(.regularMaterial)
+                                }
+                            } else {
+                                Color.clear.background(.regularMaterial)
+                            }
+                        }
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .buttonStyle(.plain)
@@ -405,15 +446,12 @@ struct BauhausDetailView: View {
             }
         }
     }
-    
-    private var helpAndSupportSection: some View {
-        HelpAndSupportSection()
-    }
 }
 
 private struct PartPaymentRow: View {
     let payment: PartPaymentItem
     let showsDisclosure: Bool
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -477,7 +515,16 @@ private struct PartPaymentRow: View {
             }
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -485,6 +532,7 @@ private struct PartPaymentRow: View {
 struct PaintProjectSplitDetailView: View {
     let plan: PartPaymentItem
     let invoices: [PartPaymentInvoice]
+    @Environment(\.colorScheme) var colorScheme
     
     private var progressPercentage: String {
         let percent = plan.progress * 100
@@ -583,7 +631,16 @@ struct PaintProjectSplitDetailView: View {
             }
         }
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     
@@ -662,7 +719,16 @@ struct PaintProjectSplitDetailView: View {
         }
         .padding(20)
         .background(Color.orange.opacity(0.1))
-        .background(.ultraThinMaterial)
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
     

@@ -8,10 +8,27 @@
 import SwiftUI
 import Combine
 
+// MARK: - Adaptive Card Background
+private struct AdaptiveCardBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        if colorScheme == .light {
+            ZStack {
+                Color.white.opacity(0.7)
+                Color.clear.background(.regularMaterial)
+            }
+        } else {
+            Color.clear.background(.regularMaterial)
+        }
+    }
+}
+
 struct ResursFamilyAccountView: View {
     @StateObject private var dataManager = DataManager.shared
-    @State private var showAISupport = false
+    @StateObject private var scrollObserver = ScrollOffsetObserver()
     @State private var showSettings = false
+    @Environment(\.colorScheme) var colorScheme
     
     // Invoice Accounts - Resurs Gold's own payment plans (filtered from DataManager)
     private var invoiceAccounts: [PartPaymentItem] {
@@ -41,13 +58,33 @@ struct ResursFamilyAccountView: View {
     ]
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 16) {
-                // Account Overview Card
-                AccountOverviewCard()
-                    .padding(.horizontal)
-                    .padding(.top, 4)
-                    .padding(.bottom, 16)
+        ZStack(alignment: .top) {
+            // Extended background for navigation bar area
+            if colorScheme == .light {
+                Color(red: 0.93, green: 0.92, blue: 0.90)
+                    .ignoresSafeArea()
+            } else {
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+            }
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Scroll offset tracker
+                    GeometryReader { geo in
+                        Color.clear
+                            .onChange(of: geo.frame(in: .named("scroll")).minY) { _, newValue in
+                                scrollObserver.offset = max(0, -newValue)
+                            }
+                    }
+                    .frame(height: 0)
+                    
+                    VStack(spacing: 16) {
+                    // Account Overview Card
+                    AccountOverviewCard()
+                        .padding(.horizontal)
+                        .padding(.top, 4)
+                        .padding(.bottom, 16)
                     
                 // Credit Cards Section
                 VStack(alignment: .leading, spacing: 12) {
@@ -209,7 +246,7 @@ struct ResursFamilyAccountView: View {
                                     Spacer()
                                 }
                                 .padding(16)
-                                .background(.ultraThinMaterial)
+                                .background(AdaptiveCardBackground())
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
                         }
@@ -250,7 +287,7 @@ struct ResursFamilyAccountView: View {
                                         .foregroundColor(.secondary)
                                 }
                                 .padding(16)
-                                .background(.ultraThinMaterial)
+                                .background(AdaptiveCardBackground())
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
                             .buttonStyle(.plain)
@@ -259,48 +296,34 @@ struct ResursFamilyAccountView: View {
                 }
                 .padding(.horizontal)
                 
-                // Help and Support Section
+                // Help and Support Section - HIG: Consistent support access
                 HelpAndSupportSection()
                     .padding(.horizontal)
+                }
+                .padding(.vertical, 24)
             }
-            .padding(.vertical, 24)
+            }
+            .coordinateSpace(name: "scroll")
         }
-        .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("Resurs Family")
         .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(scrollObserver.offset > 10 ? .visible : .hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 16) {
-                    Button(action: { showSettings = true }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: { showAISupport = true }) {
-                        Image(systemName: "questionmark.message.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
+                Button(action: { showSettings = true }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
                 }
+                .buttonStyle(.plain)
             }
-        }
-        .sheet(isPresented: $showAISupport) {
-            AISupportChatView()
-                .presentationBackground {
-                    AdaptiveSheetBackground()
-                }
         }
         .sheet(isPresented: $showSettings) {
             ServiceSettingsView(serviceName: "Resurs Family", serviceColor: .blue)
                 .presentationBackground {
                     AdaptiveSheetBackground()
                 }
-        }
-        .navigationDestination(for: PartPaymentItem.self) { account in
-            InvoiceAccountDetailView(account: account)
         }
     }
 }
@@ -403,12 +426,13 @@ struct ResursGoldPartPaymentRow: View {
             }
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
 struct AccountOverviewCard: View {
+    @Environment(\.colorScheme) var colorScheme
     var body: some View {
         VStack(spacing: 16) {
             HStack {
@@ -464,7 +488,7 @@ struct AccountOverviewCard: View {
             }
         }
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
@@ -474,6 +498,7 @@ struct CreditCardMini: View {
     let lastFour: String
     let used: String
     let color: Color
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack(spacing: 16) {
@@ -505,14 +530,12 @@ struct CreditCardMini: View {
             }
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background(AdaptiveCardBackground())
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
-
 
 #Preview {
     ResursFamilyAccountView()
         .preferredColorScheme(.dark)
 }
-

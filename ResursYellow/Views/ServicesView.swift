@@ -167,6 +167,9 @@ struct ServicesView: View {
                     EmptyView()
                 }
             }
+            .navigationDestination(for: PartPaymentItem.self) { account in
+                InvoiceAccountDetailView(account: account)
+            }
             .onReceive(NotificationCenter.default.publisher(for: .switchToServices)) { notification in
                 if let destination = notification.userInfo?["destination"] as? String,
                    destination == "ResursFamilyAccountView" {
@@ -312,8 +315,9 @@ struct CrossSellCard: View {
 }
 
 struct SavingsAccountDetailView: View {
-    @State private var showAISupport = false
+    @StateObject private var scrollObserver = ScrollOffsetObserver()
     @State private var showSettings = false
+    @Environment(\.colorScheme) var colorScheme
     
     private struct Contribution: Identifiable {
         let id = UUID()
@@ -347,45 +351,56 @@ struct SavingsAccountDetailView: View {
     ]
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 24) {
+        ZStack(alignment: .top) {
+            // Extended background for navigation bar area
+            if colorScheme == .light {
+                Color(red: 0.93, green: 0.92, blue: 0.90)
+                    .ignoresSafeArea()
+            } else {
+                Color(uiColor: .systemGroupedBackground)
+                    .ignoresSafeArea()
+            }
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Scroll offset tracker
+                    GeometryReader { geo in
+                        Color.clear
+                            .onChange(of: geo.frame(in: .named("scroll")).minY) { _, newValue in
+                                scrollObserver.offset = max(0, -newValue)
+                            }
+                    }
+                    .frame(height: 0)
+                    
+                    VStack(spacing: 24) {
                 summaryCard
                 accountsSection
                 recentActivitySection
                 benefitsSection
                 documentsSection
-                helpAndSupportSection
+                
+                // Help and Support Section - HIG: Consistent support access
+                HelpAndSupportSection()
             }
             .padding(.horizontal)
             .padding(.vertical, 24)
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+            }
+            .coordinateSpace(name: "scroll")
+        }
         .navigationTitle("Senior Savings")
         .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(scrollObserver.offset > 10 ? .visible : .hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 16) {
-                    Button(action: { showSettings = true }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button(action: { showAISupport = true }) {
-                        Image(systemName: "questionmark.message.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
-                    }
-                    .buttonStyle(.plain)
+                Button(action: { showSettings = true }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
                 }
+                .buttonStyle(.plain)
             }
-        }
-        .sheet(isPresented: $showAISupport) {
-            AISupportChatView()
-                .presentationBackground {
-                    AdaptiveSheetBackground()
-                }
         }
         .sheet(isPresented: $showSettings) {
             ServiceSettingsView(serviceName: "Senior Savings", serviceColor: .mint)
@@ -447,7 +462,16 @@ struct SavingsAccountDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
-        .background(.ultraThinMaterial)
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Senior Savings savings balance. 120 450 kronor saved. Interest rate 3.25 percent. Next deposit 1 500 kronor on 15 December.")
@@ -569,7 +593,16 @@ struct SavingsAccountDetailView: View {
                             .foregroundColor(contribution.amount.contains("-") ? .red : .green)
                     }
                     .padding(16)
-                    .background(.ultraThinMaterial)
+                    .background {
+                        if colorScheme == .light {
+                            ZStack {
+                                Color.white.opacity(0.7)
+                                Color.clear.background(.regularMaterial)
+                            }
+                        } else {
+                            Color.clear.background(.regularMaterial)
+                        }
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
@@ -603,7 +636,16 @@ struct SavingsAccountDetailView: View {
                         Spacer()
                     }
                     .padding(16)
-                    .background(.ultraThinMaterial)
+                    .background {
+                        if colorScheme == .light {
+                            ZStack {
+                                Color.white.opacity(0.7)
+                                Color.clear.background(.regularMaterial)
+                            }
+                        } else {
+                            Color.clear.background(.regularMaterial)
+                        }
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
@@ -644,17 +686,22 @@ struct SavingsAccountDetailView: View {
                                 .foregroundColor(.secondary)
                         }
                         .padding(16)
-                        .background(.ultraThinMaterial)
+                        .background {
+                            if colorScheme == .light {
+                                ZStack {
+                                    Color.white.opacity(0.7)
+                                    Color.clear.background(.regularMaterial)
+                                }
+                            } else {
+                                Color.clear.background(.regularMaterial)
+                            }
+                        }
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-    }
-    
-    private var helpAndSupportSection: some View {
-        HelpAndSupportSection()
     }
 }
 
@@ -665,6 +712,7 @@ struct SavingsAccountRow: View {
     let progress: Double
     let monthlyAmount: String
     let nextDueDate: String
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -701,7 +749,16 @@ struct SavingsAccountRow: View {
             }
         }
         .padding(16)
-        .background(.ultraThinMaterial)
+        .background {
+            if colorScheme == .light {
+                ZStack {
+                    Color.white.opacity(0.7)
+                    Color.clear.background(.regularMaterial)
+                }
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
