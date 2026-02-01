@@ -600,22 +600,30 @@ struct PaymentsView: View {
             ) {
                 // Content: keep existing sections in order
                 VStack(spacing: 24) {
-                    // Notification Center
-                    VStack(spacing: 0) {
-                        Button {
-                            navigationPath.append(WalletDestination.invoices)
-                        } label: {
-                            NotificationCard(
-                                title: "To Pay",
-                                headline: totalUnpaidAmountLabel,
-                                subtitle: invoiceSubtitleLabel,
-                                icon: "bell.fill",
-                                tint: hasOverdueInvoices ? .orange : .green
-                            )
-                        }
-                        .buttonStyle(.plain)
+                    // Notification Center with blobs behind - positioned close to header
+                    Button {
+                        navigationPath.append(WalletDestination.invoices)
+                    } label: {
+                        NotificationCard(
+                            title: "To Pay",
+                            headline: totalUnpaidAmountLabel,
+                            subtitle: invoiceSubtitleLabel,
+                            icon: "bell.fill",
+                            tint: hasOverdueInvoices ? .orange : .green,
+                            showBlobBackground: false
+                        )
                     }
+                    .buttonStyle(.plain)
                     .padding(.horizontal)
+                    .padding(.top, -24) // Eliminate spacing to header
+                    .background(
+                        // Animated blobs behind the card, extending into header
+                        AnimatedBlobBackground(isOverdue: hasOverdueInvoices)
+                            .frame(height: 280)
+                            .offset(y: -80) // Push upward into header area
+                            .padding(.horizontal, -40)
+                            .allowsHitTesting(false)
+                    )
 
                     // Segmented Control for Invoices/Purchases
                     Picker("Content", selection: $selectedSegment) {
@@ -2156,6 +2164,115 @@ struct EmptyStateRow: View {
     }
 }
 
+// MARK: - Animated Blob Background
+/// Animated gradient blobs that float organically, extending beyond container bounds
+/// Similar to iOS Siri/Weather app aesthetic with slow, organic movement
+private struct AnimatedBlobBackground: View {
+    let isOverdue: Bool
+    @State private var animate = false
+    
+    // Color schemes based on payment status
+    private var blobColors: [Color] {
+        if isOverdue {
+            // Warm, urgent colors for overdue payments
+            return [
+                Color(red: 1.0, green: 0.6, blue: 0.2),  // Orange
+                Color(red: 1.0, green: 0.3, blue: 0.3),  // Red-orange
+                Color(red: 1.0, green: 0.4, blue: 0.5)   // Pink-red
+            ]
+        } else {
+            // Cool, calm colors for on-track payments
+            return [
+                Color(red: 0.2, green: 0.7, blue: 0.9),  // Sky blue
+                Color(red: 0.2, green: 0.8, blue: 0.7),  // Teal
+                Color(red: 0.3, green: 0.85, blue: 0.5)  // Green
+            ]
+        }
+    }
+    
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1/60, paused: false)) { timeline in
+            Canvas { context, size in
+                let time = timeline.date.timeIntervalSinceReferenceDate
+                
+                // Blob 1 - Large, positioned higher for header integration
+                let blob1X = size.width * 0.15 + sin(time * 0.3) * 80
+                let blob1Y = size.height * 0.25 + cos(time * 0.25) * 50
+                let blob1Radius = size.width * 0.5
+                
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: blob1X - blob1Radius,
+                        y: blob1Y - blob1Radius,
+                        width: blob1Radius * 2,
+                        height: blob1Radius * 2
+                    )),
+                    with: .radialGradient(
+                        Gradient(colors: [
+                            blobColors[0].opacity(0.9),
+                            blobColors[0].opacity(0.5),
+                            blobColors[0].opacity(0.0)
+                        ]),
+                        center: .init(x: blob1X, y: blob1Y),
+                        startRadius: 0,
+                        endRadius: blob1Radius
+                    )
+                )
+                
+                // Blob 2 - Large, positioned higher on right side
+                let blob2X = size.width * 0.85 + cos(time * 0.35 + 2) * 70
+                let blob2Y = size.height * 0.3 + sin(time * 0.28 + 1.5) * 60
+                let blob2Radius = size.width * 0.45
+                
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: blob2X - blob2Radius,
+                        y: blob2Y - blob2Radius,
+                        width: blob2Radius * 2,
+                        height: blob2Radius * 2
+                    )),
+                    with: .radialGradient(
+                        Gradient(colors: [
+                            blobColors[1].opacity(0.8),
+                            blobColors[1].opacity(0.4),
+                            blobColors[1].opacity(0.0)
+                        ]),
+                        center: .init(x: blob2X, y: blob2Y),
+                        startRadius: 0,
+                        endRadius: blob2Radius
+                    )
+                )
+                
+                // Blob 3 - Medium, centered for card area
+                let blob3X = size.width * 0.5 + sin(time * 0.4 + 4) * 60
+                let blob3Y = size.height * 0.65 + cos(time * 0.38 + 3) * 70
+                let blob3Radius = size.width * 0.4
+                
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: blob3X - blob3Radius,
+                        y: blob3Y - blob3Radius,
+                        width: blob3Radius * 2,
+                        height: blob3Radius * 2
+                    )),
+                    with: .radialGradient(
+                        Gradient(colors: [
+                            blobColors[2].opacity(0.7),
+                            blobColors[2].opacity(0.35),
+                            blobColors[2].opacity(0.0)
+                        ]),
+                        center: .init(x: blob3X, y: blob3Y),
+                        startRadius: 0,
+                        endRadius: blob3Radius
+                    )
+                )
+            }
+            .blur(radius: 50)
+            .allowsHitTesting(false)
+        }
+    }
+}
+
 // MARK: - Notification Card (Full Width)
 private struct NotificationCard: View {
     let title: String
@@ -2163,28 +2280,35 @@ private struct NotificationCard: View {
     let subtitle: String
     let icon: String
     let tint: Color
+    var showBlobBackground: Bool = true
     
     var body: some View {
-        VStack(alignment: .center, spacing: 4) {
-            Text(title.uppercased())
-                .font(.caption)
-                .foregroundColor(.white)
-                .tracking(0.6)
-            Text(headline)
-                .font(.system(.title3, design: .rounded).weight(.bold))
-                .foregroundColor(.primary)
-            Text(subtitle)
-                .font(.caption)
-                .foregroundColor(tint == .orange ? .white : (tint == .green && title == "To Pay" ? .green : .secondary))
+        ZStack {
+            if showBlobBackground {
+                // Animated blob background layer (used in old layout)
+                AnimatedBlobBackground(isOverdue: tint == .orange)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            }
+            
+            // Content layer - no background, text floats directly on blobs
+            VStack(alignment: .center, spacing: 0) {
+                Text(title.uppercased())
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.8))
+                    .tracking(1.5)
+                Text(headline)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                    .padding(.top, 2)
+                Text(subtitle)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(tint == .orange ? .white : (tint == .green && title == "To Pay" ? .green : .secondary))
+                    .padding(.top, 1)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
         }
-        .frame(maxWidth: .infinity)
-        .padding(16)
-        .background(tint.opacity(0.70))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
-        )
     }
 }
 
