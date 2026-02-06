@@ -270,10 +270,7 @@ struct MerchantCard: View {
         .padding(16)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -301,10 +298,10 @@ struct MerchantsView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
-                // Background color - warm sandy grey in light mode, black in dark mode
+                // Background color - neutral grey in light mode, black in dark mode
                 Group {
                     if colorScheme == .light {
-                        Color(red: 0.93, green: 0.92, blue: 0.90) // Warm beige-grey
+                        Color(white: 0.93) // Neutral grey
                     } else {
                         Color.black
                     }

@@ -23,6 +23,7 @@ struct ManageView: View {
     @State private var showLogoutConfirmation = false
     @State private var showResetConfirmation = false
     @State private var selectedPersonaId: String = DataManager.shared.currentPersona.id
+    @AppStorage("notificationsRead") private var notificationsRead = false
     @Environment(\.colorScheme) var colorScheme
     
     // Helper to ensure views update when language changes
@@ -39,10 +40,10 @@ struct ManageView: View {
         let _ = currentLanguage // Ensure view updates when language changes
         return NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
-                // Background color - warm sandy grey in light mode, black in dark mode
+                // Background color - neutral grey in light mode, black in dark mode
                 Group {
                     if colorScheme == .light {
-                        Color(red: 0.93, green: 0.92, blue: 0.90) // Warm beige-grey
+                        Color(white: 0.93) // Neutral grey
                     } else {
                         Color.black
                     }
@@ -70,6 +71,17 @@ struct ManageView: View {
                 VStack(spacing: 24) {
                     // Account Section
                     ProfileSection(title: localized("Account")) {
+                        NavigationLink(value: "ContactInformation") {
+                            ProfileRow(
+                                title: localized("Profile"),
+                                subtitle: localized("Email, Phone, Customer ID"),
+                                icon: "person.fill",
+                                color: .green,
+                                showChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
                         NavigationLink(value: "Notifications") {
                             ProfileRow(
                                 title: localized("Inbox"),
@@ -117,17 +129,6 @@ struct ManageView: View {
                     
                     // Settings Section
                     ProfileSection(title: localized("Settings")) {
-                        NavigationLink(value: "ContactInformation") {
-                            ProfileRow(
-                                title: localized("Profile"),
-                                subtitle: localized("Email, Phone, Customer ID"),
-                                icon: "person.fill",
-                                color: .green,
-                                showChevron: true
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        
                         NavigationLink(value: "NotificationSettings") {
                             ProfileRow(
                                 title: localized("Notification settings"),
@@ -277,6 +278,7 @@ struct ManageView: View {
             .confirmationDialog("Reset Data", isPresented: $showResetConfirmation, titleVisibility: .visible) {
                 Button("Reset", role: .destructive) {
                     dataManager.reset()
+                    notificationsRead = false
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {

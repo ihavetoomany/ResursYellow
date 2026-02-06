@@ -14,10 +14,7 @@ private struct AdaptiveCardBackground: View {
     
     var body: some View {
         if colorScheme == .light {
-            ZStack {
-                Color.white.opacity(0.7)
-                Color.clear.background(.regularMaterial)
-            }
+            Color.white
         } else {
             Color.clear.background(.regularMaterial)
         }
@@ -61,7 +58,7 @@ struct ResursFamilyAccountView: View {
         ZStack(alignment: .top) {
             // Extended background for navigation bar area
             if colorScheme == .light {
-                Color(red: 0.93, green: 0.92, blue: 0.90)
+                Color(white: 0.93) // Neutral grey
                     .ignoresSafeArea()
             } else {
                 Color(uiColor: .systemGroupedBackground)
@@ -85,36 +82,6 @@ struct ResursFamilyAccountView: View {
                         .padding(.horizontal)
                         .padding(.top, 4)
                         .padding(.bottom, 16)
-                    
-                // Credit Cards Section
-                VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Text("Cards")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 12)
-                        
-                        VStack(spacing: 12) {
-                            CreditCardMini(
-                                holder: "Jane Doe",
-                                lastFour: "1234",
-                                used: "13 000 SEK",
-                                color: .green
-                            )
-                            
-                            CreditCardMini(
-                                holder: "John Doe",
-                                lastFour: "5678",
-                                used: "10 995 SEK",
-                                color: .purple
-                            )
-                        }
-                        .padding(.horizontal)
-                    }
-                    .padding(.bottom, 16)
                     
                 // Purchases Section
                 VStack(alignment: .leading, spacing: 12) {
@@ -219,6 +186,36 @@ struct ResursFamilyAccountView: View {
                     }
                     .padding(.bottom, 16)
                     
+                // Credit Cards Section
+                VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Cards")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 12)
+                        
+                        VStack(spacing: 12) {
+                            CreditCardMini(
+                                holder: "Jane Doe",
+                                lastFour: "1234",
+                                used: "13 000 SEK",
+                                color: .green
+                            )
+                            
+                            CreditCardMini(
+                                holder: "John Doe",
+                                lastFour: "5678",
+                                used: "10 995 SEK",
+                                color: .purple
+                            )
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(.bottom, 16)
+                    
                 // Benefits Section
                 VStack(alignment: .leading, spacing: 16) {
                         Text("Benefits and services")
@@ -252,6 +249,7 @@ struct ResursFamilyAccountView: View {
                         }
                     }
                     .padding(.horizontal)
+                    .padding(.bottom, 16)
                     
                 // Documents Section
                 VStack(alignment: .leading, spacing: 16) {
@@ -295,6 +293,7 @@ struct ResursFamilyAccountView: View {
                     }
                 }
                 .padding(.horizontal)
+                .padding(.bottom, 16)
                 
                 // Help and Support Section - HIG: Consistent support access
                 HelpAndSupportSection()

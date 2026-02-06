@@ -456,6 +456,7 @@ struct PaymentsView: View {
     @State private var showProfile = false
     @State private var showNotifications = false
     @State private var selectedSegment: WalletSegment = .invoices
+    @AppStorage("notificationsRead") private var notificationsRead = false
     
     // Helper to ensure views update when language changes
     private var currentLanguage: Language {
@@ -574,23 +575,16 @@ struct PaymentsView: View {
     }
     
     private var unreadNotificationCount: Int {
-        var count = 0
-        if !dataManager.invoicesForCategory(.overdue).isEmpty {
-            count += 1
-        }
-        if !dataManager.invoicesForCategory(.dueSoon).isEmpty {
-            count += 1
-        }
-        return count
+        return notificationsRead ? 0 : 2
     }
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
-                // Background color - warm sandy grey in light mode, black in dark mode
+                // Background color - neutral grey in light mode, black in dark mode
                 Group {
                     if colorScheme == .light {
-                        Color(red: 0.93, green: 0.92, blue: 0.90) // Warm beige-grey
+                        Color(white: 0.93) // Neutral grey
                     } else {
                         Color.black
                     }
@@ -621,9 +615,18 @@ struct PaymentsView: View {
                     VStack(spacing: 24) {
                         // Show invoice subtitle below header
                         HStack {
-                            Text(invoiceSubtitleLabel)
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(hasOverdueInvoices ? (colorScheme == .light ? Color(red: 0.8, green: 0.3, blue: 0.0) : .orange) : .green)
+                            Button {
+                                // Clear the entire navigation path and start fresh
+                                while !navigationPath.isEmpty {
+                                    navigationPath.removeLast()
+                                }
+                                navigationPath.append(WalletDestination.invoices)
+                            } label: {
+                                Text(invoiceSubtitleLabel)
+                                    .font(.system(size: 15, weight: .medium))
+                                    .foregroundColor(hasOverdueInvoices ? (colorScheme == .light ? Color(red: 0.8, green: 0.3, blue: 0.0) : .orange) : .green)
+                            }
+                            .buttonStyle(.plain)
                             Spacer()
                         }
                         .padding(.horizontal)
@@ -644,7 +647,32 @@ struct PaymentsView: View {
                                 if allInvoices.isEmpty {
                                     EmptyStateRow(title: self.localized("No unpaid invoices"), subtitle: self.localized("Did you expect something here? Sometimes it takes a few days until an invoice is generated. You can also look in the purchases list for your purchase."))
                                 } else {
-                                    ForEach(allInvoices) { invoice in
+                                    // Invoices that need attention (overdue + due soon)
+                                    ForEach(allInvoices.filter { $0.category == .overdue || $0.category == .dueSoon }) { invoice in
+                                        Button {
+                                            navigationPath.append(invoice.detail)
+                                        } label: {
+                                            InvoiceRow(
+                                                title: invoice.merchant,
+                                                subtitle: invoice.subtitle,
+                                                amount: invoice.amount,
+                                                icon: invoice.icon,
+                                                color: invoice.color,
+                                                isOverdue: invoice.isOverdue,
+                                                statusOverride: invoice.statusOverride
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                    
+                                    // Extra spacing before handled invoices
+                                    if !allInvoices.filter({ $0.category == .handledScheduled || $0.category == .handledPaid }).isEmpty {
+                                        Spacer()
+                                            .frame(height: 12)
+                                    }
+                                    
+                                    // Handled invoices (scheduled + paid)
+                                    ForEach(allInvoices.filter { $0.category == .handledScheduled || $0.category == .handledPaid }) { invoice in
                                         Button {
                                             navigationPath.append(invoice.detail)
                                         } label: {
@@ -1748,10 +1776,7 @@ struct ActionRow: View {
         .padding(16)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -1863,6 +1888,7 @@ struct InvoicesList: View {
                                     
                                     if !scheduledInvoices.isEmpty || !paidInvoices.isEmpty {
                                         sectionHeader("Handled")
+                                            .padding(.top, 16) // Extra spacing before "Handled" section
                                         ForEach(scheduledInvoices) { invoice in
                                             invoiceButton(for: invoice, allowBatching: false)
                                         }
@@ -1940,7 +1966,9 @@ struct InvoicesList: View {
         VStack(spacing: 0) {
             ZStack {
                 HStack {
-                    Button(action: { dismiss() }) {
+                    Button(action: { 
+                        navigationPath.removeLast()
+                    }) {
                         Image(systemName: "chevron.left")
                             .font(.title3)
                             .foregroundColor(.blue)
@@ -2038,10 +2066,7 @@ struct PurchaseRow: View {
         .padding(16)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -2096,10 +2121,7 @@ struct InvoiceRow: View {
         .padding(16)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -2203,10 +2225,7 @@ struct EmptyStateRow: View {
         .padding(20)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -2306,52 +2325,28 @@ struct NotificationItem: Identifiable {
 struct NotificationsOverlayView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var dataManager = DataManager.shared
+    @AppStorage("notificationsRead") private var areNotificationsRead = false
     
     private var notifications: [NotificationItem] {
         var items: [NotificationItem] = []
         
-        // Add payment reminders
-        let overdueInvoices = dataManager.invoicesForCategory(.overdue)
-        if !overdueInvoices.isEmpty {
-            items.append(NotificationItem(
-                title: "Payment Overdue",
-                message: "\(overdueInvoices.count) invoice\(overdueInvoices.count > 1 ? "s" : "") overdue",
-                time: "Today",
-                icon: "exclamationmark.circle.fill",
-                color: .red,
-                isRead: false
-            ))
-        }
-        
-        let upcomingInvoices = dataManager.invoicesForCategory(.dueSoon)
-        if !upcomingInvoices.isEmpty {
-            items.append(NotificationItem(
-                title: "Payment Due Soon",
-                message: "\(upcomingInvoices.count) invoice\(upcomingInvoices.count > 1 ? "s" : "") due soon",
-                time: "2 days ago",
-                icon: "bell.fill",
-                color: .orange,
-                isRead: false
-            ))
-        }
-        
-        // Add some sample notifications
+        // Add sample notifications
         items.append(NotificationItem(
-            title: "Payment Confirmed",
-            message: "Your payment of 2,450 SEK has been processed",
+            title: "Interest Rate Change",
+            message: "Your interest rate has been updated to 8.9%",
             time: "1 week ago",
-            icon: "checkmark.circle.fill",
-            color: .green,
-            isRead: true
+            icon: "chart.line.uptrend.xyaxis",
+            color: .blue,
+            isRead: areNotificationsRead
         ))
         
         items.append(NotificationItem(
-            title: "New Merchant Connected",
-            message: "Bauhaus has been added to your merchants",
+            title: "Agreement Updated",
+            message: "Your terms and conditions have been updated",
             time: "2 weeks ago",
-            icon: "storefront.fill",
-            color: .blue,
-            isRead: true
+            icon: "doc.text.fill",
+            color: .purple,
+            isRead: areNotificationsRead
         ))
         
         return items
@@ -2383,13 +2378,15 @@ struct NotificationsOverlayView: View {
                         }
                         .frame(maxWidth: .infinity)
                     } else {
-                        ForEach(Array(notifications.prefix(2))) { notification in
+                        ForEach(notifications) { notification in
                             NotificationRow(notification: notification)
                         }
                         
                         // Mark as read button
                         Button(action: {
-                            // Handle mark as read action
+                            withAnimation {
+                                areNotificationsRead = true
+                            }
                         }) {
                             Text("Mark as read")
                                 .font(.subheadline.weight(.semibold))

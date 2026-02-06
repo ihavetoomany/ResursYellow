@@ -14,10 +14,7 @@ private struct HelpCardBackground: View {
     
     var body: some View {
         if colorScheme == .light {
-            ZStack {
-                Color.white.opacity(0.7)
-                Color.clear.background(.regularMaterial)
-            }
+            Color.white
         } else {
             Color.clear.background(.regularMaterial)
         }

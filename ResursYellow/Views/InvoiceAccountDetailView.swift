@@ -24,7 +24,7 @@ struct InvoiceAccountDetailView: View {
         ZStack(alignment: .top) {
             // Extended background for consistent color
             if colorScheme == .light {
-                Color(red: 0.93, green: 0.92, blue: 0.90)
+                Color(white: 0.93) // Neutral grey
                     .ignoresSafeArea()
             } else {
                 Color(uiColor: .systemGroupedBackground)
@@ -89,6 +89,7 @@ struct InvoiceAccountDetailView: View {
                                 .frame(width: 44, height: 44)
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
+                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                         }
                         Spacer()
                         Button(action: { showAISupport = true }) {
@@ -98,6 +99,7 @@ struct InvoiceAccountDetailView: View {
                                 .frame(width: 44, height: 44)
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
+                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                         }
                         .buttonStyle(.plain)
                     }
@@ -638,13 +640,9 @@ private struct AdaptiveCardBackground: View {
     
     var body: some View {
         if colorScheme == .light {
-            ZStack {
-                Color.white.opacity(0.7)
-                Color.clear.background(.regularMaterial)
-            }
+            Color.white
         } else {
             Color.clear.background(.regularMaterial)
         }
     }
 }
-

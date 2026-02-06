@@ -74,7 +74,7 @@ struct InvoiceDetailView: View {
             ZStack(alignment: .top) {
                 // Extended background for consistent color
                 if colorScheme == .light {
-                    Color(red: 0.93, green: 0.92, blue: 0.90)
+                    Color(white: 0.93) // Neutral grey
                         .ignoresSafeArea()
                 } else {
                     Color(uiColor: .systemGroupedBackground)
@@ -100,18 +100,17 @@ struct InvoiceDetailView: View {
 
                             VStack(spacing: 16) {
                                 // Invoice Details Card
-                                InvoiceDetailsCard(invoice: invoice, isPaid: isPaid || isInvoicePaid, paidAmount: paidAmount)
+                                InvoiceDetailsCard(
+                                    invoice: invoice,
+                                    isPaid: isPaid || isInvoicePaid,
+                                    paidAmount: paidAmount,
+                                    onPay: shouldShowPayButton ? {
+                                        showPaymentSheet = true
+                                    } : nil
+                                )
                                 .padding(.horizontal)
                                 .padding(.top, 8)
                                 .frame(width: geometry.size.width)
-
-                                // What I Pay For Card
-                                WhatIPayForCard(
-                                    merchant: invoice.merchant,
-                                    invoiceAccount: matchingInvoiceAccount
-                                )
-                                    .padding(.horizontal)
-                                    .frame(width: geometry.size.width)
 
                                 // Payment Information Card
                                 if !isInvoicePaid {
@@ -126,6 +125,14 @@ struct InvoiceDetailView: View {
                                         .frame(width: geometry.size.width)
                                 }
 
+                                // What I Pay For Card
+                                WhatIPayForCard(
+                                    merchant: invoice.merchant,
+                                    invoiceAccount: matchingInvoiceAccount
+                                )
+                                    .padding(.horizontal)
+                                    .frame(width: geometry.size.width)
+
                                 // Payment Options
                                 if shouldShowPayButton {
                                     PaymentOptionsCard(
@@ -135,6 +142,10 @@ struct InvoiceDetailView: View {
                                         onSnooze: {
                                             // Handle snooze action
                                             // Could show a date picker sheet or similar
+                                        },
+                                        onReportProblem: {
+                                            // Handle report problem action
+                                            // Could show a support sheet or feedback form
                                         }
                                     )
                                     .padding(.horizontal)
@@ -169,6 +180,7 @@ struct InvoiceDetailView: View {
                                 .frame(width: 44, height: 44)
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
+                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                         }
                         Spacer()
                         Button(action: { showAISupport = true }) {
@@ -178,6 +190,7 @@ struct InvoiceDetailView: View {
                                 .frame(width: 44, height: 44)
                                 .background(.ultraThinMaterial)
                                 .clipShape(Circle())
+                                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
                         }
                         .buttonStyle(.plain)
                     }
@@ -226,6 +239,7 @@ struct InvoiceDetailsCard: View {
     let invoice: InvoiceData
     let isPaid: Bool
     let paidAmount: Double?
+    var onPay: (() -> Void)? = nil
     @Environment(\.colorScheme) var colorScheme
 
     private func formatSEK(_ value: Double) -> String {
@@ -264,7 +278,7 @@ struct InvoiceDetailsCard: View {
             }
 
             // Amount
-            VStack(spacing: 8) {
+            VStack(spacing: 12) {
                 Text(invoice.amount)
                     .font(.system(size: 48, weight: .bold))
 
@@ -275,6 +289,31 @@ struct InvoiceDetailsCard: View {
                     Text(isPaid ? paidLabel : invoice.status)
                         .font(.subheadline)
                         .foregroundColor(isPaid ? .green : invoice.color)
+                }
+                
+                // Pay Button
+                if !isPaid, let payAction = onPay {
+                    Button(action: {
+                        // Haptic feedback
+                        let impact = UIImpactFeedbackGenerator(style: .medium)
+                        impact.impactOccurred()
+                        payAction()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.headline)
+                            Text("Pay Invoice")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color.blue)
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 12)
                 }
             }
 
@@ -657,14 +696,25 @@ struct InvoiceItemRow: View {
 struct PaymentOptionsCard: View {
     let onPayInFull: () -> Void
     let onSnooze: () -> Void
+    let onReportProblem: () -> Void
+    
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(spacing: 12) {
             PaymentOptionRow(
+                icon: "exclamationmark.bubble.fill",
+                title: "Report a problem",
+                description: "Get help with this invoice",
+                color: colorScheme == .dark ? Color(white: 0.25) : Color(uiColor: .systemGray),
+                action: onReportProblem
+            )
+            
+            PaymentOptionRow(
                 icon: "clock.badge.checkmark.fill",
                 title: "Snooze",
                 description: "Postpone payment to a later date",
-                color: Color(uiColor: .systemGray),
+                color: colorScheme == .dark ? Color(white: 0.25) : Color(uiColor: .systemGray),
                 action: onSnooze
             )
 
@@ -710,7 +760,6 @@ struct PaymentOptionRow: View {
                 .background(isPressed ? color.opacity(0.85) : color)
                 .clipShape(Capsule())
                 .scaleEffect(isPressed ? 0.97 : 1.0)
-                .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(PlainButtonStyle())
         .simultaneousGesture(
@@ -1641,10 +1690,7 @@ private struct AdaptiveCardBackground: View {
     
     var body: some View {
         if colorScheme == .light {
-            ZStack {
-                Color.white.opacity(0.7)
-                Color.clear.background(.regularMaterial)
-            }
+            Color.white
         } else {
             Color.clear.background(.regularMaterial)
         }

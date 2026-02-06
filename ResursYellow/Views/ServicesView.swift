@@ -21,10 +21,10 @@ struct ServicesView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             ZStack(alignment: .top) {
-                // Background color - warm sandy grey in light mode, black in dark mode
+                // Background color - neutral grey in light mode, black in dark mode
                 Group {
                     if colorScheme == .light {
-                        Color(red: 0.93, green: 0.92, blue: 0.90) // Warm beige-grey
+                        Color(white: 0.93) // Neutral grey
                     } else {
                         Color.black
                     }
@@ -254,10 +254,7 @@ struct AccountCard: View {
         .padding(16)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -302,10 +299,7 @@ struct CrossSellCard: View {
         .padding(16)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -354,7 +348,7 @@ struct SavingsAccountDetailView: View {
         ZStack(alignment: .top) {
             // Extended background for navigation bar area
             if colorScheme == .light {
-                Color(red: 0.93, green: 0.92, blue: 0.90)
+                Color(white: 0.93) // Neutral grey
                     .ignoresSafeArea()
             } else {
                 Color(uiColor: .systemGroupedBackground)
@@ -464,10 +458,7 @@ struct SavingsAccountDetailView: View {
         .padding(20)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -595,10 +586,7 @@ struct SavingsAccountDetailView: View {
                     .padding(16)
                     .background {
                         if colorScheme == .light {
-                            ZStack {
-                                Color.white.opacity(0.7)
-                                Color.clear.background(.regularMaterial)
-                            }
+                            Color.white
                         } else {
                             Color.clear.background(.regularMaterial)
                         }
@@ -638,10 +626,7 @@ struct SavingsAccountDetailView: View {
                     .padding(16)
                     .background {
                         if colorScheme == .light {
-                            ZStack {
-                                Color.white.opacity(0.7)
-                                Color.clear.background(.regularMaterial)
-                            }
+                            Color.white
                         } else {
                             Color.clear.background(.regularMaterial)
                         }
@@ -688,10 +673,7 @@ struct SavingsAccountDetailView: View {
                         .padding(16)
                         .background {
                             if colorScheme == .light {
-                                ZStack {
-                                    Color.white.opacity(0.7)
-                                    Color.clear.background(.regularMaterial)
-                                }
+                                Color.white
                             } else {
                                 Color.clear.background(.regularMaterial)
                             }
@@ -751,10 +733,7 @@ struct SavingsAccountRow: View {
         .padding(16)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }

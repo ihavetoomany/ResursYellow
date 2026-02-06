@@ -45,7 +45,7 @@ struct JulaDetailView: View {
         ZStack(alignment: .top) {
             // Extended background for navigation bar area
             if colorScheme == .light {
-                Color(red: 0.93, green: 0.92, blue: 0.90)
+                Color(white: 0.93) // Neutral grey
                     .ignoresSafeArea()
             } else {
                 Color(uiColor: .systemGroupedBackground)
@@ -155,10 +155,7 @@ struct JulaDetailView: View {
         .padding(20)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }
@@ -203,10 +200,7 @@ struct JulaDetailView: View {
                     .padding(16)
                     .background {
                         if colorScheme == .light {
-                            ZStack {
-                                Color.white.opacity(0.7)
-                                Color.clear.background(.regularMaterial)
-                            }
+                            Color.white
                         } else {
                             Color.clear.background(.regularMaterial)
                         }
@@ -251,10 +245,7 @@ struct JulaDetailView: View {
                     .padding(16)
                     .background {
                         if colorScheme == .light {
-                            ZStack {
-                                Color.white.opacity(0.7)
-                                Color.clear.background(.regularMaterial)
-                            }
+                            Color.white
                         } else {
                             Color.clear.background(.regularMaterial)
                         }
@@ -294,10 +285,7 @@ struct JulaDetailView: View {
                     .padding(16)
                     .background {
                         if colorScheme == .light {
-                            ZStack {
-                                Color.white.opacity(0.7)
-                                Color.clear.background(.regularMaterial)
-                            }
+                            Color.white
                         } else {
                             Color.clear.background(.regularMaterial)
                         }
@@ -344,10 +332,7 @@ struct JulaDetailView: View {
                         .padding(16)
                         .background {
                             if colorScheme == .light {
-                                ZStack {
-                                    Color.white.opacity(0.7)
-                                    Color.clear.background(.regularMaterial)
-                                }
+                                Color.white
                             } else {
                                 Color.clear.background(.regularMaterial)
                             }

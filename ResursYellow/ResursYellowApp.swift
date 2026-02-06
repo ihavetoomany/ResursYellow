@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct ResursYellowApp: App {
-    @AppStorage("selectedTheme") private var selectedTheme = "Auto"
+    @AppStorage("selectedTheme") private var selectedTheme = "Dark"
     
     init() {
         configureTabBarAppearance()

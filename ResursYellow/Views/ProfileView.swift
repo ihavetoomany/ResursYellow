@@ -14,6 +14,7 @@ struct ProfileView: View {
     @State private var navigationPath = NavigationPath()
     @State private var showLogoutConfirmation = false
     @State private var showResetConfirmation = false
+    @AppStorage("notificationsRead") private var notificationsRead = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -268,6 +269,7 @@ struct ProfileView: View {
             .confirmationDialog("Reset Data", isPresented: $showResetConfirmation, titleVisibility: .visible) {
                 Button("Reset", role: .destructive) {
                     dataManager.reset()
+                    notificationsRead = false
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
@@ -387,10 +389,7 @@ struct ProfileRow: View {
         .padding(16)
         .background {
             if colorScheme == .light {
-                ZStack {
-                    Color.white.opacity(0.7)
-                    Color.clear.background(.regularMaterial)
-                }
+                Color.white
             } else {
                 Color.clear.background(.regularMaterial)
             }

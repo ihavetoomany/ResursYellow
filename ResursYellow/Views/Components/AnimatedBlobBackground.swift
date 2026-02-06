@@ -13,9 +13,20 @@ import SwiftUI
 struct AnimatedBlobBackground: View {
     let isOverdue: Bool
     @State private var animate = false
+    @Environment(\.colorScheme) var colorScheme
     
-    // Color schemes based on payment status
+    // Color schemes based on payment status and color scheme
     private var blobColors: [Color] {
+        // In light mode, always use blue-focused colors for all tabs
+        if colorScheme == .light {
+            return [
+                Color(red: 0.2, green: 0.6, blue: 0.9),   // Sky blue
+                Color(red: 0.3, green: 0.7, blue: 1.0),   // Light blue
+                Color(red: 0.15, green: 0.5, blue: 0.85)  // Medium blue
+            ]
+        }
+        
+        // In dark mode, use original logic based on isOverdue
         if isOverdue {
             // Warm, urgent colors for overdue payments
             return [
