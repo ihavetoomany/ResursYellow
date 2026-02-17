@@ -10,27 +10,17 @@ import SwiftUI
 
 extension Invoice {
     func toInvoiceItem(dateService: DateService) -> InvoiceItem {
-        let dueDate = dateService.formatDateOffset(dueDateOffset)
-        let issueDate = dateService.formatDateOffset(issueDateOffset)
-        
+        let data = toInvoiceData(dateService: dateService)
         return InvoiceItem(
             merchant: merchant,
-            subtitle: dueDate,
-            amount: amount,
+            subtitle: subtitle(dateService: dateService),
+            amount: data.amount,
             icon: icon,
             color: color,
             isOverdue: isOverdue,
             statusOverride: statusOverride,
             category: category.toInvoiceCategory(),
-            detail: InvoiceData(
-                merchant: merchant,
-                amount: amount,
-                dueDate: dueDate,
-                invoiceNumber: invoiceNumber,
-                issueDate: issueDate,
-                status: status,
-                color: color
-            )
+            detail: data
         )
     }
 }

@@ -50,6 +50,21 @@ struct ServicesView: View {
                     }
                 ) {
                 VStack(spacing: 16) {
+                    // Action buttons: Send, Transfer, Receive
+                    HStack(spacing: 12) {
+                        ActionButton(title: "Send", icon: "arrow.up.circle.fill") {
+                            // Send action
+                        }
+                        ActionButton(title: "Transfer", icon: "arrow.left.arrow.right.circle.fill") {
+                            // Transfer action
+                        }
+                        ActionButton(title: "Receive", icon: "arrow.down.circle.fill") {
+                            // Receive action
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 12)
+                    
                     if hasAccounts {
                         // Account Cards
                         VStack(spacing: 16) {
@@ -196,6 +211,40 @@ struct ServicesView: View {
                     }
             }
         }
+    }
+}
+
+// MARK: - Action Button (Send / Transfer / Receive)
+struct ActionButton: View {
+    let title: String
+    let icon: String
+    let action: () -> Void
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(.white)
+                Text(title)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background {
+                if colorScheme == .light {
+                    Color.accentColor.opacity(0.35)
+                } else {
+                    Color.clear.background(.regularMaterial)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
     }
 }
 

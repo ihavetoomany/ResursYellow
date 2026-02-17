@@ -16,6 +16,19 @@
       "autopaySource": "Resurs Gold"
     },
     {
+      "id": "30000000-0000-0000-0000-000000000006",
+      "title": "Emergency Buffer",
+      "subtitle": "Reserved for unexpected expenses",
+      "amount": "18 000 kr",
+      "progress": 0.9,
+      "installmentAmount": "950 kr",
+      "totalAmount": "20 000 SEK",
+      "completedPayments": 0,
+      "totalPayments": 0,
+      "nextDueDate": "—",
+      "autopaySource": "Resurs Gold"
+    },
+    {
       "id": "30000000-0000-0000-0000-000000000002",
       "title": "Flex August",
       "subtitle": "Next invoice due Nov 30",

@@ -331,16 +331,16 @@ extension InvoiceItem {
     static var handledScheduledSamples: [InvoiceItem] {
         [
             InvoiceItem(
-                merchant: "Resurs-OCT",
+                merchant: "Resurs Family",
                 subtitle: "Nov 1, 2025",
                 amount: "785 SEK",
                 icon: "checkmark",
                 color: .cyan,
                 isOverdue: false,
-                statusOverride: "785 scheduled",
+                statusOverride: "Scheduled",
                 category: .handledScheduled,
                 detail: InvoiceData(
-                    merchant: "Resurs-OCT",
+                    merchant: "Resurs Family",
                     amount: "785 SEK",
                     dueDate: "Nov 15, 2025",
                     invoiceNumber: "INV-2025-11-002",
@@ -356,16 +356,16 @@ extension InvoiceItem {
         [
             InvoiceItem(
                 merchant: "Netonnet",
-                subtitle: "Oct 27, 2025",
-                amount: "3 600 SEK",
+                subtitle: "Oct 27 (3 600 kr)",
+                amount: "600 SEK",
                 icon: "checkmark",
                 color: .green,
                 isOverdue: false,
-                statusOverride: "600 paid",
+                statusOverride: "Paid",
                 category: .handledPaid,
                 detail: InvoiceData(
                     merchant: "Netonnet",
-                    amount: "3 600 SEK",
+                    amount: "600 SEK",
                     dueDate: "Nov 10, 2025",
                     invoiceNumber: "INV-2025-10-071",
                     issueDate: "Oct 27, 2025",
@@ -374,7 +374,7 @@ extension InvoiceItem {
                 )
             ),
             InvoiceItem(
-                merchant: "ResursFLEX-SEP",
+                merchant: "Resurs Flex",
                 subtitle: "Oct 25, 2025",
                 amount: "2 340 SEK",
                 icon: "checkmark",
@@ -383,7 +383,7 @@ extension InvoiceItem {
                 statusOverride: nil,
                 category: .handledPaid,
                 detail: InvoiceData(
-                    merchant: "ResursFLEX-SEP",
+                    merchant: "Resurs Flex",
                     amount: "2 340 SEK",
                     dueDate: "Nov 8, 2025",
                     invoiceNumber: "INV-2025-10-058",
@@ -393,8 +393,8 @@ extension InvoiceItem {
                 )
             ),
             InvoiceItem(
-                merchant: "Resurs-SEP",
-                subtitle: "Oct 20, 2025",
+                merchant: "Resurs Family",
+                subtitle: "Dec 31 (4 500 kr)",
                 amount: "452 SEK",
                 icon: "checkmark",
                 color: .green,
@@ -402,11 +402,11 @@ extension InvoiceItem {
                 statusOverride: nil,
                 category: .handledPaid,
                 detail: InvoiceData(
-                    merchant: "Resurs-SEP",
+                    merchant: "Resurs Family",
                     amount: "452 SEK",
                     dueDate: "Nov 3, 2025",
                     invoiceNumber: "INV-2025-10-045",
-                    issueDate: "Oct 20, 2025",
+                    issueDate: "Dec 31, 2025",
                     status: "Paid on Nov 3",
                     color: .green
                 )
@@ -659,16 +659,27 @@ struct PaymentsView: View {
                                                 icon: invoice.icon,
                                                 color: invoice.color,
                                                 isOverdue: invoice.isOverdue,
-                                                statusOverride: invoice.statusOverride
+                                                statusOverride: invoice.statusOverride,
+                                                actionStatement: invoice.category == .overdue ? self.localized("Missing payment!") : self.localized("Partpayment available")
                                             )
                                         }
                                         .buttonStyle(.plain)
                                     }
                                     
-                                    // Extra spacing before handled invoices
+                                    // Subtle separator with "Handled" between due/snoozed and scheduled/paid
                                     if !allInvoices.filter({ $0.category == .handledScheduled || $0.category == .handledPaid }).isEmpty {
-                                        Spacer()
-                                            .frame(height: 12)
+                                        HStack(spacing: 12) {
+                                            Rectangle()
+                                                .fill(Color.secondary.opacity(0.25))
+                                                .frame(height: 1)
+                                            Text(self.localized("Handled"))
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                            Rectangle()
+                                                .fill(Color.secondary.opacity(0.25))
+                                                .frame(height: 1)
+                                        }
+                                        .padding(.vertical, 12)
                                     }
                                     
                                     // Handled invoices (scheduled + paid)
@@ -683,7 +694,8 @@ struct PaymentsView: View {
                                                 icon: invoice.icon,
                                                 color: invoice.color,
                                                 isOverdue: invoice.isOverdue,
-                                                statusOverride: invoice.statusOverride
+                                                statusOverride: invoice.statusOverride,
+                                                actionStatement: (invoice.detail.invoiceNumber == "INV-2025-10-071" || invoice.detail.invoiceNumber == "INV-2025-10-045") ? self.localized("Payment plan started") : (invoice.merchant == "Resurs Flex" ? self.localized("Full payment received") : (invoice.merchant == "Åhléns" ? self.localized("Part payment 6 of 6") : (invoice.category == .handledScheduled ? self.localized("Full payment") : self.localized("View invoice"))))
                                             )
                                         }
                                         .buttonStyle(.plain)
@@ -1919,6 +1931,28 @@ struct InvoicesList: View {
         .navigationBarHidden(true)
     }
     
+    private func actionStatement(for invoice: InvoiceItem) -> String {
+        if invoice.category == .overdue {
+            return localizationService.localizedString("Missing payment!", fallback: "Missing payment!")
+        }
+        if invoice.category == .dueSoon {
+            return localizationService.localizedString("Partpayment available", fallback: "Partpayment available")
+        }
+        if invoice.category == .handledScheduled {
+            return localizationService.localizedString("Full payment", fallback: "Full payment")
+        }
+        if invoice.category == .handledPaid && (invoice.detail.invoiceNumber == "INV-2025-10-071" || invoice.detail.invoiceNumber == "INV-2025-10-045") {
+            return localizationService.localizedString("Payment plan started", fallback: "Payment plan started")
+        }
+        if invoice.category == .handledPaid && invoice.merchant == "Resurs Flex" {
+            return localizationService.localizedString("Full payment received", fallback: "Full payment received")
+        }
+        if invoice.category == .handledPaid && invoice.merchant == "Åhléns" {
+            return localizationService.localizedString("Part payment 6 of 6", fallback: "Part payment 6 of 6")
+        }
+        return localizationService.localizedString("View invoice", fallback: "View invoice")
+    }
+    
     private func invoiceButton(for invoice: InvoiceItem, allowBatching: Bool) -> some View {
         Button {
             navigationPath.append(invoice.detail)
@@ -1931,6 +1965,7 @@ struct InvoicesList: View {
                 color: invoice.color,
                 isOverdue: invoice.isOverdue,
                 statusOverride: invoice.statusOverride,
+                actionStatement: actionStatement(for: invoice),
                 isSelected: invoice.isSelected,
                 onStatusTap: allowBatching ? {
                     toggleSelection(for: invoice)
@@ -2083,6 +2118,7 @@ struct InvoiceRow: View {
     let color: Color
     let isOverdue: Bool
     var statusOverride: String? = nil
+    var actionStatement: String = ""
     var isSelected: Bool = false
     var onStatusTap: (() -> Void)? = nil
     
@@ -2092,15 +2128,20 @@ struct InvoiceRow: View {
         HStack(spacing: 16) {
             statusIndicator
             
-            // Middle: Invoice number and date
+            // Middle: 3 rows (title, subtitle, actionStatement) — matches PurchaseRow layout
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
                     .foregroundColor(.primary)
                 Text(subtitle)
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundColor(.secondary)
+                if !actionStatement.isEmpty {
+                    Text(actionStatement)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
             }
             
             Spacer()
@@ -2108,12 +2149,12 @@ struct InvoiceRow: View {
             // Right: Amount and status
             VStack(alignment: .trailing, spacing: 4) {
                 Text(amount)
-                    .font(.headline)
+                    .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
                 if !statusText.isEmpty {
                     Text(statusText)
-                        .font(.subheadline)
+                        .font(.caption2)
                         .foregroundColor(statusColor)
                 }
             }
@@ -2140,7 +2181,7 @@ struct InvoiceRow: View {
         } else if color == .cyan {
             return "Scheduled"
         } else {
-            return ""
+            return "Due"
         }
     }
     

@@ -22,6 +22,8 @@ struct Invoice: Identifiable, Codable, Hashable {
     let isOverdue: Bool
     var statusOverride: String?
     let category: InvoiceCategory
+    /// Optional suffix appended to subtitle (e.g. "(3 600 kr)" after the date).
+    var subtitleSuffix: String?
     
     enum InvoiceCategory: String, Codable {
         case overdue
@@ -55,7 +57,8 @@ struct Invoice: Identifiable, Codable, Hashable {
         icon: String? = nil,
         isOverdue: Bool = false,
         statusOverride: String? = nil,
-        category: InvoiceCategory
+        category: InvoiceCategory,
+        subtitleSuffix: String? = nil
     ) {
         self.id = id
         self.merchant = merchant
@@ -70,6 +73,7 @@ struct Invoice: Identifiable, Codable, Hashable {
         self.isOverdue = isOverdue
         self.statusOverride = statusOverride
         self.category = category
+        self.subtitleSuffix = subtitleSuffix
     }
 }
 

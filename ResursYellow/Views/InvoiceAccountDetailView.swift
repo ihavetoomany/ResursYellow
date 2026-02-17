@@ -212,7 +212,7 @@ struct InvoiceAccountDetailView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(account.title == "Main Account" ? "Credit Account" : account.title == "Flex August" ? "Flex" : "Invoice Account")
+                    Text(account.title == "Main Account" ? "Credit Account" : account.title == "Flex August" ? "Flex" : account.title == "Emergency Buffer" ? "Emergency Buffer" : "Invoice Account")
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -338,7 +338,8 @@ struct InvoiceAccountDetailView: View {
                         icon: invoice.icon,
                         color: invoice.color,
                         isOverdue: invoice.isOverdue,
-                        statusOverride: invoice.statusOverride
+                        statusOverride: invoice.statusOverride,
+                        actionStatement: "View invoice"
                     )
                 }
             }

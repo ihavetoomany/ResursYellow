@@ -382,9 +382,9 @@ struct ResursGoldPartPaymentRow: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
                 }
-            } else if payment.title == "Main Account" || payment.title == "Flex August" {
+            } else if payment.title == "Main Account" || payment.title == "Flex August" || payment.title == "Emergency Buffer" {
                 HStack(spacing: 4) {
-                    Text("Debt:")
+                    Text(payment.title == "Emergency Buffer" ? "Savings:" : "Debt:")
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -400,11 +400,15 @@ struct ResursGoldPartPaymentRow: View {
             }
             
             ProgressView(value: payment.progress)
-                .tint(payment.title == "Main Account" ? .green : .blue)
+                .tint(payment.title == "Main Account" ? .green : payment.title == "Emergency Buffer" ? .orange : .blue)
             
             HStack {
                 if payment.title == "Main Account" {
                     Text(payment.amount == "0 kr" ? "All purchases are paid" : "Options available on next invoice")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else if payment.title == "Emergency Buffer" {
+                    Text(payment.installmentAmount.isEmpty ? "Reserved for unexpected expenses" : "\(payment.installmentAmount) monthly")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else if payment.title == "Flex August" {
@@ -417,7 +421,11 @@ struct ResursGoldPartPaymentRow: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                if !(payment.title == "Main Account" && payment.amount == "0 kr") {
+                if payment.title == "Emergency Buffer" {
+                    Text(payment.totalAmount)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else if !(payment.title == "Main Account" && payment.amount == "0 kr") {
                     Text(payment.nextDueDate)
                         .font(.caption)
                         .foregroundColor(.secondary)

@@ -850,7 +850,14 @@ struct PaymentSheet: View {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "MMM d, yyyy"
-        return formatter.date(from: invoice.dueDate)
+        if let date = formatter.date(from: invoice.dueDate) { return date }
+        formatter.dateFormat = "MMM d"
+        if let date = formatter.date(from: invoice.dueDate) {
+            var components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+            components.year = 2026
+            return Calendar.current.date(from: components)
+        }
+        return nil
     }
 
     private func datesEqual(_ lhs: Date?, _ rhs: Date?) -> Bool {

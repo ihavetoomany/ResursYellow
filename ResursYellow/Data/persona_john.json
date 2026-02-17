@@ -68,7 +68,7 @@
     },
     {
       "id": "00000000-0000-0000-0000-000000000005",
-      "merchant": "Resurs-OCT",
+      "merchant": "Resurs Family",
       "amount": "785 SEK",
       "dueDateOffset": -5,
       "invoiceNumber": "INV-2025-11-002",
@@ -77,13 +77,13 @@
       "colorName": "cyan",
       "icon": "checkmark",
       "isOverdue": false,
-      "statusOverride": "785 scheduled",
+      "statusOverride": "Scheduled",
       "category": "handledScheduled"
     },
     {
       "id": "00000000-0000-0000-0000-000000000009",
       "merchant": "Netonnet",
-      "amount": "3 600 SEK",
+      "amount": "600 SEK",
       "dueDateOffset": -10,
       "invoiceNumber": "INV-2025-10-071",
       "issueDateOffset": -24,
@@ -91,12 +91,13 @@
       "colorName": "green",
       "icon": "checkmark",
       "isOverdue": false,
-      "statusOverride": "600 paid",
-      "category": "handledPaid"
+      "statusOverride": "Paid",
+      "category": "handledPaid",
+      "subtitleSuffix": "(3 600 kr)"
     },
     {
       "id": "00000000-0000-0000-0000-000000000006",
-      "merchant": "ResursFLEX-SEP",
+      "merchant": "Resurs Flex",
       "amount": "2 340 SEK",
       "dueDateOffset": -12,
       "invoiceNumber": "INV-2025-10-058",
@@ -110,17 +111,18 @@
     },
     {
       "id": "00000000-0000-0000-0000-000000000007",
-      "merchant": "Resurs-SEP",
+      "merchant": "Resurs Family",
       "amount": "452 SEK",
       "dueDateOffset": -17,
       "invoiceNumber": "INV-2025-10-045",
-      "issueDateOffset": -31,
+      "issueDateOffset": 41,
       "status": "Paid on Nov 3",
       "colorName": "green",
       "icon": "checkmark",
       "isOverdue": false,
       "statusOverride": null,
-      "category": "handledPaid"
+      "category": "handledPaid",
+      "subtitleSuffix": "(4 500 kr)"
     },
     {
       "id": "00000000-0000-0000-0000-000000000008",
@@ -470,6 +472,19 @@
       "completedPayments": 5,
       "totalPayments": 10,
       "nextDueDate": "Nov 30, 2025",
+      "autopaySource": "Resurs Gold"
+    },
+    {
+      "id": "30000000-0000-0000-0000-000000000006",
+      "title": "Emergency Buffer",
+      "subtitle": "Reserved for unexpected expenses",
+      "amount": "18 000 kr",
+      "progress": 0.9,
+      "installmentAmount": "950 kr",
+      "totalAmount": "20 000 SEK",
+      "completedPayments": 0,
+      "totalPayments": 0,
+      "nextDueDate": "—",
       "autopaySource": "Resurs Gold"
     },
     {

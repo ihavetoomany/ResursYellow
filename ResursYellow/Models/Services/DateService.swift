@@ -88,6 +88,32 @@ class DateService {
         return formatDate(date, format: "MMM d, yyyy")
     }
     
+    /// Short format without year (e.g., "Jan 31", "Nov 7")
+    func formatDateOffset(_ offset: Int, format: String) -> String {
+        let date = relativeDate(offset: offset)
+        return formatDate(date, format: format)
+    }
+    
+    /// Returns due date string "Jan 31" for display when all upcoming/overdue/scheduled share the same date.
+    func dueDateJan31() -> String {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = 1
+        components.day = 31
+        let date = Calendar.current.date(from: components) ?? currentDate()
+        return formatDate(date, format: "MMM d")
+    }
+    
+    /// Returns date string "Dec 31" for display when all paid invoices share the same date.
+    func dueDateDec31() -> String {
+        var components = DateComponents()
+        components.year = 2025
+        components.month = 12
+        components.day = 31
+        let date = Calendar.current.date(from: components) ?? currentDate()
+        return formatDate(date, format: "MMM d")
+    }
+    
     /// Formats a date offset with time (e.g., "Nov 7, 2025, 9:05 AM")
     func formatDateOffsetWithTime(_ offset: Int, time: String) -> String {
         let dateStr = formatDateOffset(offset)
