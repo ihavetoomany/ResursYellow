@@ -235,14 +235,7 @@ struct ActionButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .background {
-                if colorScheme == .light {
-                    Color.accentColor.opacity(0.35)
-                } else {
-                    Color.clear.background(.regularMaterial)
-                }
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
     }
