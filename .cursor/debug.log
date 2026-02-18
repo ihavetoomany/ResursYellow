@@ -1,0 +1,12 @@
+{"location":"DebugLog.swift:9","message":"ScrollOffsetObserver deinit","hypothesisId":"B","timestamp":1771365494604}
+{"message":"ScrollOffsetObserver init","hypothesisId":"B","location":"DebugLog.swift:9","timestamp":1771365494627}
+{"message":"ScrollOffsetObserver init","timestamp":1771365634491,"location":"DebugLog.swift:9","hypothesisId":"B"}
+{"location":"DebugLog.swift:9","hypothesisId":"B","message":"ScrollOffsetObserver init","timestamp":1771365645258}
+{"hypothesisId":"A","timestamp":1771365645418,"message":"InvoiceDetailView onAppear","location":"DebugLog.swift:9"}
+{"location":"DebugLog.swift:9","timestamp":1771365646780,"hypothesisId":"A","message":"PaymentSheet onAppear"}
+{"message":"PaymentSheet onDisappear","location":"DebugLog.swift:9","timestamp":1771365649128,"hypothesisId":"C"}
+{"hypothesisId":"B","message":"ScrollOffsetObserver deinit","timestamp":1771365650613,"location":"DebugLog.swift:9"}
+{"hypothesisId":"B","timestamp":1771397969323,"location":"DebugLog.swift:9","message":"ScrollOffsetObserver init"}
+{"location":"DebugLog.swift:9","timestamp":1771399230917,"message":"InvoiceDetailView onAppear","hypothesisId":"A"}
+{"location":"DebugLog.swift:9","hypothesisId":"A","timestamp":1771399486679,"message":"InvoiceDetailView onAppear"}
+{"timestamp":1771399508796,"location":"DebugLog.swift:9","hypothesisId":"A","message":"InvoiceDetailView onAppear"}

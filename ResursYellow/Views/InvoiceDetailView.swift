@@ -209,6 +209,11 @@ struct InvoiceDetailView: View {
             .frame(width: geometry.size.width)
         }
         .navigationBarHidden(true)
+        .onAppear {
+            // #region agent log
+            _debugLog("InvoiceDetailView onAppear", hypothesisId: "A")
+            // #endregion
+        }
         .sheet(isPresented: $showAISupport) {
             AISupportChatView()
                 .presentationBackground {
@@ -873,7 +878,13 @@ struct PaymentSheet: View {
 
     private func finalizePayment() {
         isProcessing = true
+        // #region agent log
+        _debugLog("finalizePayment scheduled", data: ["delay": 1.5], hypothesisId: "A")
+        // #endregion
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            // #region agent log
+            _debugLog("finalizePayment closure executed", hypothesisId: "A")
+            // #endregion
             paidAmount = targetAmount
             onPaymentCompleted()
             dismiss()
@@ -974,6 +985,9 @@ struct PaymentSheet: View {
                     .buttonStyle(.plain)
                 }
                 .onAppear {
+                    // #region agent log
+                    _debugLog("PaymentSheet onAppear", hypothesisId: "A")
+                    // #endregion
                     ensureSelectionDefault()
                     paymentDate = isOverdueInvoice ? Date() : (dueDateValue ?? Date())
                     displayAmount = targetAmount
@@ -993,6 +1007,10 @@ struct PaymentSheet: View {
                     }
                 }
                 .onDisappear {
+                    // #region agent log
+                    _debugLog("PaymentSheet onDisappear", hypothesisId: "C")
+                    if amountTimer != nil { _debugLog("PaymentSheet timer invalidated", hypothesisId: "C") }
+                    // #endregion
                     amountTimer?.invalidate()
                     amountTimer = nil
                 }

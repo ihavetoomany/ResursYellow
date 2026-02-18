@@ -212,7 +212,7 @@ struct InvoiceAccountDetailView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(account.title == "Main Account" ? "Credit Account" : account.title == "Flex August" ? "Flex" : account.title == "Emergency Buffer" ? "Emergency Buffer" : "Invoice Account")
+                    Text(account.title == "Main Account" ? "Credit Account" : account.title == "Part Payment AUG" ? "Part Payment AUG" : account.title == "Emergency Buffer" ? "Emergency Buffer" : "Invoice Account")
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }

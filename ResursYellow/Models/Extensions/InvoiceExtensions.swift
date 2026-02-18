@@ -49,6 +49,17 @@ extension Invoice {
         }
         return dateString
     }
+
+    /// Subtitle for list rows. For overdue and due-soon, prefixes the date with "Due " (e.g. "Due Jan 31").
+    func listSubtitle(dateService: DateService) -> String {
+        let raw = subtitle(dateService: dateService)
+        switch category {
+        case .overdue, .dueSoon:
+            return "Due " + raw
+        default:
+            return raw
+        }
+    }
 }
 
 extension Invoice.InvoiceCategory {

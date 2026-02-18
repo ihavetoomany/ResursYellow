@@ -261,7 +261,7 @@ struct HouseRenovationLoanView: View {
         }
         .navigationTitle("House Renovation")
         .navigationBarTitleDisplayMode(.large)
-        .toolbarBackground(scrollObserver.offset > 10 ? .visible : .hidden, for: .navigationBar)
+        .toolbarBackground(scrollObserver.offset > 10 ? Color(uiColor: .systemBackground) : Color.clear, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {

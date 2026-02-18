@@ -185,7 +185,7 @@ struct BauhausDetailView: View {
         }
         .navigationTitle("Bauhaus")
         .navigationBarTitleDisplayMode(.large)
-        .toolbarBackground(scrollObserver.offset > 10 ? .visible : .hidden, for: .navigationBar)
+        .toolbarBackground(scrollObserver.offset > 10 ? Color(uiColor: .systemBackground) : Color.clear, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {
@@ -319,7 +319,7 @@ struct BauhausDetailView: View {
     private var partPaymentsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Active accounts")
+                Text("Part Payments")
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()

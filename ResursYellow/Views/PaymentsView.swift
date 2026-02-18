@@ -486,7 +486,7 @@ struct PaymentsView: View {
             InvoiceItem(
                 id: invoice.id,
                 merchant: invoice.merchant,
-                subtitle: invoice.subtitle(dateService: dateService),
+                subtitle: invoice.listSubtitle(dateService: dateService),
                 amount: invoice.amount,
                 icon: invoice.icon,
                 color: invoice.color,
@@ -504,7 +504,7 @@ struct PaymentsView: View {
             InvoiceItem(
                 id: invoice.id,
                 merchant: invoice.merchant,
-                subtitle: invoice.subtitle(dateService: dateService),
+                subtitle: invoice.listSubtitle(dateService: dateService),
                 amount: invoice.amount,
                 icon: invoice.icon,
                 color: invoice.color,
@@ -1827,7 +1827,7 @@ struct InvoicesList: View {
         InvoiceItem(
             id: invoice.id,
             merchant: invoice.merchant,
-            subtitle: invoice.subtitle(dateService: dateService),
+            subtitle: invoice.listSubtitle(dateService: dateService),
             amount: invoice.amount,
             icon: invoice.icon,
             color: invoice.color,
@@ -2154,7 +2154,7 @@ struct InvoiceRow: View {
                     .foregroundColor(.primary)
                 if !statusText.isEmpty {
                     Text(statusText)
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundColor(statusColor)
                 }
             }

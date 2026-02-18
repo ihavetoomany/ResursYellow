@@ -306,7 +306,7 @@ struct ResursFamilyAccountView: View {
         }
         .navigationTitle("Resurs Family")
         .navigationBarTitleDisplayMode(.large)
-        .toolbarBackground(scrollObserver.offset > 10 ? .visible : .hidden, for: .navigationBar)
+        .toolbarBackground(scrollObserver.offset > 10 ? Color(uiColor: .systemBackground) : Color.clear, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {
@@ -382,7 +382,7 @@ struct ResursGoldPartPaymentRow: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
                 }
-            } else if payment.title == "Main Account" || payment.title == "Flex August" || payment.title == "Emergency Buffer" {
+            } else if payment.title == "Main Account" || payment.title == "Part Payment AUG" || payment.title == "Emergency Buffer" {
                 HStack(spacing: 4) {
                     Text(payment.title == "Emergency Buffer" ? "Savings:" : "Debt:")
                         .font(.subheadline)
@@ -411,7 +411,7 @@ struct ResursGoldPartPaymentRow: View {
                     Text(payment.installmentAmount.isEmpty ? "Reserved for unexpected expenses" : "\(payment.installmentAmount) monthly")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                } else if payment.title == "Flex August" {
+                } else if payment.title == "Part Payment AUG" {
                     Text("Part payment ongoing")
                         .font(.caption)
                         .foregroundColor(.secondary)
