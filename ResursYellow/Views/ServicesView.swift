@@ -122,6 +122,16 @@ struct ServicesView: View {
                             .buttonStyle(PlainButtonStyle())
                             .accessibilityLabel("House Renovation loan. 255 000 kronor remaining balance.")
                             .accessibilityHint("Opens loan details and payment schedule.")
+                            
+                            // X-sell: promote Resurs services (Loans, Savings, Credit Cards) — distinct layout so not confused with products
+                            Button {
+                                showAddAccount = true
+                            } label: {
+                                AddFreedomCard(title: "Explore Resurs Banking")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .accessibilityLabel("Explore Resurs Banking. Explore loans, savings, and credit cards.")
+                            .accessibilityHint("Opens options to apply for more Resurs products.")
                         }
                         .padding(.horizontal)
                         .padding(.top, 12)
@@ -302,6 +312,47 @@ struct AccountCard: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+// MARK: - Add Freedom / Benefits (X-sell) Card
+/// Promotional card with dotted border and plus icon. Used in Services (“Add some freedom”) and Merchants (“Add some benefits”).
+/// Visually distinct from product/merchant cards so users don’t confuse it with existing items. HIG: clear hierarchy.
+struct AddFreedomCard: View {
+    var title: String = "Add some freedom"
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "plus.circle.fill")
+                .font(.system(size: 32))
+                .foregroundStyle(.secondary.opacity(0.8))
+            Text(title)
+                .font(.subheadline.weight(.medium))
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+        .padding(.horizontal, 16)
+        .background(Color.primary.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay {
+            // Inner shadow for indented look: darker at top-leading, masked to card shape
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.black.opacity(0.12), Color.clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .mask(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .allowsHitTesting(false)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+                .foregroundStyle(Color.secondary.opacity(0.4))
+        }
     }
 }
 

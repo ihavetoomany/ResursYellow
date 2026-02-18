@@ -109,7 +109,8 @@ struct ResursFamilyAccountView: View {
                                 icon: "display.2",
                                 color: .green,
                                 paymentMethod: .resursFamily,
-                                showsPartPayBadge: true
+                                showsPartPayBadge: true,
+                                showsPaymentMethodLine: false
                             )
                             
                             PurchaseRow(
@@ -119,7 +120,8 @@ struct ResursFamilyAccountView: View {
                                 icon: "cart.fill",
                                 color: .brown,
                                 paymentMethod: .resursFamily,
-                                showsPartPayBadge: false
+                                showsPartPayBadge: false,
+                                showsPaymentMethodLine: false
                             )
                             
                             PurchaseRow(
@@ -129,7 +131,8 @@ struct ResursFamilyAccountView: View {
                                 icon: "sportscourt.fill",
                                 color: .purple,
                                 paymentMethod: .resursFamily,
-                                showsPartPayBadge: false
+                                showsPartPayBadge: false,
+                                showsPaymentMethodLine: false
                             )
                             
                             PurchaseRow(
@@ -139,7 +142,8 @@ struct ResursFamilyAccountView: View {
                                 icon: "lightbulb.fill",
                                 color: .yellow,
                                 paymentMethod: .resursFamily,
-                                showsPartPayBadge: false
+                                showsPartPayBadge: false,
+                                showsPaymentMethodLine: false
                             )
                             
                             PurchaseRow(
@@ -149,7 +153,8 @@ struct ResursFamilyAccountView: View {
                                 icon: "bag.fill",
                                 color: .pink,
                                 paymentMethod: .resursFamily,
-                                showsPartPayBadge: true
+                                showsPartPayBadge: true,
+                                showsPaymentMethodLine: false
                             )
                         }
                         .padding(.horizontal)

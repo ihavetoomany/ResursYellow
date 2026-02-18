@@ -2051,6 +2051,8 @@ struct PurchaseRow: View {
     let color: Color
     let paymentMethod: PaymentMethod
     let showsPartPayBadge: Bool
+    /// When false, omits the "Paid with …" line (e.g. on Resurs Family account where context is clear).
+    var showsPaymentMethodLine: Bool = true
     
     @StateObject private var localizationService = LocalizationService.shared
     @Environment(\.colorScheme) var colorScheme
@@ -2073,9 +2075,11 @@ struct PurchaseRow: View {
                 Text(subtitle)
                     .font(.caption)
                     .foregroundColor(.secondary)
-                Text("\(localizationService.localizedString("Paid with", fallback: "Paid with")) \(paymentMethod.displayName)")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
+                if showsPaymentMethodLine {
+                    Text("\(localizationService.localizedString("Paid with", fallback: "Paid with")) \(paymentMethod.displayName)")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
             }
             
             Spacer()

@@ -361,6 +361,16 @@ struct MerchantsView: View {
                             .buttonStyle(PlainButtonStyle())
                             .padding(.top, 4)
                             
+                            Button {
+                                showAddMerchant = true
+                            } label: {
+                                AddFreedomCard(title: "Find your favorite stores")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .accessibilityLabel("Find your favorite stores. Explore more merchants.")
+                            .accessibilityHint("Opens options to connect more stores.")
+                            .padding(.top, 20)
+                            
                             Spacer()
                         }
                         .frame(maxWidth: .infinity)
@@ -393,6 +403,15 @@ struct MerchantsView: View {
                                         }
                                     }
                                 }
+                                
+                                Button {
+                                    showAddMerchant = true
+                                } label: {
+                                    AddFreedomCard(title: "Find your favorite stores")
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .accessibilityLabel("Find your favorite stores. Explore more merchants.")
+                                .accessibilityHint("Opens options to connect more stores.")
                             }
                         }
                         .padding(.top, 24)
