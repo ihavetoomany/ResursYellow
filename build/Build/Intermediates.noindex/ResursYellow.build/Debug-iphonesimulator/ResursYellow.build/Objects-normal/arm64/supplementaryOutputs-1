@@ -1,0 +1,30 @@
+{
+  "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Models/Extensions/InvoiceAccountExtensions.swift" : {
+    "const-values" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceAccountExtensions.swiftconstvalues",
+    "dependencies" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceAccountExtensions.d",
+    "diagnostics" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceAccountExtensions.dia",
+    "object" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceAccountExtensions.o",
+    "swift-dependencies" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceAccountExtensions.swiftdeps"
+  },
+  "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Models/Extensions/InvoiceExtensions.swift" : {
+    "const-values" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceExtensions.swiftconstvalues",
+    "dependencies" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceExtensions.d",
+    "diagnostics" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceExtensions.dia",
+    "object" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceExtensions.o",
+    "swift-dependencies" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/InvoiceExtensions.swiftdeps"
+  },
+  "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Models/Extensions/TransactionExtensions.swift" : {
+    "const-values" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/TransactionExtensions.swiftconstvalues",
+    "dependencies" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/TransactionExtensions.d",
+    "diagnostics" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/TransactionExtensions.dia",
+    "object" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/TransactionExtensions.o",
+    "swift-dependencies" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/TransactionExtensions.swiftdeps"
+  },
+  "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Models/Services/DataManager.swift" : {
+    "const-values" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/DataManager.swiftconstvalues",
+    "dependencies" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/DataManager.d",
+    "diagnostics" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/DataManager.dia",
+    "object" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/DataManager.o",
+    "swift-dependencies" : "/Users/R01501/Desktop/ResursApps/ResursYellow/build/Build/Intermediates.noindex/ResursYellow.build/Debug-iphonesimulator/ResursYellow.build/Objects-normal/arm64/DataManager.swiftdeps"
+  }
+}

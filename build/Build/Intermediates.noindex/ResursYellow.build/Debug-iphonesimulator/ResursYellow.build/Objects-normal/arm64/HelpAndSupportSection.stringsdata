@@ -1,0 +1,24 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/Components/HelpAndSupportSection.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%@, %@",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 85
+        }
+      },
+      {
+        "comment": "",
+        "key": "Double tap to open",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 86
+        }
+      }
+    ]
+  },
+  "version": 1
+}

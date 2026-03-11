@@ -1,0 +1,200 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/ResursFamilyAccountView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Resurs Family",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 312
+        }
+      },
+      {
+        "comment": "",
+        "key": "Purchases",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 89
+        }
+      },
+      {
+        "comment": "",
+        "key": "View all",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 96
+        }
+      },
+      {
+        "comment": "",
+        "key": "Accounts",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 167
+        }
+      },
+      {
+        "comment": "",
+        "key": "View all",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 174
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cards",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 197
+        }
+      },
+      {
+        "comment": "",
+        "key": "Benefits and services",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 226
+        }
+      },
+      {
+        "comment": "",
+        "key": "left to pay",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 385
+        }
+      },
+      {
+        "comment": "",
+        "key": "Savings:",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 392
+        }
+      },
+      {
+        "comment": "",
+        "key": "Debt:",
+        "location": {
+          "startingColumn": 77,
+          "startingLine": 392
+        }
+      },
+      {
+        "comment": "",
+        "key": "Part payment ongoing",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 420
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld of %lld payments",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 424
+        }
+      },
+      {
+        "comment": "",
+        "key": "All purchases are paid",
+        "location": {
+          "startingColumn": 53,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "Options available on next invoice",
+        "location": {
+          "startingColumn": 80,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reserved for unexpected expenses",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 416
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ monthly",
+        "location": {
+          "startingColumn": 99,
+          "startingLine": 416
+        }
+      },
+      {
+        "comment": "",
+        "key": "Available Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 452
+        }
+      },
+      {
+        "comment": "",
+        "key": "56 005 SEK",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 455
+        }
+      },
+      {
+        "comment": "",
+        "key": "Limit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 473
+        }
+      },
+      {
+        "comment": "",
+        "key": "80 000 SEK",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 476
+        }
+      },
+      {
+        "comment": "",
+        "key": "Used Credit",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 486
+        }
+      },
+      {
+        "comment": "",
+        "key": "23 995 SEK",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "•••• %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 528
+        }
+      },
+      {
+        "comment": "",
+        "key": "Used",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 539
+        }
+      }
+    ]
+  },
+  "version": 1
+}

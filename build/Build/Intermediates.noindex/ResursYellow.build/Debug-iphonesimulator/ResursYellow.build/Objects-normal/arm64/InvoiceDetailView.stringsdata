@@ -1,0 +1,552 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/InvoiceDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Invoice",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 199
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Scheduled",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 273
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pay Invoice",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 310
+        }
+      },
+      {
+        "comment": "",
+        "key": "What I pay for",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 366
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 396
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@",
+        "location": {
+          "startingColumn": 85,
+          "startingLine": 396
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoice account",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 416
+        }
+      },
+      {
+        "comment": "",
+        "key": "Scheduled Payment",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 464
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Information",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 464
+        }
+      },
+      {
+        "comment": "",
+        "key": "Status",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 472
+        }
+      },
+      {
+        "comment": "",
+        "key": "Auto-pay scheduled",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 476
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Method",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 484
+        }
+      },
+      {
+        "comment": "",
+        "key": "Nordea *894",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 492
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 501
+        }
+      },
+      {
+        "comment": "",
+        "key": "OCR",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 519
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankgiro",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 537
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoice PDF",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 562
+        }
+      },
+      {
+        "comment": "",
+        "key": "Items",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 644
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 660
+        }
+      },
+      {
+        "comment": "",
+        "key": "Qty: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 687
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount %@",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 972
+        }
+      },
+      {
+        "comment": "",
+        "key": "Change Amount",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 977
+        }
+      },
+      {
+        "comment": "",
+        "key": "Scheduling a payment is a request to your bank to make a transfer. The request can be declined or fail for several reasons, and you must ensure there are sufficient funds in the selected account at the time of the requested transfer.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1164
+        }
+      },
+      {
+        "comment": "",
+        "key": "Nordea *894",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1029
+        }
+      },
+      {
+        "comment": "",
+        "key": "Checking account",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1032
+        }
+      },
+      {
+        "comment": "",
+        "key": "Change",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1038
+        }
+      },
+      {
+        "comment": "",
+        "key": "One payment. Total %@",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 1069
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld kr / month · Total %lld kr",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 1073
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment insurance included",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 1077
+        }
+      },
+      {
+        "comment": "",
+        "key": "Part Pay",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1085
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pay now",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1111
+        }
+      },
+      {
+        "comment": "",
+        "key": "Overdue invoice",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1114
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Date",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 1150
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment date",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 1157
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom date",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 1139
+        }
+      },
+      {
+        "comment": "",
+        "key": "On due date",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 1139
+        }
+      },
+      {
+        "comment": "",
+        "key": "After due",
+        "location": {
+          "startingColumn": 63,
+          "startingLine": 1142
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your choice",
+        "location": {
+          "startingColumn": 77,
+          "startingLine": 1142
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pay just in time",
+        "location": {
+          "startingColumn": 94,
+          "startingLine": 1142
+        }
+      },
+      {
+        "comment": "",
+        "key": "Processing...",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 1188
+        }
+      },
+      {
+        "comment": "",
+        "key": "Confirm Payment",
+        "location": {
+          "startingColumn": 63,
+          "startingLine": 1188
+        }
+      },
+      {
+        "comment": "",
+        "key": "No payment plans available right now.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1345
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pay Over Time",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1326
+        }
+      },
+      {
+        "comment": "",
+        "key": "One payment · Total %@ kr",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1360
+        }
+      },
+      {
+        "comment": "",
+        "key": "No fees or interest",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1363
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ kr / month · Total %@ kr",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1383
+        }
+      },
+      {
+        "comment": "",
+        "key": "Interest %lld%% · Fee %lld kr",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1389
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear all debt",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 1372
+        }
+      },
+      {
+        "comment": "",
+        "key": "Also pay debt not yet invoiced",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 1374
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Payment Insurance",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1398
+        }
+      },
+      {
+        "comment": "",
+        "key": "Adds 0.4% of total to monthly amount",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1400
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit warning: Borrowing costs money. Be sure you can repay, as missed payments can lead to fees and debt. Consider your budget carefully before choosing a payment plan.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1441
+        }
+      },
+      {
+        "comment": "",
+        "key": "Confirm Selection",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1457
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select Payment Option",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1620
+        }
+      },
+      {
+        "comment": "",
+        "key": "Full payment",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 1527
+        }
+      },
+      {
+        "comment": "",
+        "key": "One payment · Total %@ kr",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 1529
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ kr / month",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 1549
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ · Total %@ kr",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 1552
+        }
+      },
+      {
+        "comment": "",
+        "key": "Interest %lld%% · Fee %lld kr",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 1555
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear all debt",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 1538
+        }
+      },
+      {
+        "comment": "",
+        "key": "Also pay debt not yet invoiced",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 1540
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Payment Insurance",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 1567
+        }
+      },
+      {
+        "comment": "",
+        "key": "Adds 0.4% of total to monthly amount",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 1569
+        }
+      },
+      {
+        "comment": "",
+        "key": "Confirm Selection",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1607
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit is a risk",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1655
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit involves borrowing money that must be repaid with interest and fees. Taking on credit can affect your financial stability, and missed or late payments may lead to additional charges, collection actions, and negative impacts on your creditworthiness. Changes in income, unexpected expenses, or higher interest costs can increase the risk of not meeting payment obligations. Always ensure you understand the total cost, repayment schedule, and consequences of non-payment before proceeding.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1659
+        }
+      },
+      {
+        "comment": "",
+        "key": "By proceeding, you acknowledge that:\n• You are responsible for repaying the credit according to the terms.\n• Charges, interest, and fees may apply if payments are late or missed.\n• Your bank or lender may decline or reverse the transaction if conditions are not met.\n• Failing to repay may impact your ability to obtain credit in the future.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1666
+        }
+      },
+      {
+        "comment": "",
+        "key": "I understand",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1678
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,240 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/InvoiceAccountDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Next payment",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 140
+        }
+      },
+      {
+        "comment": "",
+        "key": "To pay by %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 150
+        }
+      },
+      {
+        "comment": "",
+        "key": "Received amount",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "0 kr",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 166
+        }
+      },
+      {
+        "comment": "",
+        "key": "Monthly invoices created around the 5th with payment due by month end.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account information",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 185
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account Number",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 199
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit Account",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 215
+        }
+      },
+      {
+        "comment": "",
+        "key": "Part Payment AUG",
+        "location": {
+          "startingColumn": 117,
+          "startingLine": 215
+        }
+      },
+      {
+        "comment": "",
+        "key": "Emergency Buffer",
+        "location": {
+          "startingColumn": 176,
+          "startingLine": 215
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoice Account",
+        "location": {
+          "startingColumn": 197,
+          "startingLine": 215
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit Limit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 223
+        }
+      },
+      {
+        "comment": "",
+        "key": "80 000 kr",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 227
+        }
+      },
+      {
+        "comment": "",
+        "key": "Utilized Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 235
+        }
+      },
+      {
+        "comment": "",
+        "key": "OCR",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 247
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankgiro",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 259
+        }
+      },
+      {
+        "comment": "",
+        "key": "123-456",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 263
+        }
+      },
+      {
+        "comment": "",
+        "key": "No transactions yet",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 295
+        }
+      },
+      {
+        "comment": "",
+        "key": "Transactions",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 281
+        }
+      },
+      {
+        "comment": "",
+        "key": "View all",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 288
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoices",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 319
+        }
+      },
+      {
+        "comment": "",
+        "key": "View all",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 326
+        }
+      },
+      {
+        "comment": "",
+        "key": "Actions",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 415
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pay Extra",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 425
+        }
+      },
+      {
+        "comment": "",
+        "key": "Make end payment",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 445
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close account",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 465
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pay Extra",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 601
+        }
+      },
+      {
+        "comment": "",
+        "key": "Make end payment",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 618
+        }
+      }
+    ]
+  },
+  "version": 1
+}

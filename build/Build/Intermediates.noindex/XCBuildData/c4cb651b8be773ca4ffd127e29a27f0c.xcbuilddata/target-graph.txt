@@ -1,0 +1,2 @@
+Target dependency graph (1 target)
+Target 'ResursYellow' in project 'ResursYellow' (no dependencies)

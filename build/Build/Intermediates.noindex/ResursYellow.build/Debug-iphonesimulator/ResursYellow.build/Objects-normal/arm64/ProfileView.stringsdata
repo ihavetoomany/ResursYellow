@@ -1,0 +1,904 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/ProfileView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Log out",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 261
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset Data",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 269
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close profile",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 230
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dismiss profile overlay",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 231
+        }
+      },
+      {
+        "comment": "",
+        "key": "Manage your account",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 239
+        }
+      },
+      {
+        "comment": "",
+        "key": "Profile",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 243
+        }
+      },
+      {
+        "comment": "",
+        "key": "Log out",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 262
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 265
+        }
+      },
+      {
+        "comment": "",
+        "key": "Are you sure you want to log out?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 267
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 270
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 274
+        }
+      },
+      {
+        "comment": "",
+        "key": "This will restore all data to default values. All your changes will be lost. Are you sure?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 276
+        }
+      },
+      {
+        "comment": "",
+        "key": "Coming soon",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 319
+        }
+      },
+      {
+        "comment": "",
+        "key": "Contact Information",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 430
+        }
+      },
+      {
+        "comment": "",
+        "key": "Email address",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 410
+        }
+      },
+      {
+        "comment": "",
+        "key": "john.doe@example.com",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 413
+        }
+      },
+      {
+        "comment": "",
+        "key": "Phone nr",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 419
+        }
+      },
+      {
+        "comment": "",
+        "key": "+46 70 123 45 67",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 422
+        }
+      },
+      {
+        "comment": "",
+        "key": "Contact Information",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 427
+        }
+      },
+      {
+        "comment": "",
+        "key": "Messages & Notifications",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 476
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Confirmation",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 439
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoice Available",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 444
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account Update",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 449
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment of 2,450 SEK received",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 440
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Confirmation",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 441
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your December invoice is ready",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 445
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoice Available",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 446
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your credit limit has been increased",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 450
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account Update",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 451
+        }
+      },
+      {
+        "comment": "",
+        "key": "Messages",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 454
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment reminder",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 458
+        }
+      },
+      {
+        "comment": "",
+        "key": "Spending alert",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 463
+        }
+      },
+      {
+        "comment": "",
+        "key": "New offer available",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 468
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment due in 3 days",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 459
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Reminder",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 460
+        }
+      },
+      {
+        "comment": "",
+        "key": "You've reached 80% of your monthly budget",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 464
+        }
+      },
+      {
+        "comment": "",
+        "key": "Spending Alert",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 465
+        }
+      },
+      {
+        "comment": "",
+        "key": "Special rate on savings account",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 469
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Offer",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 470
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notifications",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 473
+        }
+      },
+      {
+        "comment": "",
+        "key": "KYC",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 498
+        }
+      },
+      {
+        "comment": "",
+        "key": "View answers",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 485
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit answers",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 490
+        }
+      },
+      {
+        "comment": "",
+        "key": "KYC Answers",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 486
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Answers",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 487
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit KYC Answers",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 491
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Answers",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 492
+        }
+      },
+      {
+        "comment": "",
+        "key": "Know Your Customer",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 495
+        }
+      },
+      {
+        "comment": "",
+        "key": "My Documents",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 520
+        }
+      },
+      {
+        "comment": "",
+        "key": "Agreements",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 507
+        }
+      },
+      {
+        "comment": "",
+        "key": "Contracts",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 512
+        }
+      },
+      {
+        "comment": "",
+        "key": "Agreements",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 508
+        }
+      },
+      {
+        "comment": "",
+        "key": "Agreements",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 509
+        }
+      },
+      {
+        "comment": "",
+        "key": "Contracts",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 513
+        }
+      },
+      {
+        "comment": "",
+        "key": "Contracts",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 514
+        }
+      },
+      {
+        "comment": "",
+        "key": "My Documents",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 517
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chart of Expenses",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 551
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chart of Expenses",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 529
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expense Chart",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 543
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chart of Available Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 582
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chart of Available Credit",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 560
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit Chart",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 574
+        }
+      },
+      {
+        "comment": "",
+        "key": "Spending Trends",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 598
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gamification",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 591
+        }
+      },
+      {
+        "comment": "",
+        "key": "Spending Trends",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 595
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gamification",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 620
+        }
+      },
+      {
+        "comment": "",
+        "key": "Milestones",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 607
+        }
+      },
+      {
+        "comment": "",
+        "key": "Badges or rewards",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 612
+        }
+      },
+      {
+        "comment": "",
+        "key": "Milestones",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 608
+        }
+      },
+      {
+        "comment": "",
+        "key": "Milestones",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 609
+        }
+      },
+      {
+        "comment": "",
+        "key": "Badges or Rewards",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 613
+        }
+      },
+      {
+        "comment": "",
+        "key": "Badges or Rewards",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 614
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gamification",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 617
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connect Bank Account",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 659
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connect Bank Account",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 634
+        }
+      },
+      {
+        "comment": "",
+        "key": "Link your external bank accounts to get a complete view of your finances.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 638
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connect Account",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 647
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notification Settings",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 679
+        }
+      },
+      {
+        "comment": "",
+        "key": "Communication sendouts",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 671
+        }
+      },
+      {
+        "comment": "",
+        "key": "Marketing",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 672
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notification Settings",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 674
+        }
+      },
+      {
+        "comment": "",
+        "key": "Control how you receive notifications from Resurs.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 676
+        }
+      },
+      {
+        "comment": "",
+        "key": "Theme",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 701
+        }
+      },
+      {
+        "comment": "",
+        "key": "Theme",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 690
+        }
+      },
+      {
+        "comment": "",
+        "key": "Light",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 691
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dark",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 692
+        }
+      },
+      {
+        "comment": "",
+        "key": "Auto",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 693
+        }
+      },
+      {
+        "comment": "",
+        "key": "Appearance",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 696
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose your preferred theme. Auto will match your system settings.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 698
+        }
+      },
+      {
+        "comment": "",
+        "key": "Language",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 726
+        }
+      },
+      {
+        "comment": "",
+        "key": "Language",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 712
+        }
+      },
+      {
+        "comment": "",
+        "key": "App Language",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 721
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose your preferred language for the app interface.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 723
+        }
+      },
+      {
+        "comment": "",
+        "key": "Accessibility",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 755
+        }
+      },
+      {
+        "comment": "",
+        "key": "Display & Text Size",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 735
+        }
+      },
+      {
+        "comment": "",
+        "key": "Motion",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 740
+        }
+      },
+      {
+        "comment": "",
+        "key": "VoiceOver",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 745
+        }
+      },
+      {
+        "comment": "",
+        "key": "Display & Text Size Settings",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 736
+        }
+      },
+      {
+        "comment": "",
+        "key": "Display & Text Size",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 737
+        }
+      },
+      {
+        "comment": "",
+        "key": "Motion Settings",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 741
+        }
+      },
+      {
+        "comment": "",
+        "key": "Motion",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 742
+        }
+      },
+      {
+        "comment": "",
+        "key": "VoiceOver Settings",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 746
+        }
+      },
+      {
+        "comment": "",
+        "key": "VoiceOver",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 747
+        }
+      },
+      {
+        "comment": "",
+        "key": "Accessibility",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 750
+        }
+      },
+      {
+        "comment": "",
+        "key": "Customize accessibility features to improve your experience.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 752
+        }
+      },
+      {
+        "comment": "",
+        "key": "Autopay",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 773
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enable Autopay",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 766
+        }
+      },
+      {
+        "comment": "",
+        "key": "Automatic Payments",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 768
+        }
+      },
+      {
+        "comment": "",
+        "key": "When enabled, payments will be automatically processed on their due dates.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 770
+        }
+      },
+      {
+        "comment": "",
+        "key": "Homepage Shortcuts",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 811
+        }
+      },
+      {
+        "comment": "",
+        "key": "Change Shortcuts on Homepage",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 782
+        }
+      },
+      {
+        "comment": "",
+        "key": "Customize which shortcuts appear on your homepage.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 787
+        }
+      }
+    ]
+  },
+  "version": 1
+}

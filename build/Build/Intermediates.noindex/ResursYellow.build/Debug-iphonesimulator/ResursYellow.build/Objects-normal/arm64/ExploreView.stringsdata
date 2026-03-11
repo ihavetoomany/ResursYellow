@@ -1,0 +1,40 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/ExploreView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Highlights",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 27
+        }
+      },
+      {
+        "comment": "",
+        "key": "Partner Offers",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 63
+        }
+      },
+      {
+        "comment": "",
+        "key": "News",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 104
+        }
+      },
+      {
+        "comment": "",
+        "key": "See All",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 108
+        }
+      }
+    ]
+  },
+  "version": 1
+}

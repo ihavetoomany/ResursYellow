@@ -1,0 +1,248 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/ServicesView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Resurs Family credit account. Available credit.",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opens detailed view.",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 88
+        }
+      },
+      {
+        "comment": "",
+        "key": "Senior Savings savings account. 120 450 kronor saved.",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "Shows savings account activity.",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "House Renovation loan. 255 000 kronor remaining balance.",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 123
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opens loan details and payment schedule.",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 124
+        }
+      },
+      {
+        "comment": "",
+        "key": "Explore Resurs Banking. Explore loans, savings, and credit cards.",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 133
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opens options to apply for more Resurs products.",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 134
+        }
+      },
+      {
+        "comment": "",
+        "key": "No products yet",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 149
+        }
+      },
+      {
+        "comment": "",
+        "key": "Apply for a credit card, savings account, or loan to get started.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 153
+        }
+      },
+      {
+        "comment": "",
+        "key": "Explore",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "Senior Savings",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 478
+        }
+      },
+      {
+        "comment": "",
+        "key": "Senior Savings savings balance. 120 450 kronor saved. Interest rate 3.25 percent. Next deposit 1 500 kronor on 15 December.",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 561
+        }
+      },
+      {
+        "comment": "",
+        "key": "Savings Balance",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 504
+        }
+      },
+      {
+        "comment": "",
+        "key": "120 450 SEK",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 507
+        }
+      },
+      {
+        "comment": "",
+        "key": "Interest rate",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 527
+        }
+      },
+      {
+        "comment": "",
+        "key": "3.25%",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 530
+        }
+      },
+      {
+        "comment": "",
+        "key": "Next deposit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 539
+        }
+      },
+      {
+        "comment": "",
+        "key": "15 Dec · 1 500 SEK",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 542
+        }
+      },
+      {
+        "comment": "",
+        "key": "Goal progress",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 566
+        }
+      },
+      {
+        "comment": "",
+        "key": "Keep contributing 1 500 SEK per month to reach your sofa fund by February.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 584
+        }
+      },
+      {
+        "comment": "",
+        "key": "120 450 SEK saved",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 574
+        }
+      },
+      {
+        "comment": "",
+        "key": "Goal 150 000 SEK",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 578
+        }
+      },
+      {
+        "comment": "",
+        "key": "Accounts",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 597
+        }
+      },
+      {
+        "comment": "",
+        "key": "View all",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 604
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recent activity",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 637
+        }
+      },
+      {
+        "comment": "",
+        "key": "View all",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 644
+        }
+      },
+      {
+        "comment": "",
+        "key": "Benefits and services",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 696
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Product",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 897
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose a product to apply for",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 851
+        }
+      }
+    ]
+  },
+  "version": 1
+}

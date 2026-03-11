@@ -209,6 +209,8 @@ struct MerchantCard: View {
     let title: String
     let subtitle: String?
     let amount: String?
+    /// Short copy explaining financial services (e.g. for shared-credit persona).
+    var infoCopy: String? = nil
     let icon: String
     let color: Color
     var titleColor: Color = .primary
@@ -251,8 +253,19 @@ struct MerchantCard: View {
                 Spacer(minLength: 0)
             }
             
-            Spacer()
-                .frame(height: 2)
+            if let subtitle {
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            // Short info about financial services (e.g. shared-credit persona)
+            if let infoCopy {
+                Text(infoCopy)
+                    .font(.caption)
+                    .foregroundColor(.secondary.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             
             // Available credit at bottom
             if let amount {
@@ -293,6 +306,22 @@ struct MerchantsView: View {
     
     private var connectedMerchants: [String] {
         hasMerchants ? connected : []
+    }
+    
+    /// When true (e.g. Future John), one credit is shared across all connected merchants.
+    private var usesSharedMerchantCredit: Bool {
+        dataManager.currentPersona.usesSharedMerchantCredit
+    }
+    
+    /// Formatted shared credit amount from the first credit account (when using shared merchant credit).
+    private var sharedCreditAmount: String? {
+        guard usesSharedMerchantCredit, let first = dataManager.creditAccounts.first else { return nil }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = " "
+        formatter.maximumFractionDigits = 0
+        let formatted = formatter.string(from: NSNumber(value: first.available)) ?? "\(Int(first.available))"
+        return "\(formatted) kr"
     }
 
     var body: some View {
@@ -361,16 +390,6 @@ struct MerchantsView: View {
                             .buttonStyle(PlainButtonStyle())
                             .padding(.top, 4)
                             
-                            Button {
-                                showAddMerchant = true
-                            } label: {
-                                AddFreedomCard(title: "Find your favorite stores")
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("Find your favorite stores. Explore more merchants.")
-                            .accessibilityHint("Opens options to connect more stores.")
-                            .padding(.top, 20)
-                            
                             Spacer()
                         }
                         .frame(maxWidth: .infinity)
@@ -379,6 +398,30 @@ struct MerchantsView: View {
                     } else {
                         // Connected section
                         VStack(alignment: .leading, spacing: 12) {
+                            // Shared credit banner when persona uses one credit across all merchants (e.g. Future John)
+                            if usesSharedMerchantCredit, let amount = sharedCreditAmount {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text("Shared credit")
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundColor(.secondary)
+                                    Text(amount)
+                                        .font(.title2.weight(.bold))
+                                        .foregroundColor(.primary)
+                                    Text("Available at all connected merchants")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(16)
+                                .background {
+                                    if colorScheme == .light {
+                                        Color.white
+                                    } else {
+                                        Color.clear.background(.regularMaterial)
+                                    }
+                                }
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                            }
                             VStack(spacing: 10) {
                                 ForEach(connectedMerchants, id: \.self) { merchant in
                                     let card = cardConfig(for: merchant)
@@ -388,6 +431,7 @@ struct MerchantsView: View {
                                             title: merchant,
                                             subtitle: card.subtitle,
                                             amount: card.amount,
+                                            infoCopy: card.infoCopy,
                                             icon: card.icon,
                                             color: card.color,
                                             titleColor: card.titleColor,
@@ -403,15 +447,6 @@ struct MerchantsView: View {
                                         }
                                     }
                                 }
-                                
-                                Button {
-                                    showAddMerchant = true
-                                } label: {
-                                    AddFreedomCard(title: "Find your favorite stores")
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                .accessibilityLabel("Find your favorite stores. Explore more merchants.")
-                                .accessibilityHint("Opens options to connect more stores.")
                             }
                         }
                         .padding(.top, 24)
@@ -463,41 +498,49 @@ private extension MerchantsView {
     struct MerchantCardConfig {
         let subtitle: String
         let amount: String?
+        /// Short copy about financial services (used for shared-credit persona).
+        let infoCopy: String?
         let icon: String
         let color: Color
         let titleColor: Color
     }
     
     func cardConfig(for merchant: String) -> MerchantCardConfig {
+        // When persona uses shared credit (e.g. Future John), no per-merchant amount; one credit shared across all.
+        let useShared = dataManager.currentPersona.usesSharedMerchantCredit
         switch merchant {
         case "Bauhaus":
             return MerchantCardConfig(
-                subtitle: "Store Credit and Invoice available",
-                amount: "14 500 kr",
+                subtitle: useShared ? "Payment options, offers and benefits" : "Store Credit and Invoice available",
+                amount: useShared ? nil : "14 500 kr",
+                infoCopy: useShared ? "Store credit, invoice and pay later available with your shared credit." : nil,
                 icon: "hammer.fill",
                 color: .red,
                 titleColor: .primary
             )
         case "Netonnet":
             return MerchantCardConfig(
-                subtitle: "Store Credit available",
-                amount: "20 000 kr",
+                subtitle: useShared ? "Payment options, offers and benefits" : "Store Credit available",
+                amount: useShared ? nil : "20 000 kr",
+                infoCopy: useShared ? "Store credit and pay later. Use your shared credit in-store or online." : nil,
                 icon: "shippingbox.fill",
                 color: .green,
                 titleColor: .primary
             )
         case "Jula":
             return MerchantCardConfig(
-                subtitle: "Pay later active in-store",
-                amount: "9 200 kr",
+                subtitle: useShared ? "Uses your shared credit" : "Pay later active in-store",
+                amount: useShared ? nil : "9 200 kr",
+                infoCopy: useShared ? "Pay later in-store. Your shared credit applies at checkout." : nil,
                 icon: "hammer.circle.fill",
                 color: .red,
                 titleColor: .primary
             )
         default:
             return MerchantCardConfig(
-                subtitle: "Payment options and offers enabled",
+                subtitle: useShared ? "Uses your shared credit" : "Payment options and offers enabled",
                 amount: nil,
+                infoCopy: useShared ? "Store credit, invoice and pay later where available." : nil,
                 icon: "link.circle.fill",
                 color: .green,
                 titleColor: .primary

@@ -1,0 +1,256 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/BauhausDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Bauhaus",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 186
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bauhaus available credit %@. Credit limit %@. Used credit 5 500 kronor.",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 269
+        }
+      },
+      {
+        "comment": "",
+        "key": "Available Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit Limit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 235
+        }
+      },
+      {
+        "comment": "",
+        "key": "Used Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 247
+        }
+      },
+      {
+        "comment": "",
+        "key": "5 500 kr",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 250
+        }
+      },
+      {
+        "comment": "",
+        "key": "Purchases",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 275
+        }
+      },
+      {
+        "comment": "",
+        "key": "Part Payments",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 322
+        }
+      },
+      {
+        "comment": "",
+        "key": "Benefits and services",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 352
+        }
+      },
+      {
+        "comment": "",
+        "key": "left to pay",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 470
+        }
+      },
+      {
+        "comment": "",
+        "key": "Debt:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 477
+        }
+      },
+      {
+        "comment": "",
+        "key": "Part payment ongoing",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 496
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ per month",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 552
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld of %lld payments completed",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 560
+        }
+      },
+      {
+        "comment": "",
+        "key": "Next payment",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 578
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 589
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoice created",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 599
+        }
+      },
+      {
+        "comment": "",
+        "key": "Nov 10, 2025",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 603
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoice due",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 609
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account information",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 637
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 644
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 648
+        }
+      },
+      {
+        "comment": "",
+        "key": "Invoice",
+        "location": {
+          "startingColumn": 74,
+          "startingLine": 648
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 656
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Credit",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 660
+        }
+      },
+      {
+        "comment": "",
+        "key": "Onetime Credit",
+        "location": {
+          "startingColumn": 79,
+          "startingLine": 660
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current debt",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 668
+        }
+      },
+      {
+        "comment": "",
+        "key": "OCR",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 680
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankgiro",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 692
+        }
+      },
+      {
+        "comment": "",
+        "key": "540-1234",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 696
+        }
+      },
+      {
+        "comment": "",
+        "key": "Transactions",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 717
+        }
+      }
+    ]
+  },
+  "version": 1
+}

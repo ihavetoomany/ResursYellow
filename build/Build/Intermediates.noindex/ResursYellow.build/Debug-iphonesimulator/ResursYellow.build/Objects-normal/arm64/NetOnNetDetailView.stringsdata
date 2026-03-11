@@ -1,0 +1,80 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/NetOnNetDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Netonnet",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 78
+        }
+      },
+      {
+        "comment": "",
+        "key": "Netonnet available credit %@. Credit limit %@. No credit used.",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 161
+        }
+      },
+      {
+        "comment": "",
+        "key": "Available Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 104
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit Limit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 127
+        }
+      },
+      {
+        "comment": "",
+        "key": "Used Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "0 kr",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 142
+        }
+      },
+      {
+        "comment": "",
+        "key": "Purchases",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 167
+        }
+      },
+      {
+        "comment": "",
+        "key": "Active accounts",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 214
+        }
+      },
+      {
+        "comment": "",
+        "key": "Benefits and services",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 258
+        }
+      }
+    ]
+  },
+  "version": 1
+}

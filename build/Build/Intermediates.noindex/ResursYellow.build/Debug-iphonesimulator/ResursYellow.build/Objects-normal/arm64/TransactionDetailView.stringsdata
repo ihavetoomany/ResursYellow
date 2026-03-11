@@ -1,0 +1,248 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/TransactionDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Pay Over Time",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add to Payment Plan",
+        "location": {
+          "startingColumn": 82,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "Added to Payment Plan",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove from Payment Plan",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 137
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create Payment Plan",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start a new payment plan",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 196
+        }
+      },
+      {
+        "comment": "",
+        "key": "Purchase",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 267
+        }
+      },
+      {
+        "comment": "",
+        "key": "Paid with %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 329
+        }
+      },
+      {
+        "comment": "",
+        "key": "Break out this purchase from your monthly bill and put it in a payment plan billed separately - always with the opportunity to part pay or pay in full when the invoice arrives.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 383
+        }
+      },
+      {
+        "comment": "",
+        "key": "About Payment Plans",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 378
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current total: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 457
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Plan Created",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "Purchase Added",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your new payment plan is ready",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 492
+        }
+      },
+      {
+        "comment": "",
+        "key": "This purchase is now in your payment plan",
+        "location": {
+          "startingColumn": 80,
+          "startingLine": 492
+        }
+      },
+      {
+        "comment": "",
+        "key": "Starting amount: %@",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 513
+        }
+      },
+      {
+        "comment": "",
+        "key": "New total: %@",
+        "location": {
+          "startingColumn": 76,
+          "startingLine": 513
+        }
+      },
+      {
+        "comment": "",
+        "key": "Part Payment",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 579
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment %lld of %lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 582
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Progress",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 595
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld/%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 599
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld payment%@ remaining",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 625
+        }
+      },
+      {
+        "comment": "",
+        "key": "Part payments allow you to split a large purchase into smaller, manageable monthly installments. Each month, you'll receive an invoice for your scheduled payment amount. You can pay the full amount, make a partial payment, or pay in full at any time.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 662
+        }
+      },
+      {
+        "comment": "",
+        "key": "About Open Accounts",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 655
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create New Payment Plan",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 824
+        }
+      },
+      {
+        "comment": "",
+        "key": "This purchase will be added to the new payment plan",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 828
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment Plan Name",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 835
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g., Home Renovation",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 839
+        }
+      },
+      {
+        "comment": "",
+        "key": "Starting with",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 848
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create Payment Plan",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 873
+        }
+      }
+    ]
+  },
+  "version": 1
+}

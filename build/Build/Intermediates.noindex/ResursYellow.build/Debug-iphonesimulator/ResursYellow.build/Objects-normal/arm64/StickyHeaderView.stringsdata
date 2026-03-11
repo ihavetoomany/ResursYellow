@@ -1,0 +1,96 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/Components/StickyHeaderView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Action button",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 244
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to perform action",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 245
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chat Support",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open chat with support",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 201
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notifications",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 177
+        }
+      },
+      {
+        "comment": "",
+        "key": "View notifications",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 178
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 224
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notifications",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 220
+        }
+      },
+      {
+        "comment": "",
+        "key": "View notifications",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 221
+        }
+      },
+      {
+        "comment": "",
+        "key": "Content Item %lld",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 268
+        }
+      }
+    ]
+  },
+  "version": 1
+}

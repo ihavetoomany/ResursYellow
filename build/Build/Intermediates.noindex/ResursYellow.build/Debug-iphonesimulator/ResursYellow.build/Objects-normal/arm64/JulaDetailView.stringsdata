@@ -1,0 +1,80 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/JulaDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Jula",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 82
+        }
+      },
+      {
+        "comment": "",
+        "key": "Jula available credit %@. Credit limit %@. Used credit 10 800 kronor.",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 165
+        }
+      },
+      {
+        "comment": "",
+        "key": "Available Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 108
+        }
+      },
+      {
+        "comment": "",
+        "key": "Credit Limit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "Used Credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "10 800 kr",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 146
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recent Jula Purchases",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "Active accounts",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 218
+        }
+      },
+      {
+        "comment": "",
+        "key": "Why connect Jula",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 262
+        }
+      }
+    ]
+  },
+  "version": 1
+}

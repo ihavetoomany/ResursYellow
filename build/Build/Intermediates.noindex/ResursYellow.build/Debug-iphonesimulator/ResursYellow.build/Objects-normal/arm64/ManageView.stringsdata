@@ -1,0 +1,160 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/ManageView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Log out",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 270
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset Data",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 278
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 217
+        }
+      },
+      {
+        "comment": "",
+        "key": "Log out",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 271
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 274
+        }
+      },
+      {
+        "comment": "",
+        "key": "Are you sure you want to log out?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 276
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 279
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 283
+        }
+      },
+      {
+        "comment": "",
+        "key": "This will restore all data to default values. All your changes will be lost. Are you sure?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 285
+        }
+      },
+      {
+        "comment": "",
+        "key": "Coming soon",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 320
+        }
+      },
+      {
+        "comment": "",
+        "key": "Call Support",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 438
+        }
+      },
+      {
+        "comment": "",
+        "key": "Customer Support",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 379
+        }
+      },
+      {
+        "comment": "",
+        "key": "We're here to help",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 382
+        }
+      },
+      {
+        "comment": "",
+        "key": "Phone",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 389
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hours",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 401
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mon–Fri: 08:00–18:00",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 406
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sat: 10:00–14:00",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 407
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sun: Closed",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 408
+        }
+      },
+      {
+        "comment": "",
+        "key": "Call Now",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 425
+        }
+      }
+    ]
+  },
+  "version": 1
+}

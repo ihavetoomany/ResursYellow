@@ -1,0 +1,144 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/HouseRenovationLoanView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "House Renovation",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 262
+        }
+      },
+      {
+        "comment": "",
+        "key": "Payment schedule",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "View all",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "Accounts",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "View all",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 129
+        }
+      },
+      {
+        "comment": "",
+        "key": "Benefits and services",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 164
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remaining Balance",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 294
+        }
+      },
+      {
+        "comment": "",
+        "key": "255 000 SEK",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 297
+        }
+      },
+      {
+        "comment": "",
+        "key": "Original Loan",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 315
+        }
+      },
+      {
+        "comment": "",
+        "key": "300 000 SEK",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 318
+        }
+      },
+      {
+        "comment": "",
+        "key": "Monthly Payment",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 327
+        }
+      },
+      {
+        "comment": "",
+        "key": "4 250 SEK",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 330
+        }
+      },
+      {
+        "comment": "",
+        "key": "remaining",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 381
+        }
+      },
+      {
+        "comment": "",
+        "key": "Due %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 395
+        }
+      },
+      {
+        "comment": "",
+        "key": "Due %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 441
+        }
+      },
+      {
+        "comment": "",
+        "key": "Paid",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 453
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pending",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 457
+        }
+      }
+    ]
+  },
+  "version": 1
+}

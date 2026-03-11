@@ -1,0 +1,144 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/MerchantsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "net",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 183
+        }
+      },
+      {
+        "comment": "",
+        "key": "net",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 198
+        }
+      },
+      {
+        "comment": "",
+        "key": "on",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "Available credit",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 260
+        }
+      },
+      {
+        "comment": "",
+        "key": "No merchants connected",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 340
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connect your favorite stores to access payment options and exclusive offers.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 344
+        }
+      },
+      {
+        "comment": "",
+        "key": "Find your favorite stores. Explore more merchants.",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 370
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opens options to connect more stores.",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 371
+        }
+      },
+      {
+        "comment": "",
+        "key": "Explore",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 353
+        }
+      },
+      {
+        "comment": "",
+        "key": "Find your favorite stores. Explore more merchants.",
+        "location": {
+          "startingColumn": 53,
+          "startingLine": 413
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opens options to connect more stores.",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 414
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 402
+        }
+      },
+      {
+        "comment": "",
+        "key": "Details for %@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 518
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Merchant",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 737
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search merchants",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 668
+        }
+      },
+      {
+        "comment": "",
+        "key": "No merchants found",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 691
+        }
+      },
+      {
+        "comment": "",
+        "key": "Try a different search term",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 694
+        }
+      }
+    ]
+  },
+  "version": 1
+}

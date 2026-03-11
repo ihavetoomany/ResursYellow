@@ -1,0 +1,96 @@
+{
+  "source": "/Users/R01501/Desktop/ResursApps/ResursYellow/ResursYellow/Views/PaymentsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Content",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 636
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ filter",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 1603
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1739
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2079
+        }
+      },
+      {
+        "comment": "",
+        "key": "Eligible for Part Pay",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 2101
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select %@ for batch payment",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 2218
+        }
+      },
+      {
+        "comment": "",
+        "key": "Opens %@ list",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2249
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notifications",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 2453
+        }
+      },
+      {
+        "comment": "",
+        "key": "No notifications",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 2414
+        }
+      },
+      {
+        "comment": "",
+        "key": "You're all caught up!",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 2418
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mark as read",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 2436
+        }
+      }
+    ]
+  },
+  "version": 1
+}

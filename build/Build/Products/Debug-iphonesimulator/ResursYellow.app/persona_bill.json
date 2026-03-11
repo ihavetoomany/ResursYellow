@@ -1,0 +1,9 @@
+{
+  "id": "bill",
+  "name": "bill",
+  "displayName": "Bill",
+  "creditAccounts": [],
+  "invoices": [],
+  "transactions": [],
+  "invoiceAccounts": []
+}
