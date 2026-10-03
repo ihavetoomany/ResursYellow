@@ -58,14 +58,22 @@ struct CrossSellCarousel: View {
                         Button { onSelect(offer) } label: { card(offer) }
                             .buttonStyle(.plain)
                             .containerRelativeFrame(.horizontal) { w, _ in w - 56 }
+                            // Off-centre cards sit back slightly so the snap reads visually
+                            .scrollTransition(.interactive, axis: .horizontal) { content, phase in
+                                content
+                                    .scaleEffect(phase.isIdentity ? 1 : 0.94)
+                                    .opacity(phase.isIdentity ? 1 : 0.8)
+                            }
                             .id(offer.id)
                     }
                 }
                 .scrollTargetLayout()
             }
             .contentMargins(.horizontal, 16, for: .scrollContent)
-            .scrollTargetBehavior(.viewAligned)
+            // One card per swipe: a flick can't skip past the next card
+            .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
             .scrollPosition(id: $selectedID)
+            .sensoryFeedback(.selection, trigger: selectedID)
 
             HStack(spacing: 6) {
                 ForEach(offers) { offer in
