@@ -45,8 +45,8 @@ struct CrossSellCarousel: View {
             title: "Split your purchases with Flex".localized,
             subtitle: "Spread the cost of a purchase over monthly payments, after you have bought it.".localized,
             cta: "Choose a purchase".localized,
-            accent: RyColor.warningMain,
-            background: RyColor.warningBackground.opacity(0.45)
+            accent: RyColor.flexMain,
+            background: RyColor.flexBackground.opacity(0.55)
         )
     ]
 

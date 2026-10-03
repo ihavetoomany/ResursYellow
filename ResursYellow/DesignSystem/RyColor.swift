@@ -69,6 +69,9 @@ enum RyColor {
     static let infoBackground   = dyn("#B8E6FE", "#052F4A")
     static let warningMain      = dyn("#BB4D00", "#FFD230")
     static let warningBackground = dyn("#FEE685", "#461901")
+    // Flex (amber) — built like info/success: deep low-saturation background, pale accent
+    static let flexMain         = dyn("#B45309", "#FFC47A")
+    static let flexBackground   = dyn("#FFE4C4", "#4D2E00")
     static let errorMain        = dyn("#C10007", "#FFA2A2")
     static let errorBackground  = dyn("#FFE2E2", "#460809")
 

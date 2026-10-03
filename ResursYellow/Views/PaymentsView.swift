@@ -605,7 +605,7 @@ struct PaymentsView: View {
                 
                 StickyHeaderView(
                     title: localized("Welcome"),
-                    subtitle: "Resurs",
+                    subtitle: "Bosse Larsson",
                     minimizedTitle: localized("Payments"),
                     trailingButton: "",
                     trailingButtonTint: .primary,
