@@ -39,8 +39,8 @@ struct ServicesView: View {
                     .allowsHitTesting(false)
                 
                 StickyHeaderView(
-                    title: "Services",
-                    subtitle: hasAccounts ? "Your banking solutions" : "Get started",
+                    title: "Finances".localized,
+                    subtitle: hasAccounts ? "Your banking solutions".localized : "Get started".localized,
                     trailingButton: "plus",
                     trailingButtonTint: .primary,
                     trailingButtonSize: 44,
@@ -50,21 +50,6 @@ struct ServicesView: View {
                     }
                 ) {
                 VStack(spacing: 16) {
-                    // Action buttons: Send, Transfer, Receive
-                    HStack(spacing: 12) {
-                        ActionButton(title: "Send", icon: "arrow.up.circle.fill") {
-                            // Send action
-                        }
-                        ActionButton(title: "Transfer", icon: "arrow.left.arrow.right.circle.fill") {
-                            // Transfer action
-                        }
-                        ActionButton(title: "Receive", icon: "arrow.down.circle.fill") {
-                            // Receive action
-                        }
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 12)
-                    
                     if hasAccounts {
                         // Account Cards
                         VStack(spacing: 16) {
@@ -79,49 +64,49 @@ struct ServicesView: View {
                                     balance: "\(dataManager.creditAccounts.first?.availableLabel ?? "0 SEK")",
                                     icon: "heart.fill",
                                     color: .blue,
-                                    balanceLabel: "Available credit",
+                                    balanceLabel: "Available credit".localized,
                                     hideTitle: true
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("Resurs Family credit account. Available credit.")
-                            .accessibilityHint("Opens detailed view.")
+                            .accessibilityLabel("Resurs Family credit account. Available credit.".localized)
+                            .accessibilityHint("Opens detailed view.".localized)
                             
                             Button {
                                 navigationPath.append("SavingsAccount")
                             } label: {
                                 AccountCard(
-                                    title: "Senior Savings",
-                                    accountType: "Senior Savings",
+                                    title: "Senior Savings".localized,
+                                    accountType: "Senior Savings".localized,
                                     accountNumber: "**** 5678",
                                     balance: "120 450 SEK",
                                     icon: "star.fill",
                                     color: .mint,
-                                    balanceLabel: "Savings Balance",
+                                    balanceLabel: "Savings Balance".localized,
                                     hideTitle: true
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("Senior Savings savings account. 120 450 kronor saved.")
-                            .accessibilityHint("Shows savings account activity.")
+                            .accessibilityLabel("Senior Savings savings account. 120 450 kronor saved.".localized)
+                            .accessibilityHint("Shows savings account activity.".localized)
                             
                             Button {
                                 navigationPath.append("HouseRenovationLoan")
                             } label: {
                                 AccountCard(
-                                    title: "House Renovation",
-                                    accountType: "House Renovation",
+                                    title: "House Renovation".localized,
+                                    accountType: "House Renovation".localized,
                                     accountNumber: "**** 9012",
                                     balance: "255 000 SEK",
                                     icon: "house.fill",
                                     color: .orange,
-                                    balanceLabel: "Remaining Balance",
+                                    balanceLabel: "Remaining Balance".localized,
                                     hideTitle: true
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("House Renovation loan. 255 000 kronor remaining balance.")
-                            .accessibilityHint("Opens loan details and payment schedule.")
+                            .accessibilityLabel("House Renovation loan. 255 000 kronor remaining balance.".localized)
+                            .accessibilityHint("Opens loan details and payment schedule.".localized)
                         }
                         .padding(.horizontal)
                         .padding(.top, 12)
@@ -136,11 +121,11 @@ struct ServicesView: View {
                                 .font(.system(size: 56))
                                 .foregroundColor(.secondary.opacity(0.4))
                             
-                            Text("No products yet")
+                            Text("No products yet".localized)
                                 .font(.title3.weight(.semibold))
                                 .foregroundColor(.secondary)
                             
-                            Text("Apply for a credit card, savings account, or loan to get started.")
+                            Text("Apply for a credit card, savings account, or loan to get started.".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary.opacity(0.8))
                                 .multilineTextAlignment(.center)
@@ -149,7 +134,7 @@ struct ServicesView: View {
                             Button {
                                 showAddAccount = true
                             } label: {
-                                Text("Explore")
+                                Text("Explore".localized)
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundColor(.secondary)
                                     .padding(.horizontal, 24)
@@ -214,32 +199,6 @@ struct ServicesView: View {
     }
 }
 
-// MARK: - Action Button (Send / Transfer / Receive)
-struct ActionButton: View {
-    let title: String
-    let icon: String
-    let action: () -> Void
-    
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(.white)
-                Text(title)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
-        }
-        .buttonStyle(.plain)
-    }
-}
 
 struct AccountCard: View {
     let title: String
@@ -366,17 +325,17 @@ struct SavingsAccountDetailView: View {
     }
     
     private let contributions: [Contribution] = [
-        .init(title: "Monthly deposit", date: "30 Nov · Automatic", amount: "+1 500 SEK", icon: "calendar.badge.clock", color: .mint),
-        .init(title: "Rounding transfer", date: "28 Nov · Purchases", amount: "+225 SEK", icon: "arrow.up.arrow.down", color: .blue),
-        .init(title: "Withdrawal", date: "22 Nov · Part Pay", amount: "-4 800 SEK", icon: "sofa.fill", color: .purple)
+        .init(title: "Monthly deposit".localized, date: "30 Nov · Automatic".localized, amount: "+1 500 SEK", icon: "calendar.badge.clock", color: .mint),
+        .init(title: "Rounding transfer".localized, date: "28 Nov · Purchases".localized, amount: "+225 SEK", icon: "arrow.up.arrow.down", color: .blue),
+        .init(title: "Withdrawal".localized, date: "22 Nov · Part Pay".localized, amount: "-4 800 SEK", icon: "sofa.fill", color: .purple)
     ]
     
     // Benefits for Senior Savings
     private let benefits: [(icon: String, title: String, desc: String)] = [
-        ("percent", "Competitive Interest Rate", "Earn 3.25% annual interest on your savings."),
-        ("arrow.up.circle.fill", "Automatic Deposits", "Set up recurring monthly deposits to grow your savings."),
-        ("chart.line.uptrend.xyaxis", "Goal Tracking", "Track your progress toward your savings goals."),
-        ("shield.checkerboard", "Secure Savings", "Your savings are protected and secure.")
+        ("percent", "Competitive Interest Rate".localized, "Earn 3.25% annual interest on your savings.".localized),
+        ("arrow.up.circle.fill", "Automatic Deposits".localized, "Set up recurring monthly deposits to grow your savings.".localized),
+        ("chart.line.uptrend.xyaxis", "Goal Tracking".localized, "Track your progress toward your savings goals.".localized),
+        ("shield.checkerboard", "Secure Savings".localized, "Your savings are protected and secure.".localized)
     ]
     
     // Documents for Senior Savings
@@ -425,13 +384,13 @@ struct SavingsAccountDetailView: View {
             }
             .coordinateSpace(name: "scroll")
         }
-        .navigationTitle("Senior Savings")
+        .navigationTitle("Senior Savings".localized)
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(scrollObserver.offset > 10 ? Color(uiColor: .systemBackground) : Color.clear, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {
-                    Image(systemName: "gearshape.fill")
+                    Image(systemName: "ellipsis")
                         .font(.title3)
                         .foregroundColor(.secondary)
                         .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
@@ -440,7 +399,7 @@ struct SavingsAccountDetailView: View {
             }
         }
         .sheet(isPresented: $showSettings) {
-            ServiceSettingsView(serviceName: "Senior Savings", serviceColor: .mint)
+            ServiceSettingsView(serviceName: "Senior Savings".localized, serviceColor: .mint)
                 .presentationBackground {
                     AdaptiveSheetBackground()
                 }
@@ -451,7 +410,7 @@ struct SavingsAccountDetailView: View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Savings Balance")
+                    Text("Savings Balance".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("120 450 SEK")
@@ -474,7 +433,7 @@ struct SavingsAccountDetailView: View {
             
             HStack(alignment: .center, spacing: 18) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Interest rate")
+                    Text("Interest rate".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("3.25%")
@@ -486,10 +445,10 @@ struct SavingsAccountDetailView: View {
                     .frame(height: 32)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Next deposit")
+                    Text("Next deposit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("15 Dec · 1 500 SEK")
+                    Text("15 Dec · 1 500 SEK".localized)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                 }
@@ -508,12 +467,12 @@ struct SavingsAccountDetailView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Senior Savings savings balance. 120 450 kronor saved. Interest rate 3.25 percent. Next deposit 1 500 kronor on 15 December.")
+        .accessibilityLabel("Senior Savings savings balance. 120 450 kronor saved. Interest rate 3.25 percent. Next deposit 1 500 kronor on 15 December.".localized)
     }
     
     private var progressCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Goal progress")
+            Text("Goal progress".localized)
                 .font(.headline)
                 .fontWeight(.semibold)
             
@@ -521,17 +480,17 @@ struct SavingsAccountDetailView: View {
                 ProgressView(value: 0.8)
                     .tint(.mint)
                 HStack {
-                    Text("120 450 SEK saved")
+                    Text("120 450 SEK saved".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text("Goal 150 000 SEK")
+                    Text("Goal 150 000 SEK".localized)
                         .font(.caption)
                         .fontWeight(.semibold)
                 }
             }
             
-            Text("Keep contributing 1 500 SEK per month to reach your sofa fund by February.")
+            Text("Keep contributing 1 500 SEK per month to reach your sofa fund by February.".localized)
                 .font(.footnote)
                 .foregroundColor(.secondary)
         }
@@ -544,14 +503,14 @@ struct SavingsAccountDetailView: View {
     private var accountsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Accounts")
+                Text("Accounts".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
                 Button(action: {
                     // Handle "View all" tap
                 }) {
-                    Text("View all")
+                    Text("View all".localized)
                         .font(.subheadline)
                         .foregroundColor(.blue)
                 }
@@ -560,21 +519,21 @@ struct SavingsAccountDetailView: View {
             
             VStack(spacing: 12) {
                 SavingsAccountRow(
-                    title: "Emergency Fund",
-                    subtitle: "Savings account · •••• 5678",
+                    title: "Emergency Fund".localized,
+                    subtitle: "Savings account · •••• 5678".localized,
                     amount: "45 230 SEK",
                     progress: 0.6,
-                    monthlyAmount: "1 500 SEK monthly",
-                    nextDueDate: "15 Jan"
+                    monthlyAmount: "1 500 SEK monthly".localized,
+                    nextDueDate: "15 Jan".localized
                 )
                 
                 SavingsAccountRow(
-                    title: "Grandchildren Gift",
-                    subtitle: "Savings account · •••• 9012",
+                    title: "Grandchildren Gift".localized,
+                    subtitle: "Savings account · •••• 9012".localized,
                     amount: "75 220 SEK",
                     progress: 0.75,
-                    monthlyAmount: "2 000 SEK monthly",
-                    nextDueDate: "20 Jan"
+                    monthlyAmount: "2 000 SEK monthly".localized,
+                    nextDueDate: "20 Jan".localized
                 )
             }
         }
@@ -584,14 +543,14 @@ struct SavingsAccountDetailView: View {
     private var recentActivitySection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Recent activity")
+                Text("Recent activity".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
                 Button(action: {
                     // Handle "View all" tap
                 }) {
-                    Text("View all")
+                    Text("View all".localized)
                         .font(.subheadline)
                         .foregroundColor(.blue)
                 }
@@ -643,7 +602,7 @@ struct SavingsAccountDetailView: View {
     
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Benefits and services")
+            Text("Benefits and services".localized)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.top, 12)
@@ -798,7 +757,7 @@ struct AddAccountView: View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
-                    Text("Choose a product to apply for")
+                    Text("Choose a product to apply for".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -808,8 +767,8 @@ struct AddAccountView: View {
                         // Handle credit card tap
                     } label: {
                         CrossSellCard(
-                            title: "Get a credit card",
-                            subtitle: "Up to 80 000 SEK credit",
+                            title: "Get a credit card".localized,
+                            subtitle: "Up to 80 000 SEK credit".localized,
                             icon: "creditcard.fill",
                             color: .blue
                         )
@@ -820,8 +779,8 @@ struct AddAccountView: View {
                         showSavingsWebView = true
                     } label: {
                         CrossSellCard(
-                            title: "Start saving",
-                            subtitle: "Earn up to 3.25% interest",
+                            title: "Start saving".localized,
+                            subtitle: "Earn up to 3.25% interest".localized,
                             icon: "banknote.fill",
                             color: .mint
                         )
@@ -832,8 +791,8 @@ struct AddAccountView: View {
                         // Handle loan tap
                     } label: {
                         CrossSellCard(
-                            title: "Apply for a loan",
-                            subtitle: "Borrow up to 500 000 SEK",
+                            title: "Apply for a loan".localized,
+                            subtitle: "Borrow up to 500 000 SEK".localized,
                             icon: "building.columns.fill",
                             color: .purple
                         )
@@ -844,7 +803,7 @@ struct AddAccountView: View {
                 .padding(.bottom, 24)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("Add Product")
+            .navigationTitle("Add Product".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

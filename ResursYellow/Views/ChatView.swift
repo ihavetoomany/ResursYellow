@@ -10,7 +10,7 @@ import SwiftUI
 // Placeholder for future chat functionality
 struct ChatView: View {
     var body: some View {
-        Text("Chat functionality coming soon")
+        Text("Chat functionality coming soon".localized)
             .foregroundColor(.secondary)
     }
 }

@@ -55,7 +55,7 @@ extension Invoice {
         let raw = subtitle(dateService: dateService)
         switch category {
         case .overdue, .dueSoon:
-            return "Due " + raw
+            return String(format: "Due %@".localized, raw)
         default:
             return raw
         }

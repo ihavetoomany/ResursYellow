@@ -28,13 +28,19 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
     let content: Content
     let stickyContent: StickyContent?
     @StateObject private var scrollObserver = ScrollOffsetObserver()
+    @Environment(\.colorScheme) private var colorScheme
+    
+    /// Matches the ZStack base fill used on Payments, Services, Merchants, and Manage tabs so the header tint aligns with the screen while material blur keeps translucency.
+    private var screenBaseBackground: Color {
+        RyColor.bgDefault
+    }
     
     init(
         title: String,
         subtitle: String,
         minimizedTitle: String? = nil,
         trailingButton: String = "person.circle.fill",
-        trailingButtonTint: Color = Color(UIColor.systemBlue),
+        trailingButtonTint: Color = RyColor.primaryMain,
         trailingButtonSize: CGFloat = 44,
         trailingButtonIconScale: CGFloat = 0.45,
         trailingButtonAction: (() -> Void)? = nil,
@@ -63,7 +69,7 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
         subtitle: String,
         minimizedTitle: String? = nil,
         trailingButton: String = "person.circle.fill",
-        trailingButtonTint: Color = Color(UIColor.systemBlue),
+        trailingButtonTint: Color = RyColor.primaryMain,
         trailingButtonSize: CGFloat = 44,
         trailingButtonIconScale: CGFloat = 0.45,
         trailingButtonAction: (() -> Void)? = nil,
@@ -86,6 +92,88 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
         self.bellBadgeCount = bellBadgeCount
         self.stickyContent = stickyContent()
         self.content = content()
+    }
+    
+    /// Bell and/or trailing toolbar control (HIG: persistent affordances in navigation chrome).
+    @ViewBuilder
+    private func trailingHeaderAccessory() -> some View {
+        if showBellIcon && !trailingButton.isEmpty {
+            HStack(spacing: 0) {
+                ZStack(alignment: .topTrailing) {
+                    Button(action: {
+                        bellIconAction?()
+                    }) {
+                        Image(systemName: "bell.fill")
+                            .font(.system(size: trailingButtonSize * trailingButtonIconScale, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: trailingButtonSize, height: trailingButtonSize)
+                            .contentShape(Circle())
+                    }
+                    .accessibilityLabel("Notifications".localized)
+                    .accessibilityHint("View notifications".localized)
+                    
+                    if bellBadgeCount > 0 {
+                        Text("\(bellBadgeCount)")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 16, height: 16)
+                            .background(RyColor.errorMain)
+                            .clipShape(Circle())
+                            .offset(x: 0, y: 0)
+                    }
+                }
+                
+                Button(action: {
+                    trailingButtonAction?()
+                }) {
+                    Image(systemName: trailingButton)
+                        .font(.system(size: trailingButtonSize * trailingButtonIconScale, weight: .semibold))
+                        .foregroundStyle(trailingButtonTint)
+                        .frame(width: trailingButtonSize, height: trailingButtonSize)
+                        .contentShape(Circle())
+                }
+                .accessibilityLabel("Chat Support".localized)
+                .accessibilityHint("Open chat with support".localized)
+            }
+            .background(.ultraThinMaterial, in: Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.18), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+        } else if showBellIcon {
+            ZStack(alignment: .topTrailing) {
+                GlassIconButton(size: trailingButtonSize, action: {
+                    bellIconAction?()
+                }) {
+                    Image(systemName: "bell.fill")
+                        .font(.system(size: trailingButtonSize * trailingButtonIconScale, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityLabel("Notifications".localized)
+                .accessibilityHint("View notifications".localized)
+                
+                if bellBadgeCount > 0 {
+                    Text("\(bellBadgeCount)")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(width: 16, height: 16)
+                        .background(RyColor.errorMain)
+                        .clipShape(Circle())
+                        .offset(x: 0, y: 0)
+                }
+            }
+        } else if !trailingButton.isEmpty {
+            GlassIconButton(size: trailingButtonSize, action: {
+                trailingButtonAction?()
+            }) {
+                Image(systemName: trailingButton)
+                    .font(.system(size: trailingButtonSize * trailingButtonIconScale, weight: .semibold))
+                    .foregroundStyle(trailingButtonTint)
+            }
+            .accessibilityLabel("Action button".localized)
+            .accessibilityHint("Tap to perform action".localized)
+        }
     }
     
     var body: some View {
@@ -127,129 +215,44 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
             // Sticky Header (overlays the content)
             VStack(alignment: .leading, spacing: 0) {
                 // Header content
-                VStack(alignment: scrollProgress > 0.5 ? .center : .leading, spacing: 12) {
-                    HStack {
-                        // Spacer for centering when scrolled
-                        if scrollProgress > 0.5 {
-                            Spacer()
-                        }
-                        
-                        VStack(alignment: scrollProgress > 0.5 ? .center : .leading, spacing: 4) {
-                            // Subtitle - fades out
-                            Text(subtitle)
-                                .foregroundColor(.secondary)
-                                .opacity(1.0 - scrollProgress)
-                                .frame(height: scrollProgress > 0.5 ? 0 : nil)
-                                .clipped()
+                VStack(alignment: scrollProgress >= 0.5 ? .center : .leading, spacing: 12) {
+                    if scrollProgress >= 0.5 {
+                        // Collapsed: centered title (HIG inline navigation) + trailing bell stays visible
+                        ZStack {
+                            Text((minimizedTitle ?? title).localized)
+                                .font(.ry(20, 700))
+                                .foregroundStyle(RyColor.fgPrimary)
+                                .frame(maxWidth: .infinity)
                             
-                            // Title - shrinks and centers with minimizedTitle support
-                            if scrollProgress > 0.5 {
-                                Text(minimizedTitle ?? title)
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                            } else {
-                                Text(title)
-                                    .font(.largeTitle)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                            }
-                        }
-                        
-                        // Icons - fades out
-                        if showBellIcon || !trailingButton.isEmpty {
-                            if scrollProgress < 0.5 {
-                                Spacer()
-                                
-                                if showBellIcon && !trailingButton.isEmpty {
-                                    // Combined glass bubble with bell and chat icons
-                                    HStack(spacing: 0) {
-                                        ZStack(alignment: .topTrailing) {
-                                            Button(action: {
-                                                bellIconAction?()
-                                            }) {
-                                                Image(systemName: "bell.fill")
-                                                    .font(.system(size: trailingButtonSize * trailingButtonIconScale, weight: .semibold))
-                                                    .foregroundStyle(.secondary)
-                                                    .frame(width: trailingButtonSize, height: trailingButtonSize)
-                                                    .contentShape(Circle())
-                                            }
-                                            .accessibilityLabel("Notifications")
-                                            .accessibilityHint("View notifications")
-                                            
-                                            if bellBadgeCount > 0 {
-                                                Text("\(bellBadgeCount)")
-                                                    .font(.system(size: 10, weight: .bold))
-                                                    .foregroundColor(.white)
-                                                    .frame(width: 16, height: 16)
-                                                    .background(Color.red)
-                                                    .clipShape(Circle())
-                                                    .offset(x: 0, y: 0)
-                                            }
-                                        }
-                                        
-                                        Button(action: {
-                                            trailingButtonAction?()
-                                        }) {
-                                            Image(systemName: trailingButton)
-                                                .font(.system(size: trailingButtonSize * trailingButtonIconScale, weight: .semibold))
-                                                .foregroundStyle(trailingButtonTint)
-                                                .frame(width: trailingButtonSize, height: trailingButtonSize)
-                                                .contentShape(Circle())
-                                        }
-                                        .accessibilityLabel("Chat Support")
-                                        .accessibilityHint("Open chat with support")
-                                    }
-                                    .background(.ultraThinMaterial, in: Capsule())
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(Color.white.opacity(0.18), lineWidth: 1)
-                                    )
-                                    .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
-                                    .opacity(1.0 - scrollProgress * 2)
-                                } else if showBellIcon {
-                                    // Bell icon only
-                                    ZStack(alignment: .topTrailing) {
-                                        GlassIconButton(size: trailingButtonSize, action: {
-                                            bellIconAction?()
-                                        }) {
-                                            Image(systemName: "bell.fill")
-                                                .font(.system(size: trailingButtonSize * trailingButtonIconScale, weight: .semibold))
-                                                .foregroundStyle(.secondary)
-                                        }
-                                        .accessibilityLabel("Notifications")
-                                        .accessibilityHint("View notifications")
-                                        
-                                        if bellBadgeCount > 0 {
-                                            Text("\(bellBadgeCount)")
-                                                .font(.system(size: 10, weight: .bold))
-                                                .foregroundColor(.white)
-                                                .frame(width: 16, height: 16)
-                                                .background(Color.red)
-                                                .clipShape(Circle())
-                                                .offset(x: 0, y: 0)
-                                        }
-                                    }
-                                    .opacity(1.0 - scrollProgress * 2)
-                                } else {
-                                    // Single icon button
-                                    GlassIconButton(size: trailingButtonSize, action: {
-                                        trailingButtonAction?()
-                                    }) {
-                                        Image(systemName: trailingButton)
-                                            .font(.system(size: trailingButtonSize * trailingButtonIconScale, weight: .semibold))
-                                            .foregroundStyle(trailingButtonTint)
-                                    }
-                                    .opacity(1.0 - scrollProgress * 2)
-                                    .accessibilityLabel("Action button")
-                                    .accessibilityHint("Tap to perform action")
+                            if showBellIcon || !trailingButton.isEmpty {
+                                HStack {
+                                    Spacer()
+                                    trailingHeaderAccessory()
                                 }
-                            } else {
-                                Spacer()
                             }
                         }
+                        .frame(minHeight: trailingButtonSize)
+                    } else {
+                        HStack(alignment: .top, spacing: 0) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(subtitle.localized)
+                                    .font(.ryBody2)
+                                    .foregroundStyle(RyColor.fgSecondary)
+                                    .opacity(1.0 - scrollProgress)
+
+                                Text(title.localized)
+                                    .font(.ry(34, 800))
+                                    .foregroundStyle(RyColor.fgPrimary)
+                            }
+                            
+                            if showBellIcon || !trailingButton.isEmpty {
+                                Spacer(minLength: 8)
+                                trailingHeaderAccessory()
+                                    .opacity(1.0 - scrollProgress * 2)
+                            }
+                        }
+                    }
                 }
-            }
                 .padding(.horizontal)
                 .padding(.vertical, 20 - (scrollProgress * 10)) // Shrink vertical padding
                 
@@ -258,7 +261,7 @@ struct StickyHeaderView<Content: View, StickyContent: View>: View {
                     AnyView(stickyContent)
                 }
             }
-            .background(Color(uiColor: .systemBackground).opacity(scrollProgress * 0.5))
+            .background(screenBaseBackground.opacity(scrollProgress * 0.5))
             .background(.ultraThinMaterial.opacity(scrollProgress * 0.8))
             .animation(.easeInOut(duration: 0.2), value: scrollProgress)
         }

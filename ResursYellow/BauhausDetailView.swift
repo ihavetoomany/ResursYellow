@@ -33,9 +33,9 @@ struct BauhausDetailView: View {
     
     // Example purchases list using BauhausPurchase
     let purchases: [BauhausPurchase] = [
-        BauhausPurchase(title: "Paint Roller Set", subtitle: "Nov 2, 2025", amount: "298 kr", icon: "paintbrush.pointed.fill", color: .red, category: .large, transaction: nil),
-        BauhausPurchase(title: "Interior Paint", subtitle: "Nov 2, 2025", amount: "800 kr", icon: "paintpalette.fill", color: .red, category: .large, transaction: nil),
-        BauhausPurchase(title: "Drop Cloth", subtitle: "Oct 5, 2025", amount: "200 kr", icon: "drop.fill", color: .red, category: .recent, transaction: nil)
+        BauhausPurchase(title: "Paint Roller Set".localized, subtitle: "Nov 2, 2025".localized, amount: "298 kr", icon: "paintbrush.pointed.fill", color: .red, category: .large, transaction: nil),
+        BauhausPurchase(title: "Interior Paint".localized, subtitle: "Nov 2, 2025".localized, amount: "800 kr", icon: "paintpalette.fill", color: .red, category: .large, transaction: nil),
+        BauhausPurchase(title: "Drop Cloth".localized, subtitle: "Oct 5, 2025".localized, amount: "200 kr", icon: "drop.fill", color: .red, category: .recent, transaction: nil)
     ]
     
     let benefits: [(icon: String, title: String, desc: String)] = [
@@ -65,42 +65,42 @@ struct BauhausDetailView: View {
     let paintProjectInvoices: [PartPaymentInvoice] = [
         PartPaymentInvoice(
             installment: 1,
-            dueDate: "Oct 15, 2025",
+            dueDate: "Oct 15, 2025".localized,
             amount: "726 kr",
             reference: "PP-2025-10-001",
             status: .paid
         ),
         PartPaymentInvoice(
             installment: 2,
-            dueDate: "Nov 15, 2025",
+            dueDate: "Nov 15, 2025".localized,
             amount: "726 kr",
             reference: "PP-2025-11-001",
             status: .paid
         ),
         PartPaymentInvoice(
             installment: 3,
-            dueDate: "Dec 15, 2025",
+            dueDate: "Dec 15, 2025".localized,
             amount: "726 kr",
             reference: "PP-2025-12-001",
             status: .upcoming
         ),
         PartPaymentInvoice(
             installment: 4,
-            dueDate: "Jan 15, 2026",
+            dueDate: "Jan 15, 2026".localized,
             amount: "726 kr",
             reference: "PP-2026-01-001",
             status: .upcoming
         ),
         PartPaymentInvoice(
             installment: 5,
-            dueDate: "Feb 15, 2026",
+            dueDate: "Feb 15, 2026".localized,
             amount: "726 kr",
             reference: "PP-2026-02-001",
             status: .upcoming
         ),
         PartPaymentInvoice(
             installment: 6,
-            dueDate: "Mar 15, 2026",
+            dueDate: "Mar 15, 2026".localized,
             amount: "726 kr",
             reference: "PP-2026-03-001",
             status: .upcoming
@@ -110,35 +110,35 @@ struct BauhausDetailView: View {
     let gardenSuppliesInvoices: [PartPaymentInvoice] = [
         PartPaymentInvoice(
             installment: 1,
-            dueDate: "Sep 30, 2025",
+            dueDate: "Sep 30, 2025".localized,
             amount: "300 kr",
             reference: "PP-2025-09-001",
             status: .paid
         ),
         PartPaymentInvoice(
             installment: 2,
-            dueDate: "Oct 30, 2025",
+            dueDate: "Oct 30, 2025".localized,
             amount: "300 kr",
             reference: "PP-2025-10-002",
             status: .paid
         ),
         PartPaymentInvoice(
             installment: 3,
-            dueDate: "Nov 30, 2025",
+            dueDate: "Nov 30, 2025".localized,
             amount: "300 kr",
             reference: "PP-2025-11-002",
             status: .paid
         ),
         PartPaymentInvoice(
             installment: 4,
-            dueDate: "Dec 30, 2025",
+            dueDate: "Dec 30, 2025".localized,
             amount: "300 kr",
             reference: "PP-2025-12-002",
             status: .upcoming
         ),
         PartPaymentInvoice(
             installment: 5,
-            dueDate: "Jan 30, 2026",
+            dueDate: "Jan 30, 2026".localized,
             amount: "300 kr",
             reference: "PP-2026-01-002",
             status: .upcoming
@@ -189,7 +189,7 @@ struct BauhausDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {
-                    Image(systemName: "gearshape.fill")
+                    Image(systemName: "ellipsis")
                         .font(.title3)
                         .foregroundColor(.secondary)
                         .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
@@ -209,7 +209,7 @@ struct BauhausDetailView: View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Available Credit")
+                    Text("Available Credit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(availableCredit)
@@ -232,7 +232,7 @@ struct BauhausDetailView: View {
             
             HStack(alignment: .center, spacing: 18) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Credit Limit")
+                    Text("Credit Limit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(creditLimit)
@@ -244,7 +244,7 @@ struct BauhausDetailView: View {
                     .frame(height: 32)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Used Credit")
+                    Text("Used Credit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("5 500 kr")
@@ -266,13 +266,13 @@ struct BauhausDetailView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Bauhaus available credit \(availableCredit). Credit limit \(creditLimit). Used credit 5 500 kronor.")
+        .accessibilityLabel(String(format: "Bauhaus available credit %@. Credit limit %@. Used credit 5 500 kronor.".localized, availableCredit, creditLimit))
     }
     
     private var purchasesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Purchases")
+                Text("Purchases".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
@@ -289,10 +289,10 @@ struct BauhausDetailView: View {
                             .background(item.color.opacity(0.2))
                             .clipShape(Circle())
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(item.title)
+                            Text(item.title.localized)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            Text(item.subtitle)
+                            Text(item.subtitle.localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -319,7 +319,7 @@ struct BauhausDetailView: View {
     private var partPaymentsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Part Payments")
+                Text("Part Payments".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
@@ -349,7 +349,7 @@ struct BauhausDetailView: View {
     
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Benefits and services")
+            Text("Benefits and services".localized)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.top, 12)
@@ -363,10 +363,10 @@ struct BauhausDetailView: View {
                             .background(Color.red.opacity(0.15))
                             .clipShape(Circle())
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(benefit.title)
+                            Text(benefit.title.localized)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            Text(benefit.desc)
+                            Text(benefit.desc.localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -445,10 +445,10 @@ private struct PartPaymentRow: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(payment.title)
+                    Text(payment.title.localized)
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Text(payment.subtitle)
+                    Text(payment.subtitle.localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -467,14 +467,14 @@ private struct PartPaymentRow: View {
                     Text(amountValue)
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                    Text("left to pay")
+                    Text("left to pay".localized)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
                 }
             } else if payment.title.contains("Bauhaus") {
                 HStack(spacing: 4) {
-                    Text("Debt:")
+                    Text("Debt:".localized)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -493,11 +493,11 @@ private struct PartPaymentRow: View {
                 .tint(.orange)
             
             HStack {
-                Text("Part payment ongoing")
+                Text("Part payment ongoing".localized)
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text(payment.nextDueDate)
+                Text(payment.nextDueDate.localized)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -541,7 +541,7 @@ struct PaintProjectSplitDetailView: View {
             }
             .padding()
         }
-        .navigationTitle(plan.title)
+        .navigationTitle(plan.title.localized)
         .navigationBarTitleDisplayMode(.inline)
     }
     
@@ -549,7 +549,7 @@ struct PaintProjectSplitDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(plan.totalAmount)
                 .font(.system(size: 34, weight: .bold, design: .rounded))
-            Text("\(plan.installmentAmount) per month")
+            Text(String(format: "%@ per month".localized, plan.installmentAmount))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             
@@ -557,7 +557,7 @@ struct PaintProjectSplitDetailView: View {
                 .tint(.red)
             
             HStack {
-                Text("\(plan.completedPayments) of \(plan.totalPayments) payments completed")
+                Text(String(format: "%lld of %lld payments completed".localized, plan.completedPayments, plan.totalPayments))
                     .font(.footnote)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -575,7 +575,7 @@ struct PaintProjectSplitDetailView: View {
     private var nextPaymentCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label {
-                Text("Next payment")
+                Text("Next payment".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
             } icon: {
@@ -586,7 +586,7 @@ struct PaintProjectSplitDetailView: View {
             Divider()
             
             HStack {
-                Text("Amount")
+                Text("Amount".localized)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -596,21 +596,21 @@ struct PaintProjectSplitDetailView: View {
             }
             
             HStack {
-                Text("Invoice created")
+                Text("Invoice created".localized)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text("Nov 10, 2025")
+                Text("Nov 10, 2025".localized)
                     .font(.subheadline)
                     .fontWeight(.medium)
             }
             
             HStack {
-                Text("Invoice due")
+                Text("Invoice due".localized)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text(plan.nextDueDate)
+                Text(plan.nextDueDate.localized)
                     .font(.subheadline)
                     .fontWeight(.medium)
             }
@@ -634,18 +634,18 @@ struct PaintProjectSplitDetailView: View {
                     .font(.title3)
                     .foregroundColor(.orange)
                 
-                Text("Account information")
+                Text("Account information".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
             }
             
             VStack(spacing: 8) {
                 HStack {
-                    Text("Type")
+                    Text("Type".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(plan.title == "Bauhaus - October" ? "Account" : "Invoice")
+                    Text(plan.title == "Bauhaus - October" ? "Account".localized : "Invoice".localized)
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -653,11 +653,11 @@ struct PaintProjectSplitDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Credit")
+                    Text("Credit".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(plan.title == "Bauhaus - October" ? "Store Credit" : "Onetime Credit")
+                    Text(plan.title == "Bauhaus - October" ? "Store Credit".localized : "Onetime Credit".localized)
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -665,7 +665,7 @@ struct PaintProjectSplitDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Current debt")
+                    Text("Current debt".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -677,7 +677,7 @@ struct PaintProjectSplitDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("OCR")
+                    Text("OCR".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -689,7 +689,7 @@ struct PaintProjectSplitDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Bankgiro")
+                    Text("Bankgiro".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -714,7 +714,7 @@ struct PaintProjectSplitDetailView: View {
     // MARK: - Transactions Section
     private var transactionsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Transactions")
+            Text("Transactions".localized)
                 .font(.headline)
                 .fontWeight(.semibold)
             
@@ -742,22 +742,22 @@ struct PaintProjectSplitDetailView: View {
         [
             TransactionItem(
                 id: UUID(),
-                date: "Nov 15, 2025",
-                description: "Payment received",
+                date: "Nov 15, 2025".localized,
+                description: "Payment received".localized,
                 amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
                 amountColor: .green
             ),
             TransactionItem(
                 id: UUID(),
-                date: "Oct 15, 2025",
-                description: "Payment received",
+                date: "Oct 15, 2025".localized,
+                description: "Payment received".localized,
                 amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
                 amountColor: .green
             ),
             TransactionItem(
                 id: UUID(),
-                date: "Sep 15, 2025",
-                description: "Payment received",
+                date: "Sep 15, 2025".localized,
+                description: "Payment received".localized,
                 amount: plan.installmentAmount.isEmpty ? "726 kr" : plan.installmentAmount,
                 amountColor: .green
             )
@@ -776,9 +776,9 @@ struct PartPaymentInvoice: Identifiable {
         var label: String {
             switch self {
             case .paid:
-                return "Paid"
+                return "Paid".localized
             case .upcoming:
-                return "Upcoming"
+                return "Upcoming".localized
             }
         }
         

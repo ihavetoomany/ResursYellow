@@ -36,7 +36,7 @@ struct HelpAndSupportSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Section title - HIG: Use semantic font styles
-            Text(title)
+            Text(title.localized)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 4)
@@ -61,11 +61,11 @@ struct HelpAndSupportSection: View {
                             
                             // Content - HIG: Use semantic labels for VoiceOver
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(option.title)
+                                Text(option.title.localized)
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(.primary)
-                                Text(option.subtitle)
+                                Text(option.subtitle.localized)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -82,8 +82,8 @@ struct HelpAndSupportSection: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(option.title), \(option.subtitle)")
-                    .accessibilityHint("Double tap to open")
+                    .accessibilityLabel("\(option.title.localized), \(option.subtitle.localized)")
+                    .accessibilityHint("Double tap to open".localized)
                 }
             }
         }

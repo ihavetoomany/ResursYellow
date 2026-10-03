@@ -85,7 +85,7 @@ struct JulaDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {
-                    Image(systemName: "gearshape.fill")
+                    Image(systemName: "ellipsis")
                         .font(.title3)
                         .foregroundColor(.secondary)
                         .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
@@ -105,7 +105,7 @@ struct JulaDetailView: View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Available Credit")
+                    Text("Available Credit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(availableCredit)
@@ -128,7 +128,7 @@ struct JulaDetailView: View {
             
             HStack(alignment: .center, spacing: 18) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Credit Limit")
+                    Text("Credit Limit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(creditLimit)
@@ -140,7 +140,7 @@ struct JulaDetailView: View {
                     .frame(height: 32)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Used Credit")
+                    Text("Used Credit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("10 800 kr")
@@ -162,13 +162,13 @@ struct JulaDetailView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Jula available credit \(availableCredit). Credit limit \(creditLimit). Used credit 10 800 kronor.")
+        .accessibilityLabel(String(format: "Jula available credit %@. Credit limit %@. Used credit 10 800 kronor.".localized, availableCredit, creditLimit))
     }
     
     private var purchasesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Recent Jula Purchases")
+                Text("Recent Jula Purchases".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
@@ -185,10 +185,10 @@ struct JulaDetailView: View {
                             .background(purchase.color.opacity(0.2))
                             .clipShape(Circle())
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(purchase.title)
+                            Text(purchase.title.localized)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            Text(purchase.subtitle)
+                            Text(purchase.subtitle.localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -215,7 +215,7 @@ struct JulaDetailView: View {
     private var partPaymentsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Active accounts")
+                Text("Active accounts".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
@@ -225,10 +225,10 @@ struct JulaDetailView: View {
             VStack(spacing: 12) {
                 ForEach(partPayments, id: \.title) { plan in
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(plan.title)
+                        Text(plan.title.localized)
                             .font(.subheadline)
                             .fontWeight(.medium)
-                        Text(plan.subtitle)
+                        Text(plan.subtitle.localized)
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Text(plan.amount)
@@ -259,7 +259,7 @@ struct JulaDetailView: View {
     
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Why connect Jula")
+            Text("Why connect Jula".localized)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.top, 12)
@@ -273,10 +273,10 @@ struct JulaDetailView: View {
                             .background(Color.red.opacity(0.15))
                             .clipShape(Circle())
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(benefit.title)
+                            Text(benefit.title.localized)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            Text(benefit.description)
+                            Text(benefit.description.localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

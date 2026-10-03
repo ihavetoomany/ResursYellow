@@ -30,20 +30,20 @@ struct TransactionDetailView: View {
     private var splitPaymentOptions: [SplitPaymentOption] {
         [
             SplitPaymentOption(
-                title: "3 months interest free",
-                subtitle: "Split into 3 equal payments with 0% fees",
+                title: "3 months interest free".localized,
+                subtitle: "Split into 3 equal payments with 0% fees".localized,
                 icon: "3.circle.fill",
                 color: .blue
             ),
             SplitPaymentOption(
-                title: "6 months interest free",
-                subtitle: "Lower monthly cost, still no interest",
+                title: "6 months interest free".localized,
+                subtitle: "Lower monthly cost, still no interest".localized,
                 icon: "6.circle.fill",
                 color: .indigo
             ),
             SplitPaymentOption(
-                title: "12 months, 6% interest",
-                subtitle: "Smallest monthly cost with fixed 6% interest",
+                title: "12 months, 6% interest".localized,
+                subtitle: "Smallest monthly cost with fixed 6% interest".localized,
                 icon: "12.circle.fill",
                 color: .purple
             )
@@ -110,8 +110,8 @@ struct TransactionDetailView: View {
                             // Add to Payment Plan Section
                             VStack(alignment: .leading, spacing: 12) {
                                 Text(selectedPaymentPlan == nil
-                                     ? (usesSplitPaymentFlow ? "Pay Over Time" : "Add to Payment Plan")
-                                     : "Added to Payment Plan")
+                                     ? (usesSplitPaymentFlow ? "Pay Over Time".localized : "Add to Payment Plan".localized)
+                                     : "Added to Payment Plan".localized)
                                     .font(.title2)
                                     .fontWeight(.semibold)
                                     .padding(.horizontal)
@@ -134,7 +134,7 @@ struct TransactionDetailView: View {
                                                 selectedPaymentPlan = nil
                                             }
                                         }) {
-                                            Text("Remove from Payment Plan")
+                                            Text("Remove from Payment Plan".localized)
                                                 .font(.headline)
                                                 .foregroundColor(.red)
                                                 .frame(maxWidth: .infinity)
@@ -189,11 +189,11 @@ struct TransactionDetailView: View {
                                                         .frame(width: 36, height: 36)
                                                     
                                                     VStack(alignment: .leading, spacing: 4) {
-                                                        Text("Create Payment Plan")
+                                                        Text("Create Payment Plan".localized)
                                                             .font(.subheadline)
                                                             .fontWeight(.medium)
                                                             .foregroundColor(.primary)
-                                                        Text("Start a new payment plan")
+                                                        Text("Start a new payment plan".localized)
                                                             .font(.caption)
                                                             .foregroundColor(.secondary)
                                                     }
@@ -264,7 +264,7 @@ struct TransactionDetailView: View {
                     }
 
                     // Merchant title (always centered)
-                    Text("Purchase")
+                    Text("Purchase".localized)
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
@@ -326,7 +326,7 @@ struct TransactionDetailsCard: View {
                     Image(systemName: paymentMethod.iconName)
                         .font(.caption)
                         .foregroundColor(paymentMethod.accentColor)
-                    Text("Paid with \(paymentMethod.displayName)")
+                    Text(String(format: "Paid with %@".localized, paymentMethod.displayName))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -336,12 +336,12 @@ struct TransactionDetailsCard: View {
             
             // Details
             VStack(spacing: 12) {
-                DetailRow(label: "Merchant", value: merchant)
-                DetailRow(label: "Date", value: date)
-                DetailRow(label: "Time", value: time)
-                DetailRow(label: "Transaction ID", value: generateTransactionID(merchant: merchant, date: date))
-                DetailRow(label: "Payment Method", value: paymentMethod.displayName)
-                DetailRow(label: "Status", value: "Completed")
+                DetailRow(label: "Merchant".localized, value: merchant)
+                DetailRow(label: "Date".localized, value: date)
+                DetailRow(label: "Time".localized, value: time)
+                DetailRow(label: "Transaction ID".localized, value: generateTransactionID(merchant: merchant, date: date))
+                DetailRow(label: "Payment Method".localized, value: paymentMethod.displayName)
+                DetailRow(label: "Status".localized, value: "Completed".localized)
             }
         }
         .padding(20)
@@ -375,12 +375,12 @@ struct PaymentPlansExplanationCard: View {
                     .font(.title3)
                     .foregroundColor(.blue)
                 
-                Text("About Payment Plans")
+                Text("About Payment Plans".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
             }
             
-            Text("Break out this purchase from your monthly bill and put it in a payment plan billed separately - always with the opportunity to part pay or pay in full when the invoice arrives.")
+            Text("Break out this purchase from your monthly bill and put it in a payment plan billed separately - always with the opportunity to part pay or pay in full when the invoice arrives.".localized)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .lineSpacing(4)
@@ -454,7 +454,7 @@ struct ExistingPaymentPlanRow: View {
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundColor(.primary)
-                Text("Current total: \(amount)")
+                Text(String(format: "Current total: %@".localized, amount))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -486,10 +486,10 @@ struct SelectedPaymentPlanCard: View {
                     .foregroundColor(.green)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(isNewPaymentPlan ? "Payment Plan Created" : "Purchase Added")
+                    Text(isNewPaymentPlan ? "Payment Plan Created".localized : "Purchase Added".localized)
                         .font(.headline)
                         .fontWeight(.semibold)
-                    Text(isNewPaymentPlan ? "Your new payment plan is ready" : "This purchase is now in your payment plan")
+                    Text(isNewPaymentPlan ? "Your new payment plan is ready".localized : "This purchase is now in your payment plan".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -510,7 +510,7 @@ struct SelectedPaymentPlanCard: View {
                     Text(title)
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Text(isNewPaymentPlan ? "Starting amount: \(amount)" : "New total: \(amount)")
+                    Text(isNewPaymentPlan ? String(format: "Starting amount: %@".localized, amount) : String(format: "New total: %@".localized, amount))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -576,10 +576,10 @@ struct PartPaymentCard: View {
                     .foregroundColor(.orange)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Part Payment")
+                    Text("Part Payment".localized)
                         .font(.headline)
                         .fontWeight(.semibold)
-                    Text("Payment \(currentPayment) of \(totalPayments)")
+                    Text(String(format: "Payment %d of %d".localized, currentPayment, totalPayments))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -592,7 +592,7 @@ struct PartPaymentCard: View {
             // Progress Section
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("Payment Progress")
+                    Text("Payment Progress".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -622,7 +622,7 @@ struct PartPaymentCard: View {
                     Image(systemName: "info.circle.fill")
                         .font(.caption)
                         .foregroundColor(.orange)
-                    Text("\(remainingPayments) payment\(remainingPayments == 1 ? "" : "s") remaining")
+                    Text(String(format: (remainingPayments == 1 ? "%d payment remaining" : "%d payments remaining").localized, remainingPayments))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -632,10 +632,10 @@ struct PartPaymentCard: View {
             
             // Payment Details
             VStack(spacing: 8) {
-                DetailRow(label: "Total Amount", value: totalAmount)
-                DetailRow(label: "Monthly Amount", value: monthlyAmount)
-                DetailRow(label: "Payments Completed", value: "\(currentPayment) of \(totalPayments)")
-                DetailRow(label: "Remaining Payments", value: "\(remainingPayments)")
+                DetailRow(label: "Total Amount".localized, value: totalAmount)
+                DetailRow(label: "Monthly Amount".localized, value: monthlyAmount)
+                DetailRow(label: "Payments Completed".localized, value: String(format: "%d of %d".localized, currentPayment, totalPayments))
+                DetailRow(label: "Remaining Payments".localized, value: "\(remainingPayments)")
             }
         }
         .padding(20)
@@ -652,14 +652,14 @@ struct PartPaymentsExplanationCard: View {
                     .font(.title3)
                     .foregroundColor(.orange)
                 
-                Text("About Open Accounts")
+                Text("About Open Accounts".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 
                 Spacer()
             }
             
-            Text("Part payments allow you to split a large purchase into smaller, manageable monthly installments. Each month, you'll receive an invoice for your scheduled payment amount. You can pay the full amount, make a partial payment, or pay in full at any time.")
+            Text("Part payments allow you to split a large purchase into smaller, manageable monthly installments. Each month, you'll receive an invoice for your scheduled payment amount. You can pay the full amount, make a partial payment, or pay in full at any time.".localized)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .lineSpacing(4)
@@ -686,7 +686,7 @@ struct InvoiceHistorySection: View {
     var invoices: [InvoiceHistoryItem]
     
     init(
-        title: String = "Invoice History",
+        title: String = "Invoice History".localized,
         invoices: [InvoiceHistoryItem] = InvoiceHistorySection.sampleInvoices
     ) {
         self.title = title
@@ -732,7 +732,7 @@ struct InvoiceHistorySection: View {
             invoiceNumber: "INV-2025-09-001",
             date: "Sep 9, 2025",
             amount: "726 kr",
-            status: "of 4 356 kr",
+            status: "of 4 356 kr".localized,
             isPaid: true
         )
     ]
@@ -757,9 +757,9 @@ struct InvoiceHistoryRow: View {
     
     private var statusText: String {
         if isPaid {
-            return "Paid"
+            return "Paid".localized
         } else if status == "Overdue" {
-            return "Overdue"
+            return "Overdue".localized
         } else {
             return status
         }
@@ -821,22 +821,22 @@ struct NewPaymentPlanSheet: View {
             ScrollView {
                 VStack(spacing: 24) {
                     VStack(spacing: 12) {
-                        Text("Create New Payment Plan")
+                        Text("Create New Payment Plan".localized)
                             .font(.title2)
                             .fontWeight(.bold)
                         
-                        Text("This purchase will be added to the new payment plan")
+                        Text("This purchase will be added to the new payment plan".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
                     .padding(.top, 8)
                     
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Payment Plan Name")
+                        Text("Payment Plan Name".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
-                        TextField("e.g., Home Renovation", text: $paymentPlanName)
+                        TextField("e.g., Home Renovation".localized, text: $paymentPlanName)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .padding(12)
                             .background(.ultraThinMaterial)
@@ -845,7 +845,7 @@ struct NewPaymentPlanSheet: View {
                     .padding(.horizontal)
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Starting with")
+                        Text("Starting with".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
@@ -870,7 +870,7 @@ struct NewPaymentPlanSheet: View {
                             dismiss()
                         }
                     }) {
-                        Text("Create Payment Plan")
+                        Text("Create Payment Plan".localized)
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)

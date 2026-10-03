@@ -18,25 +18,25 @@ struct HouseRenovationLoanView: View {
     private var loanInstallments: [LoanInstallment] {
         [
             LoanInstallment(
-                title: "Monthly installment",
+                title: "Monthly installment".localized,
                 amount: "4 250 SEK",
-                dueDate: "15 Jan",
+                dueDate: "15 Jan".localized,
                 isPaid: false,
                 icon: "calendar",
                 color: .orange
             ),
             LoanInstallment(
-                title: "December payment",
+                title: "December payment".localized,
                 amount: "4 250 SEK",
-                dueDate: "15 Dec",
+                dueDate: "15 Dec".localized,
                 isPaid: true,
                 icon: "checkmark.circle.fill",
                 color: .green
             ),
             LoanInstallment(
-                title: "November payment",
+                title: "November payment".localized,
                 amount: "4 250 SEK",
-                dueDate: "15 Nov",
+                dueDate: "15 Nov".localized,
                 isPaid: true,
                 icon: "checkmark.circle.fill",
                 color: .green
@@ -46,10 +46,10 @@ struct HouseRenovationLoanView: View {
     
     // Benefits for House Renovation Loan
     private let benefits: [(icon: String, title: String, desc: String)] = [
-        ("house.fill", "Home Improvement", "Finance your kitchen, bathroom, or full home renovation."),
-        ("percent", "Competitive Rate", "Fixed interest rate of 4.95% for the entire loan period."),
-        ("calendar.badge.clock", "Flexible Terms", "Choose repayment periods from 1 to 15 years."),
-        ("shield.checkerboard", "Payment Protection", "Optional insurance to protect your payments.")
+        ("house.fill", "Home Improvement".localized, "Finance your kitchen, bathroom, or full home renovation.".localized),
+        ("percent", "Competitive Rate".localized, "Fixed interest rate of 4.95% for the entire loan period.".localized),
+        ("calendar.badge.clock", "Flexible Terms".localized, "Choose repayment periods from 1 to 15 years.".localized),
+        ("shield.checkerboard", "Payment Protection".localized, "Optional insurance to protect your payments.".localized)
     ]
     
     // Documents for House Renovation Loan
@@ -92,14 +92,14 @@ struct HouseRenovationLoanView: View {
                 // Payment Schedule Section
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("Payment schedule")
+                        Text("Payment schedule".localized)
                             .font(.headline)
                             .fontWeight(.semibold)
                         Spacer()
                         Button(action: {
                             // Handle "View all" tap
                         }) {
-                            Text("View all")
+                            Text("View all".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.blue)
                         }
@@ -119,14 +119,14 @@ struct HouseRenovationLoanView: View {
                 // Accounts Section
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("Accounts")
+                        Text("Accounts".localized)
                             .font(.headline)
                             .fontWeight(.semibold)
                         Spacer()
                         Button(action: {
                             // Handle "View all" tap
                         }) {
-                            Text("View all")
+                            Text("View all".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.blue)
                         }
@@ -136,22 +136,22 @@ struct HouseRenovationLoanView: View {
                     
                     VStack(spacing: 12) {
                         LoanAccountRow(
-                            title: "Kitchen Renovation",
-                            subtitle: "Loan account · •••• 9012",
+                            title: "Kitchen Renovation".localized,
+                            subtitle: "Loan account · •••• 9012".localized,
                             amount: "145 000 SEK",
                             progress: 0.52,
-                            monthlyAmount: "2 450 SEK monthly",
-                            nextDueDate: "15 Jan",
+                            monthlyAmount: "2 450 SEK monthly".localized,
+                            nextDueDate: "15 Jan".localized,
                             interestRate: "4.95%"
                         )
                         
                         LoanAccountRow(
-                            title: "Bathroom Upgrade",
-                            subtitle: "Loan account · •••• 9013",
+                            title: "Bathroom Upgrade".localized,
+                            subtitle: "Loan account · •••• 9013".localized,
                             amount: "110 000 SEK",
                             progress: 0.63,
-                            monthlyAmount: "1 800 SEK monthly",
-                            nextDueDate: "15 Jan",
+                            monthlyAmount: "1 800 SEK monthly".localized,
+                            nextDueDate: "15 Jan".localized,
                             interestRate: "4.95%"
                         )
                     }
@@ -161,7 +161,7 @@ struct HouseRenovationLoanView: View {
                 
                 // Benefits Section
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Benefits and services")
+                    Text("Benefits and services".localized)
                         .font(.headline)
                         .fontWeight(.semibold)
                         .padding(.horizontal, 4)
@@ -259,13 +259,13 @@ struct HouseRenovationLoanView: View {
             }
             .coordinateSpace(name: "scroll")
         }
-        .navigationTitle("House Renovation")
+        .navigationTitle("House Renovation".localized)
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(scrollObserver.offset > 10 ? Color(uiColor: .systemBackground) : Color.clear, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {
-                    Image(systemName: "gearshape.fill")
+                    Image(systemName: "ellipsis")
                         .font(.title3)
                         .foregroundColor(.secondary)
                         .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
@@ -274,7 +274,7 @@ struct HouseRenovationLoanView: View {
             }
         }
         .sheet(isPresented: $showSettings) {
-            ServiceSettingsView(serviceName: "House Renovation", serviceColor: .orange)
+            ServiceSettingsView(serviceName: "House Renovation".localized, serviceColor: .orange)
                 .presentationBackground {
                     AdaptiveSheetBackground()
                 }
@@ -291,7 +291,7 @@ struct LoanOverviewCard: View {
         VStack(spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Remaining Balance")
+                    Text("Remaining Balance".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Text("255 000 SEK")
@@ -312,7 +312,7 @@ struct LoanOverviewCard: View {
             
             HStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Original Loan")
+                    Text("Original Loan".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("300 000 SEK")
@@ -324,7 +324,7 @@ struct LoanOverviewCard: View {
                     .frame(height: 30)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Monthly Payment")
+                    Text("Monthly Payment".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("4 250 SEK")
@@ -378,7 +378,7 @@ struct LoanAccountRow: View {
                 Text(amount)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                Text("remaining")
+                Text("remaining".localized)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(.secondary)
@@ -392,7 +392,7 @@ struct LoanAccountRow: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
-                Text("Due \(nextDueDate)")
+                Text(String(format: "Due %@".localized, nextDueDate))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -438,7 +438,7 @@ struct LoanInstallmentRow: View {
                 Text(installment.title)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text("Due \(installment.dueDate)")
+                Text(String(format: "Due %@".localized, installment.dueDate))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -450,11 +450,11 @@ struct LoanInstallmentRow: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                 if installment.isPaid {
-                    Text("Paid")
+                    Text("Paid".localized)
                         .font(.caption)
                         .foregroundColor(.green)
                 } else {
-                    Text("Pending")
+                    Text("Pending".localized)
                         .font(.caption)
                         .foregroundColor(.orange)
                 }

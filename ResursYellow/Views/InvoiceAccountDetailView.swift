@@ -137,7 +137,7 @@ struct InvoiceAccountDetailView: View {
     private var nextPaymentCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label {
-                Text("Next payment")
+                Text("Next payment".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
             } icon: {
@@ -147,7 +147,7 @@ struct InvoiceAccountDetailView: View {
             
             VStack(spacing: 8) {
                 HStack {
-                    Text("To pay by \(formatDueDate(account.nextDueDate))")
+                    Text(String(format: "To pay by %@".localized, formatDueDate(account.nextDueDate)))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -159,7 +159,7 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Received amount")
+                    Text("Received amount".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -182,12 +182,12 @@ struct InvoiceAccountDetailView: View {
                     .font(.title3)
                     .foregroundColor(.blue)
                 
-                Text("Account information")
+                Text("Account information".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
             }
             
-            Text("Monthly invoices created around the 5th with payment due by month end.")
+            Text("Monthly invoices created around the 5th with payment due by month end.".localized)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -196,7 +196,7 @@ struct InvoiceAccountDetailView: View {
             
             VStack(spacing: 8) {
                 HStack {
-                    Text("Account Number")
+                    Text("Account Number".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -208,11 +208,11 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Type")
+                    Text("Type".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text(account.title == "Main Account" ? "Credit Account" : account.title == "Part Payment AUG" ? "Part Payment AUG" : account.title == "Emergency Buffer" ? "Emergency Buffer" : "Invoice Account")
+                    Text(account.title == "Main Account" ? "Credit Account".localized : account.title == "Part Payment AUG" ? "Part Payment AUG".localized : account.title == "Emergency Buffer" ? "Emergency Buffer".localized : "Invoice Account".localized)
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }
@@ -220,7 +220,7 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Credit Limit")
+                    Text("Credit Limit".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -232,7 +232,7 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Utilized Credit")
+                    Text("Utilized Credit".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -244,7 +244,7 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("OCR")
+                    Text("OCR".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -256,7 +256,7 @@ struct InvoiceAccountDetailView: View {
                 Divider()
                 
                 HStack {
-                    Text("Bankgiro")
+                    Text("Bankgiro".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -278,21 +278,21 @@ struct InvoiceAccountDetailView: View {
         
         return VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Transactions")
+                Text("Transactions".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
                 Button(action: {
                     // Handle view all transactions
                 }) {
-                    Text("View all")
+                    Text("View all".localized)
                         .font(.subheadline)
                         .foregroundColor(.blue)
                 }
             }
             
             if transactions.isEmpty {
-                Text("No transactions yet")
+                Text("No transactions yet".localized)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .padding(.vertical, 8)
@@ -316,14 +316,14 @@ struct InvoiceAccountDetailView: View {
     private var invoiceHistorySection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Invoices")
+                Text("Invoices".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
                 Button(action: {
                     // Handle view all invoices
                 }) {
-                    Text("View all")
+                    Text("View all".localized)
                         .font(.subheadline)
                         .foregroundColor(.blue)
                 }
@@ -339,7 +339,7 @@ struct InvoiceAccountDetailView: View {
                         color: invoice.color,
                         isOverdue: invoice.isOverdue,
                         statusOverride: invoice.statusOverride,
-                        actionStatement: "View invoice"
+                        actionStatement: "View invoice".localized.localized
                     )
                 }
             }
@@ -372,7 +372,7 @@ struct InvoiceAccountDetailView: View {
             let isPaid = i > 0 // All except current month are paid
             let amountString = (amountFormatter.string(from: NSNumber(value: amounts[i])) ?? "\(amounts[i])") + " kr"
             let merchantName = "Resurs Family - \(monthNames[i])"
-            let statusText = isPaid ? "Paid" : "Due soon"
+            let statusText = isPaid ? "Paid".localized : "Due soon".localized
             
             let invoice = InvoiceItem(
                 merchant: merchantName,
@@ -412,7 +412,7 @@ struct InvoiceAccountDetailView: View {
     // MARK: - Actions Section
     private var actionsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Actions")
+            Text("Actions".localized)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.top, 24)
@@ -421,62 +421,44 @@ struct InvoiceAccountDetailView: View {
                 Button {
                     // Handle pay extra action
                 } label: {
-                    HStack {
-                        Text("Pay Extra")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(16)
+                    ActionListRow(
+                        title: "Pay Extra".localized,
+                        systemImage: "plus.circle",
+                        tint: .primary
+                    )
                 }
                 .buttonStyle(.plain)
                 
                 Divider()
-                    .padding(.leading, 16)
+                    .padding(.leading, 72)
                 
                 Button {
                     // Handle make end payment action
                 } label: {
-                    HStack {
-                        Text("Make end payment")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(16)
+                    ActionListRow(
+                        title: "Make end payment".localized,
+                        systemImage: "flag.checkered",
+                        tint: .primary
+                    )
                 }
                 .buttonStyle(.plain)
                 
                 Divider()
-                    .padding(.leading, 16)
+                    .padding(.leading, 72)
                 
                 Button {
                     // Handle close account action
                 } label: {
-                    HStack {
-                        Text("Close account")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.red)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(16)
+                    ActionListRow(
+                        title: "Close account".localized,
+                        systemImage: "trash",
+                        tint: .red
+                    )
                 }
                 .buttonStyle(.plain)
             }
             .background(AdaptiveCardBackground())
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: 18))
         }
     }
     
@@ -556,6 +538,35 @@ struct InfoRow: View {
     }
 }
 
+struct ActionListRow: View {
+    let title: String
+    let systemImage: String
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: systemImage)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(tint)
+                .frame(width: 24, height: 24)
+
+            Text(title)
+                .font(.title3)
+                .fontWeight(.medium)
+                .foregroundColor(tint)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.title3.weight(.medium))
+                .foregroundColor(tint == .red ? .red : .secondary)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 18)
+        .contentShape(Rectangle())
+    }
+}
+
 struct TransactionRow: View {
     let date: String
     let description: String
@@ -598,7 +609,7 @@ struct ActionsSheet: View {
             Button(action: onPayExtra) {
                 HStack {
                     Spacer()
-                    Text("Pay Extra")
+                    Text("Pay Extra".localized)
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundColor(.blue)
@@ -615,7 +626,7 @@ struct ActionsSheet: View {
             Button(action: onMakeEndPayment) {
                 HStack {
                     Spacer()
-                    Text("Make end payment")
+                    Text("Make end payment".localized)
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundColor(.blue)

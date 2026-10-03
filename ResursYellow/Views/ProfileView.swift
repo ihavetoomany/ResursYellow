@@ -27,9 +27,9 @@ struct ProfileView: View {
                         
                         VStack(spacing: 24) {
                             // Account/Profile Section
-                            ProfileSection(title: "Account/Profile") {
+                            ProfileSection(title: "Account/Profile".localized) {
                                 ProfileRow(
-                                    title: "Customer ID",
+                                    title: "Customer ID".localized,
                                     subtitle: "12345678",
                                     icon: "person.fill",
                                     color: .blue
@@ -37,8 +37,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "ContactInformation") {
                                     ProfileRow(
-                                        title: "Contact information",
-                                        subtitle: "Email, Phone",
+                                        title: "Contact information".localized,
+                                        subtitle: "Email, Phone".localized,
                                         icon: "envelope.fill",
                                         color: .green,
                                         showChevron: true
@@ -48,8 +48,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "KYC") {
                                     ProfileRow(
-                                        title: "KYC",
-                                        subtitle: "Know Your Customer",
+                                        title: "KYC".localized,
+                                        subtitle: "Know Your Customer".localized,
                                         icon: "person.text.rectangle.fill",
                                         color: .purple,
                                         showChevron: true
@@ -59,8 +59,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "MyDocuments") {
                                     ProfileRow(
-                                        title: "My documents",
-                                        subtitle: "Agreements, Contracts",
+                                        title: "My documents".localized,
+                                        subtitle: "Agreements, Contracts".localized,
                                         icon: "doc.fill",
                                         color: .orange,
                                         showChevron: true
@@ -70,11 +70,11 @@ struct ProfileView: View {
                             }
                             
                             // Insights Section
-                            ProfileSection(title: "Insights") {
+                            ProfileSection(title: "Insights".localized) {
                                 NavigationLink(value: "ChartOfExpenses") {
                                     ProfileRow(
-                                        title: "Chart of expenses",
-                                        subtitle: "View spending breakdown",
+                                        title: "Chart of expenses".localized,
+                                        subtitle: "View spending breakdown".localized,
                                         icon: "chart.pie.fill",
                                         color: .red,
                                         showChevron: true
@@ -84,8 +84,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "ChartOfAvailableCredit") {
                                     ProfileRow(
-                                        title: "Chart of available credit",
-                                        subtitle: "Credit utilization",
+                                        title: "Chart of available credit".localized,
+                                        subtitle: "Credit utilization".localized,
                                         icon: "chart.bar.fill",
                                         color: .blue,
                                         showChevron: true
@@ -95,8 +95,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "SpendingTrends") {
                                     ProfileRow(
-                                        title: "Spending trends",
-                                        subtitle: "Gamification",
+                                        title: "Spending trends".localized,
+                                        subtitle: "Gamification".localized,
                                         icon: "chart.line.uptrend.xyaxis",
                                         color: .green,
                                         showChevron: true
@@ -106,11 +106,11 @@ struct ProfileView: View {
                             }
                             
                             // Settings Section
-                            ProfileSection(title: "Settings") {
+                            ProfileSection(title: "Settings".localized) {
                                 NavigationLink(value: "ConnectBankAccount") {
                                     ProfileRow(
-                                        title: "Payment method",
-                                        subtitle: "Link external accounts",
+                                        title: "Payment method".localized,
+                                        subtitle: "Link external accounts".localized,
                                         icon: "building.columns.fill",
                                         color: .blue,
                                         showChevron: true
@@ -120,8 +120,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "NotificationSettings") {
                                     ProfileRow(
-                                        title: "Notification settings",
-                                        subtitle: "Communication, Marketing",
+                                        title: "Notification settings".localized,
+                                        subtitle: "Communication, Marketing".localized,
                                         icon: "bell.fill",
                                         color: .orange,
                                         showChevron: true
@@ -131,8 +131,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "Theme") {
                                     ProfileRow(
-                                        title: "Theme",
-                                        subtitle: "Light, Dark, Auto",
+                                        title: "Theme".localized,
+                                        subtitle: "Light, Dark, Auto".localized,
                                         icon: "paintbrush.fill",
                                         color: .purple,
                                         showChevron: true
@@ -142,7 +142,7 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "Language") {
                                     ProfileRow(
-                                        title: "Language",
+                                        title: "Language".localized,
                                         subtitle: localizationService.currentLanguage.displayName,
                                         icon: "globe",
                                         color: .cyan,
@@ -153,8 +153,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "Accessibility") {
                                     ProfileRow(
-                                        title: "A11y",
-                                        subtitle: "Accessibility settings",
+                                        title: "A11y".localized,
+                                        subtitle: "Accessibility settings".localized,
                                         icon: "accessibility",
                                         color: .indigo,
                                         showChevron: true
@@ -164,8 +164,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "Autopay") {
                                     ProfileRow(
-                                        title: "Autopay",
-                                        subtitle: "Automatic payments",
+                                        title: "Autopay".localized,
+                                        subtitle: "Automatic payments".localized,
                                         icon: "arrow.clockwise.circle.fill",
                                         color: .green,
                                         showChevron: true
@@ -175,8 +175,8 @@ struct ProfileView: View {
                                 
                                 NavigationLink(value: "ChangeShortcuts") {
                                     ProfileRow(
-                                        title: "Change shortcuts on homepage",
-                                        subtitle: "Customize homepage",
+                                        title: "Change shortcuts on homepage".localized,
+                                        subtitle: "Customize homepage".localized,
                                         icon: "square.grid.2x2.fill",
                                         color: .pink,
                                         showChevron: true
@@ -188,8 +188,8 @@ struct ProfileView: View {
                                     showResetConfirmation = true
                                 } label: {
                                     ProfileRow(
-                                        title: "Reset Data",
-                                        subtitle: "Restore default data",
+                                        title: "Reset Data".localized,
+                                        subtitle: "Restore default data".localized,
                                         icon: "arrow.counterclockwise",
                                         color: .orange,
                                         showChevron: false
@@ -203,8 +203,8 @@ struct ProfileView: View {
                                 showLogoutConfirmation = true
                             } label: {
                                 ProfileRow(
-                                    title: "Log out",
-                                    subtitle: "Sign out of your account",
+                                    title: "Log out".localized,
+                                    subtitle: "Sign out of your account".localized,
                                     icon: "rectangle.portrait.and.arrow.right",
                                     color: .red,
                                     showChevron: false
@@ -227,8 +227,8 @@ struct ProfileView: View {
                         GlassIconButton(systemName: "xmark") {
                             dismiss()
                         }
-                        .accessibilityLabel("Close profile")
-                        .accessibilityHint("Dismiss profile overlay")
+                        .accessibilityLabel("Close profile".localized)
+                        .accessibilityHint("Dismiss profile overlay".localized)
                     }
                     .padding(.horizontal)
                     .padding(.top, 20)
@@ -236,11 +236,11 @@ struct ProfileView: View {
                     
                     // Title and subtitle below close button
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Manage your account")
+                        Text("Manage your account".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
-                        Text("Profile")
+                        Text("Profile".localized)
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
@@ -258,22 +258,22 @@ struct ProfileView: View {
             .navigationDestination(for: String.self) { destination in
                 destinationView(for: destination)
             }
-            .confirmationDialog("Log out", isPresented: $showLogoutConfirmation, titleVisibility: .visible) {
-                Button("Log out", role: .destructive) {
+            .confirmationDialog("Log out".localized, isPresented: $showLogoutConfirmation, titleVisibility: .visible) {
+                Button("Log out".localized, role: .destructive) {
                     // Handle logout
                 }
-                Button("Cancel", role: .cancel) {}
+                Button("Cancel".localized, role: .cancel) {}
             } message: {
-                Text("Are you sure you want to log out?")
+                Text("Are you sure you want to log out?".localized)
             }
-            .confirmationDialog("Reset Data", isPresented: $showResetConfirmation, titleVisibility: .visible) {
-                Button("Reset", role: .destructive) {
+            .confirmationDialog("Reset Data".localized, isPresented: $showResetConfirmation, titleVisibility: .visible) {
+                Button("Reset".localized, role: .destructive) {
                     dataManager.reset()
                     notificationsRead = false
                 }
-                Button("Cancel", role: .cancel) {}
+                Button("Cancel".localized, role: .cancel) {}
             } message: {
-                Text("This will restore all data to default values. All your changes will be lost. Are you sure?")
+                Text("This will restore all data to default values. All your changes will be lost. Are you sure?".localized)
             }
         }
     }
@@ -316,7 +316,7 @@ struct ProfileView: View {
         case "ChangeShortcuts":
             ChangeShortcutsView()
         default:
-            Text("Coming soon")
+            Text("Coming soon".localized)
                 .navigationTitle(destination)
         }
     }
@@ -407,7 +407,7 @@ struct ContactInformationView: View {
         List {
             Section {
                 HStack {
-                    Text("Email address")
+                    Text("Email address".localized)
                         .font(.subheadline)
                     Spacer()
                     Text("john.doe@example.com")
@@ -416,7 +416,7 @@ struct ContactInformationView: View {
                 }
                 
                 HStack {
-                    Text("Phone nr")
+                    Text("Phone nr".localized)
                         .font(.subheadline)
                     Spacer()
                     Text("+46 70 123 45 67")
@@ -424,10 +424,10 @@ struct ContactInformationView: View {
                         .foregroundColor(.secondary)
                 }
             } header: {
-                Text("Contact Information")
+                Text("Contact Information".localized)
             }
         }
-        .navigationTitle("Contact Information")
+        .navigationTitle("Contact Information".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -436,44 +436,44 @@ struct NotificationsView: View {
     var body: some View {
         List {
             Section {
-                NavigationLink("Payment Confirmation") {
-                    Text("Payment of 2,450 SEK received")
-                        .navigationTitle("Payment Confirmation")
+                NavigationLink("Payment Confirmation".localized) {
+                    Text("Payment of 2,450 SEK received".localized)
+                        .navigationTitle("Payment Confirmation".localized)
                 }
                 
-                NavigationLink("Invoice Available") {
-                    Text("Your December invoice is ready")
-                        .navigationTitle("Invoice Available")
+                NavigationLink("Invoice Available".localized) {
+                    Text("Your December invoice is ready".localized)
+                        .navigationTitle("Invoice Available".localized)
                 }
                 
-                NavigationLink("Account Update") {
-                    Text("Your credit limit has been increased")
-                        .navigationTitle("Account Update")
+                NavigationLink("Account Update".localized) {
+                    Text("Your credit limit has been increased".localized)
+                        .navigationTitle("Account Update".localized)
                 }
             } header: {
-                Text("Messages")
+                Text("Messages".localized)
             }
             
             Section {
-                NavigationLink("Payment reminder") {
-                    Text("Payment due in 3 days")
-                        .navigationTitle("Payment Reminder")
+                NavigationLink("Payment reminder".localized) {
+                    Text("Payment due in 3 days".localized)
+                        .navigationTitle("Payment Reminder".localized)
                 }
                 
-                NavigationLink("Spending alert") {
-                    Text("You've reached 80% of your monthly budget")
-                        .navigationTitle("Spending Alert")
+                NavigationLink("Spending alert".localized) {
+                    Text("You've reached 80% of your monthly budget".localized)
+                        .navigationTitle("Spending Alert".localized)
                 }
                 
-                NavigationLink("New offer available") {
-                    Text("Special rate on savings account")
-                        .navigationTitle("New Offer")
+                NavigationLink("New offer available".localized) {
+                    Text("Special rate on savings account".localized)
+                        .navigationTitle("New Offer".localized)
                 }
             } header: {
-                Text("Notifications")
+                Text("Notifications".localized)
             }
         }
-        .navigationTitle("Messages & Notifications")
+        .navigationTitle("Messages & Notifications".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -482,20 +482,20 @@ struct KYCView: View {
     var body: some View {
         List {
             Section {
-                NavigationLink("View answers") {
-                    Text("KYC Answers")
-                        .navigationTitle("View Answers")
+                NavigationLink("View answers".localized) {
+                    Text("KYC Answers".localized)
+                        .navigationTitle("View Answers".localized)
                 }
                 
-                NavigationLink("Edit answers") {
-                    Text("Edit KYC Answers")
-                        .navigationTitle("Edit Answers")
+                NavigationLink("Edit answers".localized) {
+                    Text("Edit KYC Answers".localized)
+                        .navigationTitle("Edit Answers".localized)
                 }
             } header: {
-                Text("Know Your Customer")
+                Text("Know Your Customer".localized)
             }
         }
-        .navigationTitle("KYC")
+        .navigationTitle("KYC".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -504,20 +504,20 @@ struct MyDocumentsView: View {
     var body: some View {
         List {
             Section {
-                NavigationLink("Agreements") {
-                    Text("Agreements")
-                        .navigationTitle("Agreements")
+                NavigationLink("Agreements".localized) {
+                    Text("Agreements".localized)
+                        .navigationTitle("Agreements".localized)
                 }
                 
-                NavigationLink("Contracts") {
-                    Text("Contracts")
-                        .navigationTitle("Contracts")
+                NavigationLink("Contracts".localized) {
+                    Text("Contracts".localized)
+                        .navigationTitle("Contracts".localized)
                 }
             } header: {
-                Text("My Documents")
+                Text("My Documents".localized)
             }
         }
-        .navigationTitle("My Documents")
+        .navigationTitle("My Documents".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -526,7 +526,7 @@ struct ChartOfExpensesView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                Text("Chart of Expenses")
+                Text("Chart of Expenses".localized)
                     .font(.title2)
                     .fontWeight(.bold)
                     .padding()
@@ -540,7 +540,7 @@ struct ChartOfExpensesView: View {
                             Image(systemName: "chart.pie.fill")
                                 .font(.system(size: 50))
                                 .foregroundColor(.secondary)
-                            Text("Expense Chart")
+                            Text("Expense Chart".localized)
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                         }
@@ -548,7 +548,7 @@ struct ChartOfExpensesView: View {
                     .padding()
             }
         }
-        .navigationTitle("Chart of Expenses")
+        .navigationTitle("Chart of Expenses".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -557,7 +557,7 @@ struct ChartOfAvailableCreditView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                Text("Chart of Available Credit")
+                Text("Chart of Available Credit".localized)
                     .font(.title2)
                     .fontWeight(.bold)
                     .padding()
@@ -571,7 +571,7 @@ struct ChartOfAvailableCreditView: View {
                             Image(systemName: "chart.bar.fill")
                                 .font(.system(size: 50))
                                 .foregroundColor(.secondary)
-                            Text("Credit Chart")
+                            Text("Credit Chart".localized)
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                         }
@@ -579,7 +579,7 @@ struct ChartOfAvailableCreditView: View {
                     .padding()
             }
         }
-        .navigationTitle("Chart of Available Credit")
+        .navigationTitle("Chart of Available Credit".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -588,14 +588,14 @@ struct SpendingTrendsView: View {
     var body: some View {
         List {
             Section {
-                NavigationLink("Gamification") {
+                NavigationLink("Gamification".localized) {
                     GamificationView()
                 }
             } header: {
-                Text("Spending Trends")
+                Text("Spending Trends".localized)
             }
         }
-        .navigationTitle("Spending Trends")
+        .navigationTitle("Spending Trends".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -604,20 +604,20 @@ struct GamificationView: View {
     var body: some View {
         List {
             Section {
-                NavigationLink("Milestones") {
-                    Text("Milestones")
-                        .navigationTitle("Milestones")
+                NavigationLink("Milestones".localized) {
+                    Text("Milestones".localized)
+                        .navigationTitle("Milestones".localized)
                 }
                 
-                NavigationLink("Badges or rewards") {
-                    Text("Badges or Rewards")
-                        .navigationTitle("Badges or Rewards")
+                NavigationLink("Badges or rewards".localized) {
+                    Text("Badges or Rewards".localized)
+                        .navigationTitle("Badges or Rewards".localized)
                 }
             } header: {
-                Text("Gamification")
+                Text("Gamification".localized)
             }
         }
-        .navigationTitle("Gamification")
+        .navigationTitle("Gamification".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -631,11 +631,11 @@ struct ConnectBankAccountView: View {
                     .foregroundColor(.blue)
                     .padding(.top, 40)
                 
-                Text("Connect Bank Account")
+                Text("Connect Bank Account".localized)
                     .font(.title2)
                     .fontWeight(.bold)
                 
-                Text("Link your external bank accounts to get a complete view of your finances.")
+                Text("Link your external bank accounts to get a complete view of your finances.".localized)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -644,7 +644,7 @@ struct ConnectBankAccountView: View {
                 Button {
                     // Handle connect bank account
                 } label: {
-                    Text("Connect Account")
+                    Text("Connect Account".localized)
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -656,7 +656,7 @@ struct ConnectBankAccountView: View {
                 .padding(.top, 20)
             }
         }
-        .navigationTitle("Connect Bank Account")
+        .navigationTitle("Connect Bank Account".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -668,15 +668,15 @@ struct NotificationSettingsView: View {
     var body: some View {
         List {
             Section {
-                Toggle("Communication sendouts", isOn: $communicationEnabled)
-                Toggle("Marketing", isOn: $marketingEnabled)
+                Toggle("Communication sendouts".localized, isOn: $communicationEnabled)
+                Toggle("Marketing".localized, isOn: $marketingEnabled)
             } header: {
-                Text("Notification Settings")
+                Text("Notification Settings".localized)
             } footer: {
-                Text("Control how you receive notifications from Resurs.")
+                Text("Control how you receive notifications from Resurs.".localized)
             }
         }
-        .navigationTitle("Notification Settings")
+        .navigationTitle("Notification Settings".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -687,18 +687,18 @@ struct ThemeSettingsView: View {
     var body: some View {
         List {
             Section {
-                Picker("Theme", selection: $selectedTheme) {
-                    Text("Light").tag("Light")
-                    Text("Dark").tag("Dark")
-                    Text("Auto").tag("Auto")
+                Picker("Theme".localized, selection: $selectedTheme) {
+                    Text("Light".localized).tag("Light")
+                    Text("Dark".localized).tag("Dark")
+                    Text("Auto".localized).tag("Auto")
                 }
             } header: {
-                Text("Appearance")
+                Text("Appearance".localized)
             } footer: {
-                Text("Choose your preferred theme. Auto will match your system settings.")
+                Text("Choose your preferred theme. Auto will match your system settings.".localized)
             }
         }
-        .navigationTitle("Theme")
+        .navigationTitle("Theme".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -709,7 +709,7 @@ struct LanguageSettingsView: View {
     var body: some View {
         List {
             Section {
-                Picker("Language", selection: Binding(
+                Picker("Language".localized, selection: Binding(
                     get: { localizationService.currentLanguage },
                     set: { localizationService.setLanguage($0) }
                 )) {
@@ -718,12 +718,12 @@ struct LanguageSettingsView: View {
                     }
                 }
             } header: {
-                Text("App Language")
+                Text("App Language".localized)
             } footer: {
-                Text("Choose your preferred language for the app interface.")
+                Text("Choose your preferred language for the app interface.".localized)
             }
         }
-        .navigationTitle("Language")
+        .navigationTitle("Language".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -732,27 +732,27 @@ struct AccessibilitySettingsView: View {
     var body: some View {
         List {
             Section {
-                NavigationLink("Display & Text Size") {
-                    Text("Display & Text Size Settings")
-                        .navigationTitle("Display & Text Size")
+                NavigationLink("Display & Text Size".localized) {
+                    Text("Display & Text Size Settings".localized)
+                        .navigationTitle("Display & Text Size".localized)
                 }
                 
-                NavigationLink("Motion") {
-                    Text("Motion Settings")
-                        .navigationTitle("Motion")
+                NavigationLink("Motion".localized) {
+                    Text("Motion Settings".localized)
+                        .navigationTitle("Motion".localized)
                 }
                 
-                NavigationLink("VoiceOver") {
-                    Text("VoiceOver Settings")
-                        .navigationTitle("VoiceOver")
+                NavigationLink("VoiceOver".localized) {
+                    Text("VoiceOver Settings".localized)
+                        .navigationTitle("VoiceOver".localized)
                 }
             } header: {
-                Text("Accessibility")
+                Text("Accessibility".localized)
             } footer: {
-                Text("Customize accessibility features to improve your experience.")
+                Text("Customize accessibility features to improve your experience.".localized)
             }
         }
-        .navigationTitle("Accessibility")
+        .navigationTitle("Accessibility".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -763,14 +763,14 @@ struct AutopaySettingsView: View {
     var body: some View {
         List {
             Section {
-                Toggle("Enable Autopay", isOn: $autopayEnabled)
+                Toggle("Enable Autopay".localized, isOn: $autopayEnabled)
             } header: {
-                Text("Automatic Payments")
+                Text("Automatic Payments".localized)
             } footer: {
-                Text("When enabled, payments will be automatically processed on their due dates.")
+                Text("When enabled, payments will be automatically processed on their due dates.".localized)
             }
         }
-        .navigationTitle("Autopay")
+        .navigationTitle("Autopay".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -779,12 +779,12 @@ struct ChangeShortcutsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                Text("Change Shortcuts on Homepage")
+                Text("Change Shortcuts on Homepage".localized)
                     .font(.title2)
                     .fontWeight(.bold)
                     .padding()
                 
-                Text("Customize which shortcuts appear on your homepage.")
+                Text("Customize which shortcuts appear on your homepage.".localized)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -794,7 +794,7 @@ struct ChangeShortcutsView: View {
                 VStack(spacing: 12) {
                     ForEach(["Overview", "Accounts", "Merchants", "Support"], id: \.self) { shortcut in
                         HStack {
-                            Text(shortcut)
+                            Text(shortcut.localized)
                                 .font(.subheadline)
                             Spacer()
                             Image(systemName: "line.3.horizontal")
@@ -808,7 +808,7 @@ struct ChangeShortcutsView: View {
                 .padding()
             }
         }
-        .navigationTitle("Homepage Shortcuts")
+        .navigationTitle("Homepage Shortcuts".localized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }

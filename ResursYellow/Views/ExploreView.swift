@@ -13,8 +13,8 @@ struct ExploreView: View {
     var body: some View {
         NavigationStack(path: $navigationPath) {
             StickyHeaderView(
-                title: "Discover",
-                subtitle: "Explore more",
+                title: "Discover".localized,
+                subtitle: "Explore more".localized,
                 trailingButton: "",
                 trailingButtonTint: .black,
                 trailingButtonSize: 52,
@@ -24,7 +24,7 @@ struct ExploreView: View {
                 VStack(spacing: 16) {
                     // Highlights Section
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Highlights")
+                        Text("Highlights".localized)
                             .font(.title2)
                             .fontWeight(.semibold)
                             .padding(.horizontal)
@@ -32,22 +32,22 @@ struct ExploreView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 16) {
                                 FeaturedCard(
-                                    title: "Special Offers",
-                                    subtitle: "Exclusive deals for you",
+                                    title: "Special Offers".localized,
+                                    subtitle: "Exclusive deals for you".localized,
                                     icon: "star.fill",
                                     color: .blue
                                 )
                                 
                                 FeaturedCard(
-                                    title: "New Features",
-                                    subtitle: "Discover what's new",
+                                    title: "New Features".localized,
+                                    subtitle: "Discover what's new".localized,
                                     icon: "sparkles",
                                     color: .purple
                                 )
                                 
                                 FeaturedCard(
-                                    title: "Top Products",
-                                    subtitle: "Most popular choices",
+                                    title: "Top Products".localized,
+                                    subtitle: "Most popular choices".localized,
                                     icon: "chart.bar.fill",
                                     color: .green
                                 )
@@ -60,36 +60,36 @@ struct ExploreView: View {
                     
                     // Partner Offers Section
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Partner Offers")
+                        Text("Partner Offers".localized)
                             .font(.title2)
                             .fontWeight(.semibold)
                             .padding(.horizontal)
                         
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
                             ServiceCard(
-                                title: "Partner Deal 1",
-                                subtitle: "Exclusive offer",
+                                title: "Partner Deal 1".localized,
+                                subtitle: "Exclusive offer".localized,
                                 icon: "handshake.fill",
                                 color: .blue
                             )
                             
                             ServiceCard(
-                                title: "Partner Deal 2",
-                                subtitle: "Limited time",
+                                title: "Partner Deal 2".localized,
+                                subtitle: "Limited time".localized,
                                 icon: "gift.fill",
                                 color: .orange
                             )
                             
                             ServiceCard(
-                                title: "Partner Deal 3",
-                                subtitle: "Special discount",
+                                title: "Partner Deal 3".localized,
+                                subtitle: "Special discount".localized,
                                 icon: "tag.fill",
                                 color: .green
                             )
                             
                             ServiceCard(
-                                title: "Partner Deal 4",
-                                subtitle: "Best value",
+                                title: "Partner Deal 4".localized,
+                                subtitle: "Best value".localized,
                                 icon: "percent",
                                 color: .purple
                             )
@@ -101,11 +101,11 @@ struct ExploreView: View {
                     // News Section with Marketing Campaigns
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
-                            Text("News")
+                            Text("News".localized)
                                 .font(.title2)
                                 .fontWeight(.semibold)
                             Spacer()
-                            Button("See All") {
+                            Button("See All".localized) {
                                 // Navigate to news
                             }
                             .font(.subheadline)
@@ -115,39 +115,39 @@ struct ExploreView: View {
                         
                         VStack(spacing: 12) {
                             NewsRow(
-                                title: "Marketing Campaign: Summer Savings",
-                                subtitle: "2 hours ago",
-                                category: "Marketing"
+                                title: "Marketing Campaign: Summer Savings".localized,
+                                subtitle: "2 hours ago".localized,
+                                category: "Marketing".localized
                             )
                             
                             NewsRow(
-                                title: "Marketing Campaign: New Year Special",
-                                subtitle: "5 hours ago",
-                                category: "Marketing"
+                                title: "Marketing Campaign: New Year Special".localized,
+                                subtitle: "5 hours ago".localized,
+                                category: "Marketing".localized
                             )
                             
                             NewsRow(
-                                title: "Latest Financial News",
-                                subtitle: "1 day ago",
-                                category: "News"
+                                title: "Latest Financial News".localized,
+                                subtitle: "1 day ago".localized,
+                                category: "News".localized
                             )
                             
                             NewsRow(
-                                title: "Marketing Campaign: Spring Promotion",
-                                subtitle: "2 days ago",
-                                category: "Marketing"
+                                title: "Marketing Campaign: Spring Promotion".localized,
+                                subtitle: "2 days ago".localized,
+                                category: "Marketing".localized
                             )
                             
                             NewsRow(
-                                title: "Industry Updates",
-                                subtitle: "3 days ago",
-                                category: "News"
+                                title: "Industry Updates".localized,
+                                subtitle: "3 days ago".localized,
+                                category: "News".localized
                             )
                             
                             NewsRow(
-                                title: "Marketing Campaign: Holiday Deals",
-                                subtitle: "4 days ago",
-                                category: "Marketing"
+                                title: "Marketing Campaign: Holiday Deals".localized,
+                                subtitle: "4 days ago".localized,
+                                category: "Marketing".localized
                             )
                         }
                         .padding(.horizontal)

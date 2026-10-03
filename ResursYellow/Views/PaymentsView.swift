@@ -28,6 +28,11 @@ private func formattedSEK(_ value: Double) -> String {
     return "\(formatted) SEK"
 }
 
+/// Matches the Payments tab `ZStack` base so pushed invoice/purchase/action lists share the same chroma as their sticky headers.
+private func paymentsTabChromeBackground(for colorScheme: ColorScheme) -> Color {
+    colorScheme == .light ? Color(white: 0.93) : Color.black
+}
+
 struct ActionItem: Identifiable {
     let id = UUID()
     let title: String
@@ -113,7 +118,7 @@ enum PaymentMethod: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     
     var displayName: String {
-        rawValue
+        rawValue.localized
     }
     
     var iconName: String {
@@ -266,7 +271,7 @@ extension InvoiceItem {
             InvoiceItem(
                 merchant: "Gekås",
                 subtitle: "Oct 25, 2025",
-                amount: "895 SEK",
+                amount: "8 500 SEK",
                 icon: nil,
                 color: .orange,
                 isOverdue: true,
@@ -274,7 +279,7 @@ extension InvoiceItem {
                 category: .overdue,
                 detail: InvoiceData(
                     merchant: "Gekås",
-                    amount: "895 SEK",
+                    amount: "8 500 SEK",
                     dueDate: "Nov 8, 2025",
                     invoiceNumber: "INV-2025-10-052",
                     issueDate: "Oct 25, 2025",
@@ -438,6 +443,8 @@ enum WalletDestination: Hashable {
     case invoices
     case purchases(filter: PurchaseFilter = .all)
     case actions
+    case loan
+    case savings
 }
 
 enum WalletSegment: String, CaseIterable {
@@ -563,11 +570,9 @@ struct PaymentsView: View {
         if toPayInvoices.isEmpty {
             return localized("No unpaid invoices")
         }
-        let overdueCount = dataManager.invoicesForCategory(.overdue).count
-        if overdueCount > 0 {
-            return "\(overdueCount) \(localized("invoices overdue"))"
-        }
-        return "\(unpaidCount) \(localized("invoices due"))"
+        let total = toPayInvoices.reduce(0.0) { $0 + $1.numericAmount }
+        let amount = formattedSEK(total).replacingOccurrences(of: " SEK", with: " kr")
+        return String(format: localized("%@ to pay"), amount)
     }
     
     private var hasOverdueInvoices: Bool {
@@ -599,9 +604,9 @@ struct PaymentsView: View {
                     .allowsHitTesting(false)
                 
                 StickyHeaderView(
-                    title: totalUnpaidAmountLabel,
-                    subtitle: "To pay",
-                    minimizedTitle: "Payments",
+                    title: localized("Welcome"),
+                    subtitle: "Resurs",
+                    minimizedTitle: localized("Payments"),
                     trailingButton: "",
                     trailingButtonTint: .primary,
                     trailingButtonSize: 44,
@@ -622,9 +627,12 @@ struct PaymentsView: View {
                                 }
                                 navigationPath.append(WalletDestination.invoices)
                             } label: {
-                                Text(invoiceSubtitleLabel)
-                                    .font(.system(size: 15, weight: .medium))
-                                    .foregroundColor(hasOverdueInvoices ? (colorScheme == .light ? Color(red: 0.8, green: 0.3, blue: 0.0) : .orange) : .green)
+                                HStack(spacing: 6) {
+                                    FAIconView(.fileInvoice, style: .solid, size: 14)
+                                    Text(invoiceSubtitleLabel)
+                                        .font(.system(size: 15, weight: .medium))
+                                }
+                                .foregroundColor(hasOverdueInvoices ? (colorScheme == .light ? Color(red: 0.8, green: 0.3, blue: 0.0) : .orange) : .green)
                             }
                             .buttonStyle(.plain)
                             Spacer()
@@ -632,8 +640,17 @@ struct PaymentsView: View {
                         .padding(.horizontal)
                         .padding(.top, -12) // Bring closer to header
 
+                    // Cross-sell: loans and savings
+                    CrossSellCarousel { offer in
+                        switch offer.id {
+                        case "loan": navigationPath.append(WalletDestination.loan)
+                        case "flex": navigationPath.append(WalletDestination.purchases())
+                        default: navigationPath.append(WalletDestination.savings)
+                        }
+                    }
+
                     // Segmented Control for Invoices/Purchases
-                    Picker("Content", selection: $selectedSegment) {
+                    Picker(localized("Content"), selection: $selectedSegment) {
                         Text(self.localized("Invoices")).tag(WalletSegment.invoices)
                         Text(self.localized("Purchases")).tag(WalletSegment.purchases)
                     }
@@ -744,6 +761,10 @@ struct PaymentsView: View {
                     PurchasesList(navigationPath: $navigationPath, initialFilter: filter)
                 case .actions:
                     ActionsList(actionItems: ActionItem.allItems)
+                case .loan:
+                    HouseRenovationLoanView()
+                case .savings:
+                    SavingsAccountDetailView()
                 }
             }
             .navigationDestination(for: TransactionData.self) { transaction in
@@ -1199,7 +1220,7 @@ struct PurchaseItem: Identifiable {
     var subtitleWithoutTime: String {
         let dateAndLocation = subtitle.components(separatedBy: " - ")
         let rawDate = dateAndLocation.first ?? subtitle
-        let cleanedDate = rawDate.components(separatedBy: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? rawDate.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanedDate = (rawDate.components(separatedBy: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? rawDate.trimmingCharacters(in: .whitespacesAndNewlines)).localized
         
         guard dateAndLocation.count > 1 else {
             return cleanedDate
@@ -1352,15 +1373,15 @@ extension PurchaseItem {
         }
         
         let components = subtitle.components(separatedBy: ",")
-        let dateText = components.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Recent purchase"
+        let dateText = components.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Recent purchase".localized
         let timeAndLocation = components.dropFirst().first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let timeText = timeAndLocation.components(separatedBy: "-").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Time unavailable"
+        let timeText = timeAndLocation.components(separatedBy: "-").first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "Time unavailable".localized
         
         return TransactionData(
             merchant: merchant,
             amount: amount,
             date: dateText,
-            time: timeText.isEmpty ? "Time unavailable" : timeText,
+            time: timeText.isEmpty ? "Time unavailable".localized : timeText,
             paymentMethod: paymentMethod
         )
     }
@@ -1388,7 +1409,7 @@ enum PurchaseCategory: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     
     var label: String {
-        rawValue
+        rawValue.localized
     }
 }
 
@@ -1404,45 +1425,45 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
     var label: String {
         switch self {
         case .all:
-            return "All"
+            return "All".localized
         case .mastercard:
-            return "Family"
+            return "Family".localized
         case .merchants:
-            return "Merchants"
+            return "Merchants".localized
         case .swish:
-            return "Swish"
+            return "Swish".localized
         case .partPay:
-            return "Part Pay"
+            return "Part Pay".localized
         }
     }
     
     var summaryDescription: String {
         switch self {
         case .all:
-            return "All activity"
+            return "All activity".localized
         case .mastercard:
-            return "Resurs Gold card"
+            return "Resurs Gold card".localized
         case .merchants:
-            return "Connected merchants"
+            return "Connected merchants".localized
         case .swish:
-            return "Swish payments"
+            return "Swish payments".localized
         case .partPay:
-            return "Eligible for Part Pay"
+            return "Eligible for Part Pay".localized
         }
     }
     
     var accessibilityHint: String {
         switch self {
         case .all:
-            return "Shows every purchase"
+            return "Shows every purchase".localized
         case .mastercard:
-            return "Shows purchases paid with the Resurs Gold card"
+            return "Shows purchases paid with the Resurs Gold card".localized
         case .merchants:
-            return "Shows purchases paid with merchant accounts"
+            return "Shows purchases paid with merchant accounts".localized
         case .swish:
-            return "Shows purchases paid with Swish"
+            return "Shows purchases paid with Swish".localized
         case .partPay:
-            return "Shows purchases that can be moved into Part Pay"
+            return "Shows purchases that can be moved into Part Pay".localized
         }
     }
     
@@ -1465,6 +1486,7 @@ enum PurchaseFilter: String, CaseIterable, Identifiable {
 struct PurchasesList: View {
     @Binding var navigationPath: NavigationPath
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var localizationService = LocalizationService.shared
     @State private var selectedFilter: PurchaseFilter = .all
@@ -1483,7 +1505,8 @@ struct PurchasesList: View {
     
     private var summaryText: String {
         let count = filteredPurchases.count
-        return "\(count) purchase\(count == 1 ? "" : "s") · \(selectedFilter.summaryDescription)"
+        let format = count == 1 ? "%lld purchase · %@".localized : "%lld purchases · %@".localized
+        return String(format: format, count, selectedFilter.summaryDescription)
     }
     
     private var scrollProgress: CGFloat {
@@ -1493,6 +1516,9 @@ struct PurchasesList: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .top) {
+                paymentsTabChromeBackground(for: colorScheme)
+                    .ignoresSafeArea()
+                
                 ScrollViewReader { proxy in
                     scrollablePurchases(proxy: proxy)
                 }
@@ -1600,7 +1626,7 @@ struct PurchasesList: View {
                                 .contentShape(Capsule())
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("\(filter.label) filter")
+                        .accessibilityLabel(String(format: "%@ filter".localized, filter.label))
                         .accessibilityHint(filter.accessibilityHint)
                     }
                 }
@@ -1647,7 +1673,7 @@ struct PurchasesList: View {
                 .padding(.bottom, 16)
             }
         }
-        .background(Color(uiColor: .systemBackground).opacity(0.95))
+        .background(paymentsTabChromeBackground(for: colorScheme).opacity(0.95))
         .background(.ultraThinMaterial)
         .animation(.easeInOut(duration: 0.2), value: scrollProgress)
     }
@@ -1656,6 +1682,7 @@ struct PurchasesList: View {
 struct ActionsList: View {
     let actionItems: [ActionItem]
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var localizationService = LocalizationService.shared
     
@@ -1664,6 +1691,9 @@ struct ActionsList: View {
         
         GeometryReader { geometry in
             ZStack(alignment: .top) {
+                paymentsTabChromeBackground(for: colorScheme)
+                    .ignoresSafeArea()
+                
                 ScrollViewReader { proxy in
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
@@ -1745,7 +1775,7 @@ struct ActionsList: View {
                 .padding(.bottom, 16)
             }
         }
-        .background(Color(uiColor: .systemBackground).opacity(0.95))
+        .background(paymentsTabChromeBackground(for: colorScheme).opacity(0.95))
         .background(.ultraThinMaterial)
         .animation(.easeInOut(duration: 0.2), value: scrollProgress)
     }
@@ -1771,10 +1801,10 @@ struct ActionRow: View {
                 )
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(title.localized)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text(subtitle)
+                Text(subtitle.localized)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -1800,6 +1830,7 @@ struct ActionRow: View {
 struct InvoicesList: View {
     @Binding var navigationPath: NavigationPath
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var localizationService = LocalizationService.shared
     @StateObject private var dataManager = DataManager.shared
@@ -1849,7 +1880,7 @@ struct InvoicesList: View {
     
     private var outstandingSummaryText: String {
         let amount = outstandingPool.reduce(0) { $0 + $1.numericAmount }
-        return "\(outstandingPool.count) open · \(formattedSEK(amount))"
+        return String(format: "%lld open · %@".localized, outstandingPool.count, formattedSEK(amount))
     }
 
     var body: some View {
@@ -1857,6 +1888,9 @@ struct InvoicesList: View {
         
         GeometryReader { geometry in
             ZStack(alignment: .top) {
+                paymentsTabChromeBackground(for: colorScheme)
+                    .ignoresSafeArea()
+                
                 ScrollViewReader { proxy in
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
@@ -1888,7 +1922,7 @@ struct InvoicesList: View {
                                     .padding(.top, 60)
                                 } else {
                                     if !overdueInvoices.isEmpty || !dueSoonInvoices.isEmpty {
-                                        sectionHeader("TO PAY")
+                                        sectionHeader("To pay".localized)
                                         ForEach(overdueInvoices) { invoice in
                                             invoiceButton(for: invoice, allowBatching: true)
                                         }
@@ -1899,7 +1933,7 @@ struct InvoicesList: View {
                                     }
                                     
                                     if !scheduledInvoices.isEmpty || !paidInvoices.isEmpty {
-                                        sectionHeader("Handled")
+                                        sectionHeader("Handled".localized)
                                             .padding(.top, 16) // Extra spacing before "Handled" section
                                         ForEach(scheduledInvoices) { invoice in
                                             invoiceButton(for: invoice, allowBatching: false)
@@ -2037,7 +2071,7 @@ struct InvoicesList: View {
                 .padding(.bottom, 16)
             }
         }
-        .background(Color(uiColor: .systemBackground).opacity(0.95))
+        .background(paymentsTabChromeBackground(for: colorScheme).opacity(0.95))
         .background(.ultraThinMaterial)
         .animation(.easeInOut(duration: 0.2), value: scrollProgress)
     }
@@ -2098,7 +2132,7 @@ struct PurchaseRow: View {
                         .padding(.vertical, 4)
                         .background(Color.accentColor.opacity(0.15))
                         .clipShape(Capsule())
-                        .accessibilityLabel("Eligible for Part Pay")
+                        .accessibilityLabel("Eligible for Part Pay".localized)
                 }
             }
         }
@@ -2176,16 +2210,16 @@ struct InvoiceRow: View {
     
     private var statusText: String {
         if let override = statusOverride {
-            return override
+            return override.localized
         }
         if isOverdue {
-            return "Overdue"
+            return "Overdue".localized
         } else if color == .green {
-            return "Paid"
+            return "Paid".localized
         } else if color == .cyan {
-            return "Scheduled"
+            return "Scheduled".localized
         } else {
-            return "Due"
+            return "Due".localized
         }
     }
     
@@ -2215,7 +2249,7 @@ struct InvoiceRow: View {
                 indicator
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Select \(title) for batch payment")
+            .accessibilityLabel(String(format: "Select %@ for batch payment".localized, title))
         } else {
             indicator
         }
@@ -2229,13 +2263,13 @@ struct WalletSectionHeader: View {
     
     var body: some View {
         HStack(alignment: .center) {
-            Text(title)
+            Text(title.localized)
                 .font(.title3)
                 .fontWeight(.semibold)
             Spacer(minLength: 12)
             Button(action: action) {
                 HStack(spacing: 4) {
-                    Text(actionTitle)
+                    Text(actionTitle.localized)
                         .font(.subheadline.weight(.semibold))
                     Image(systemName: "chevron.right")
                         .font(.caption.weight(.bold))
@@ -2246,7 +2280,7 @@ struct WalletSectionHeader: View {
                 .clipShape(Capsule())
             }
             .buttonStyle(.plain)
-            .accessibilityHint("Opens \(title.lowercased()) list")
+            .accessibilityHint(String(format: "Opens %@ list".localized, title.lowercased()))
         }
     }
 }
@@ -2259,10 +2293,10 @@ struct EmptyStateRow: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title)
+            Text(title.localized)
                 .font(.headline)
                 .fontWeight(.semibold)
-            Text(subtitle)
+            Text(subtitle.localized)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
@@ -2411,11 +2445,11 @@ struct NotificationsOverlayView: View {
                                 .font(.system(size: 56))
                                 .foregroundColor(.secondary.opacity(0.4))
                             
-                            Text("No notifications")
+                            Text("No notifications".localized)
                                 .font(.title3.weight(.semibold))
                                 .foregroundColor(.secondary)
                             
-                            Text("You're all caught up!")
+                            Text("You're all caught up!".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary.opacity(0.8))
                             
@@ -2433,7 +2467,7 @@ struct NotificationsOverlayView: View {
                                 areNotificationsRead = true
                             }
                         }) {
-                            Text("Mark as read")
+                            Text("Mark as read".localized)
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(.primary)
                                 .frame(maxWidth: .infinity)
@@ -2450,7 +2484,7 @@ struct NotificationsOverlayView: View {
                 .padding(.bottom, 24)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("Notifications")
+            .navigationTitle("Notifications".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -2492,7 +2526,7 @@ private struct NotificationRow: View {
                                 .frame(width: 8, height: 8)
                         }
                         
-                        Text(notification.title)
+                        Text(notification.title.localized)
                             .font(.subheadline)
                             .fontWeight(.medium)
                             .foregroundColor(.primary)
@@ -2500,12 +2534,12 @@ private struct NotificationRow: View {
                         Spacer()
                     }
                     
-                    Text(notification.message)
+                    Text(notification.message.localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .lineLimit(2)
                     
-                    Text(notification.time)
+                    Text(notification.time.localized)
                         .font(.caption2)
                         .foregroundColor(.secondary.opacity(0.7))
                 }
@@ -2532,5 +2566,4 @@ private struct NotificationRow: View {
     NotificationsOverlayView()
         .preferredColorScheme(.dark)
 }
-
 

@@ -20,12 +20,12 @@ struct MerchantSettingsView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     // Account Management Section
-                    SettingsSection(title: "Account Management") {
+                    SettingsSection(title: "Account Management".localized) {
                         SettingsRow(
                             icon: "creditcard.fill",
                             iconColor: merchantColor,
-                            title: "View Credit Details",
-                            subtitle: "Check your credit limit and usage"
+                            title: "View Credit Details".localized,
+                            subtitle: "Check your credit limit and usage".localized
                         ) {
                             // Handle tap
                         }
@@ -33,8 +33,8 @@ struct MerchantSettingsView: View {
                         SettingsRow(
                             icon: "bell.fill",
                             iconColor: .blue,
-                            title: "Notifications",
-                            subtitle: "Manage alerts for purchases and payments"
+                            title: "Notifications".localized,
+                            subtitle: "Manage alerts for purchases and payments".localized
                         ) {
                             // Handle tap
                         }
@@ -42,20 +42,20 @@ struct MerchantSettingsView: View {
                         SettingsRow(
                             icon: "calendar.badge.clock",
                             iconColor: .orange,
-                            title: "Payment Reminders",
-                            subtitle: "Set up payment due date reminders"
+                            title: "Payment Reminders".localized,
+                            subtitle: "Set up payment due date reminders".localized
                         ) {
                             // Handle tap
                         }
                     }
                     
                     // Preferences Section
-                    SettingsSection(title: "Preferences") {
+                    SettingsSection(title: "Preferences".localized) {
                         SettingsRow(
                             icon: "doc.text.fill",
                             iconColor: .purple,
-                            title: "Statement Preferences",
-                            subtitle: "Choose how you receive statements"
+                            title: "Statement Preferences".localized,
+                            subtitle: "Choose how you receive statements".localized
                         ) {
                             // Handle tap
                         }
@@ -63,20 +63,20 @@ struct MerchantSettingsView: View {
                         SettingsRow(
                             icon: "lock.fill",
                             iconColor: .green,
-                            title: "Security Settings",
-                            subtitle: "Manage PIN and security options"
+                            title: "Security Settings".localized,
+                            subtitle: "Manage PIN and security options".localized
                         ) {
                             // Handle tap
                         }
                     }
                     
                     // Account Actions Section
-                    SettingsSection(title: "Account Actions") {
+                    SettingsSection(title: "Account Actions".localized) {
                         SettingsRow(
                             icon: "pause.circle.fill",
                             iconColor: .yellow,
-                            title: "Freeze Account",
-                            subtitle: "Temporarily disable purchases"
+                            title: "Freeze Account".localized,
+                            subtitle: "Temporarily disable purchases".localized
                         ) {
                             // Handle tap
                         }
@@ -84,8 +84,8 @@ struct MerchantSettingsView: View {
                         SettingsRow(
                             icon: "xmark.circle.fill",
                             iconColor: .red,
-                            title: "Close Account",
-                            subtitle: "Permanently close this credit account"
+                            title: "Close Account".localized,
+                            subtitle: "Permanently close this credit account".localized
                         ) {
                             // Handle tap
                         }
@@ -95,7 +95,7 @@ struct MerchantSettingsView: View {
                 .padding(.vertical, 24)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("\(merchantName) Settings")
+            .navigationTitle(String(format: "%@ Settings".localized, merchantName))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -125,12 +125,12 @@ struct ServiceSettingsView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     // Account Management Section
-                    SettingsSection(title: "Account Management") {
+                    SettingsSection(title: "Account Management".localized) {
                         SettingsRow(
                             icon: "creditcard.fill",
                             iconColor: serviceColor,
-                            title: "Account Details",
-                            subtitle: "View complete account information"
+                            title: "Account Details".localized,
+                            subtitle: "View complete account information".localized
                         ) {
                             // Handle tap
                         }
@@ -138,8 +138,8 @@ struct ServiceSettingsView: View {
                         SettingsRow(
                             icon: "bell.fill",
                             iconColor: .blue,
-                            title: "Notifications",
-                            subtitle: "Manage alerts and notifications"
+                            title: "Notifications".localized,
+                            subtitle: "Manage alerts and notifications".localized
                         ) {
                             // Handle tap
                         }
@@ -147,20 +147,20 @@ struct ServiceSettingsView: View {
                         SettingsRow(
                             icon: "calendar.badge.clock",
                             iconColor: .orange,
-                            title: "Payment Schedule",
-                            subtitle: "View and manage payment dates"
+                            title: "Payment Schedule".localized,
+                            subtitle: "View and manage payment dates".localized
                         ) {
                             // Handle tap
                         }
                     }
                     
                     // Preferences Section
-                    SettingsSection(title: "Preferences") {
+                    SettingsSection(title: "Preferences".localized) {
                         SettingsRow(
                             icon: "doc.text.fill",
                             iconColor: .purple,
-                            title: "Statement Preferences",
-                            subtitle: "Choose how you receive statements"
+                            title: "Statement Preferences".localized,
+                            subtitle: "Choose how you receive statements".localized
                         ) {
                             // Handle tap
                         }
@@ -168,8 +168,8 @@ struct ServiceSettingsView: View {
                         SettingsRow(
                             icon: "arrow.triangle.2.circlepath",
                             iconColor: .cyan,
-                            title: "Auto-Pay Settings",
-                            subtitle: "Configure automatic payments"
+                            title: "Auto-Pay Settings".localized,
+                            subtitle: "Configure automatic payments".localized
                         ) {
                             // Handle tap
                         }
@@ -177,20 +177,20 @@ struct ServiceSettingsView: View {
                         SettingsRow(
                             icon: "lock.fill",
                             iconColor: .green,
-                            title: "Security Settings",
-                            subtitle: "Manage security and privacy"
+                            title: "Security Settings".localized,
+                            subtitle: "Manage security and privacy".localized
                         ) {
                             // Handle tap
                         }
                     }
                     
                     // Account Actions Section
-                    SettingsSection(title: "Account Actions") {
+                    SettingsSection(title: "Account Actions".localized) {
                         SettingsRow(
                             icon: "pause.circle.fill",
                             iconColor: .yellow,
-                            title: "Pause Service",
-                            subtitle: "Temporarily suspend this service"
+                            title: "Pause Service".localized,
+                            subtitle: "Temporarily suspend this service".localized
                         ) {
                             // Handle tap
                         }
@@ -198,8 +198,8 @@ struct ServiceSettingsView: View {
                         SettingsRow(
                             icon: "xmark.circle.fill",
                             iconColor: .red,
-                            title: "Close Account",
-                            subtitle: "Permanently close this account"
+                            title: "Close Account".localized,
+                            subtitle: "Permanently close this account".localized
                         ) {
                             // Handle tap
                         }
@@ -209,7 +209,7 @@ struct ServiceSettingsView: View {
                 .padding(.vertical, 24)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("\(serviceName) Settings")
+            .navigationTitle(String(format: "%@ Settings".localized, serviceName))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

@@ -17,7 +17,7 @@
     {
       "id": "00000000-0000-0000-0000-000000000002",
       "merchant": "Gekås",
-      "amount": "895 SEK",
+      "amount": "8 500 SEK",
       "dueDateOffset": -12,
       "invoiceNumber": "INV-2025-10-052",
       "issueDateOffset": -26,
@@ -132,6 +132,5 @@
   "transactions": [],
   "invoiceAccounts": []
 }
-
 
 

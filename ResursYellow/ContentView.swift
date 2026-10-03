@@ -26,10 +26,10 @@ struct ContentView: View {
             hasAppeared: $hasAppeared,
             paymentPlansManager: paymentPlansManager,
             localizationService: localizationService,
-            walletLabel: "Payments",
-            bankingLabel: "Services",
-            merchantsLabel: "Merchants",
-            manageLabel: "My Resurs"
+            walletLabel: "Payments".localized,
+            bankingLabel: "Finances".localized,
+            merchantsLabel: "Merchants".localized,
+            manageLabel: "My Resurs".localized
         )
         .onAppear {
             hasAppeared = true
@@ -68,9 +68,7 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             // Payments Tab
             PaymentsView()
-                .tabItem {
-                    Label(walletLabel, systemImage: selectedTab == 0 ? "wallet.bifold.fill" : "wallet.bifold")
-                }
+                .tabItem { tabLabel(walletLabel, .wallet, tab: 0) }
                 .tag(0)
             
             // Services Tab (lazy loaded)
@@ -81,9 +79,7 @@ struct MainTabView: View {
                     Color.clear
                 }
             }
-            .tabItem {
-                Label(bankingLabel, systemImage: selectedTab == 1 ? "building.columns.fill" : "building.columns")
-            }
+            .tabItem { tabLabel(bankingLabel, .piggyBank, tab: 1) }
             .tag(1)
             
             // Merchants Tab (lazy loaded)
@@ -94,9 +90,7 @@ struct MainTabView: View {
                     Color.clear
                 }
             }
-            .tabItem {
-                Label(merchantsLabel, systemImage: selectedTab == 2 ? "cart.fill" : "cart")
-            }
+            .tabItem { tabLabel(merchantsLabel, .store, tab: 2) }
             .tag(2)
             
             // Manage Tab (lazy loaded)
@@ -107,15 +101,22 @@ struct MainTabView: View {
                     Color.clear
                 }
             }
-            .tabItem {
-                Label(manageLabel, systemImage: selectedTab == 3 ? "person.fill" : "person")
-            }
+            .tabItem { tabLabel(manageLabel, .user, tab: 3) }
             .tag(3)
         }
-        .tint(.blue)
+        .tint(RyColor.primaryMain)
         .environmentObject(paymentPlansManager)
         .environmentObject(localizationService)
         .id(localizationService.currentLanguage)
+    }
+
+    /// Font Awesome tab icon: regular weight idle, solid when selected.
+    private func tabLabel(_ title: String, _ icon: FAIcon, tab: Int) -> some View {
+        Label {
+            Text(title)
+        } icon: {
+            Image(uiImage: icon.uiImage(style: selectedTab == tab ? .solid : .regular, size: 22))
+        }
     }
 }
 

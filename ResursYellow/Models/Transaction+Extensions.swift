@@ -62,7 +62,7 @@ extension Transaction {
         }()
         
         let dateStr = dateService.formatRelativeDate(offset: dateOffset)
-        let subtitle = "\(dateStr) - Location"
+        let subtitle = "\(dateStr) - \("Location".localized)"
         
         return PurchaseItem(
             title: description,
@@ -77,7 +77,7 @@ extension Transaction {
                 merchant: merchant,
                 amount: amount,
                 date: dateStr,
-                time: "Time",
+                time: "Time".localized,
                 paymentMethod: paymentMethod
             )
         )

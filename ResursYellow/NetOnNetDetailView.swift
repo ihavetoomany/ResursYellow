@@ -81,7 +81,7 @@ struct NetOnNetDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {
-                    Image(systemName: "gearshape.fill")
+                    Image(systemName: "ellipsis")
                         .font(.title3)
                         .foregroundColor(.secondary)
                         .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
@@ -101,7 +101,7 @@ struct NetOnNetDetailView: View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Available Credit")
+                    Text("Available Credit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(availableCredit)
@@ -124,7 +124,7 @@ struct NetOnNetDetailView: View {
             
             HStack(alignment: .center, spacing: 18) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Credit Limit")
+                    Text("Credit Limit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(creditLimit)
@@ -136,7 +136,7 @@ struct NetOnNetDetailView: View {
                     .frame(height: 32)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Used Credit")
+                    Text("Used Credit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("0 kr")
@@ -158,13 +158,13 @@ struct NetOnNetDetailView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Netonnet available credit \(availableCredit). Credit limit \(creditLimit). No credit used.")
+        .accessibilityLabel(String(format: "Netonnet available credit %@. Credit limit %@. No credit used.".localized, availableCredit, creditLimit))
     }
     
     private var purchasesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Purchases")
+                Text("Purchases".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
@@ -181,10 +181,10 @@ struct NetOnNetDetailView: View {
                             .background(purchase.color.opacity(0.2))
                             .clipShape(Circle())
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(purchase.title)
+                            Text(purchase.title.localized)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            Text(purchase.subtitle)
+                            Text(purchase.subtitle.localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -211,7 +211,7 @@ struct NetOnNetDetailView: View {
     private var partPaymentsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Active accounts")
+                Text("Active accounts".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
@@ -234,8 +234,8 @@ struct NetOnNetDetailView: View {
                     ResursGoldPartPaymentRow(
                         payment: PartPaymentItem(
                             id: UUID(),
-                            title: "Main Account",
-                            subtitle: "No invoice until you make a purchase",
+                            title: "Main Account".localized,
+                            subtitle: "No invoice until you make a purchase".localized,
                             amount: "0 kr",
                             progress: 0.0,
                             installmentAmount: "",
@@ -255,7 +255,7 @@ struct NetOnNetDetailView: View {
     
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Benefits and services")
+            Text("Benefits and services".localized)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .padding(.top, 12)
@@ -269,10 +269,10 @@ struct NetOnNetDetailView: View {
                             .background(Color.green.opacity(0.15))
                             .clipShape(Circle())
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(benefit.title)
+                            Text(benefit.title.localized)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            Text(benefit.description)
+                            Text(benefit.description.localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

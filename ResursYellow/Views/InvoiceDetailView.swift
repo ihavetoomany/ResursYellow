@@ -24,11 +24,18 @@ struct InstallmentPlan: Identifiable, Equatable {
     let fee: Double // fixed fee in SEK
     let monthlyCost: Double
     let totalCost: Double
-    var title: String { "\(months) months" }
+    var title: String { String(format: "%lld months".localized, months) }
     var subtitle: String {
         let interest = Int(interestRate * 100)
-        return "Interest \(interest)% · Fee \(Int(fee)) kr"
+        return String(format: "Interest %lld%% · Fee %lld kr".localized, interest, Int(fee))
     }
+}
+
+enum GekasPaymentTier: String {
+    case custom
+    case sixMonths
+    case fullStatement
+    case topUpCredit
 }
 
 struct InvoiceDetailView: View {
@@ -37,6 +44,8 @@ struct InvoiceDetailView: View {
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @StateObject private var dataManager = DataManager.shared
     @State private var showPaymentSheet = false
+    @State private var showGekasAmountSheet = false
+    @State private var selectedGekasAmount: Double = 8_500
     @State private var isPaying = false
     @State private var isPaid = false
     @State private var paidAmount: Double? = nil
@@ -66,6 +75,35 @@ struct InvoiceDetailView: View {
             
             return invoice.merchant.lowercased().contains(merchantName.lowercased()) ||
                    merchantName.lowercased().contains(invoice.merchant.lowercased())
+        }
+    }
+
+    private var isGekasInvoice: Bool {
+        invoice.merchant.localizedCaseInsensitiveContains("Gekås")
+    }
+
+    private var gekasStatementAmount: Double {
+        8_500
+    }
+
+    private var gekasSixMonthBreakpoint: Double {
+        1_500
+    }
+
+    private var gekasTopUpAmount: Double {
+        9_300
+    }
+
+    private var gekasCreditLimit: Double {
+        20_000
+    }
+
+    private func startPaymentFlow() {
+        if isGekasInvoice {
+            selectedGekasAmount = gekasStatementAmount
+            showGekasAmountSheet = true
+        } else {
+            showPaymentSheet = true
         }
     }
 
@@ -105,7 +143,7 @@ struct InvoiceDetailView: View {
                                     isPaid: isPaid || isInvoicePaid,
                                     paidAmount: paidAmount,
                                     onPay: shouldShowPayButton ? {
-                                        showPaymentSheet = true
+                                        startPaymentFlow()
                                     } : nil
                                 )
                                 .padding(.horizontal)
@@ -137,7 +175,7 @@ struct InvoiceDetailView: View {
                                 if shouldShowPayButton {
                                     PaymentOptionsCard(
                                         onPayInFull: {
-                                            showPaymentSheet = true
+                                            startPaymentFlow()
                                         },
                                         onSnooze: {
                                             // Handle snooze action
@@ -196,7 +234,7 @@ struct InvoiceDetailView: View {
                     }
 
                     // Minimized title
-                    Text("Invoice")
+                    Text("Invoice".localized)
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
@@ -220,9 +258,27 @@ struct InvoiceDetailView: View {
                     AdaptiveSheetBackground()
                 }
         }
+        .sheet(isPresented: $showGekasAmountSheet) {
+            GekasAmountSelectorSheet(
+                invoiceAmount: gekasStatementAmount,
+                sixMonthAmount: gekasSixMonthBreakpoint,
+                topUpAmount: gekasTopUpAmount,
+                creditLimit: gekasCreditLimit,
+                selectedAmount: $selectedGekasAmount
+            ) {
+                showGekasAmountSheet = false
+                showPaymentSheet = true
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground {
+                AdaptiveSheetBackground()
+            }
+        }
         .sheet(isPresented: $showPaymentSheet) {
             PaymentSheet(
                 invoice: invoice,
+                initialGekasAmount: isGekasInvoice ? selectedGekasAmount : nil,
                 paidAmount: $paidAmount,
                 onPaymentCompleted: {
                     withAnimation {
@@ -257,9 +313,9 @@ struct InvoiceDetailsCard: View {
 
     private var paidLabel: String {
         if let amount = paidAmount {
-            return "\(formatSEK(amount)) paid"
+            return String(format: "%@ paid".localized, formatSEK(amount))
         }
-        return "Paid"
+        return "Paid".localized
     }
 
     var body: some View {
@@ -270,7 +326,7 @@ struct InvoiceDetailsCard: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title3)
                         .foregroundColor(.green)
-                    Text("Payment Scheduled")
+                    Text("Payment Scheduled".localized)
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundColor(.green)
@@ -307,7 +363,7 @@ struct InvoiceDetailsCard: View {
                         HStack(spacing: 8) {
                             Image(systemName: "arrow.up.circle.fill")
                                 .font(.headline)
-                            Text("Pay Invoice")
+                            Text("Pay Invoice".localized)
                                 .font(.headline)
                                 .fontWeight(.semibold)
                         }
@@ -326,11 +382,11 @@ struct InvoiceDetailsCard: View {
 
             // Details
             VStack(spacing: 12) {
-                DetailRow(label: "Merchant", value: invoice.merchant)
-                DetailRow(label: "Invoice Number", value: invoice.invoiceNumber)
-                DetailRow(label: "Issue Date", value: invoice.issueDate)
-                DetailRow(label: "Due Date", value: invoice.dueDate)
-                DetailRow(label: "Status", value: isPaid ? paidLabel : invoice.status)
+                DetailRow(label: "Merchant".localized, value: invoice.merchant)
+                DetailRow(label: "Invoice Number".localized, value: invoice.invoiceNumber)
+                DetailRow(label: "Issue Date".localized, value: invoice.issueDate)
+                DetailRow(label: "Due Date".localized, value: invoice.dueDate)
+                DetailRow(label: "Status".localized, value: isPaid ? paidLabel : invoice.status)
             }
         }
         .padding(20)
@@ -346,13 +402,13 @@ struct WhatIPayForCard: View {
     private var sampleTransactions: [(date: String, description: String, amount: String, isPayment: Bool)] {
         // Generate sample transactions based on merchant
         return [
-            ("Jan 15, 2026", "\(merchant) - Purchase", "1 249 kr", false),
-            ("Jan 12, 2026", "Payment", "500 kr", true),
-            ("Jan 8, 2026", "\(merchant) - Purchase", "782 kr", false),
-            ("Jan 5, 2026", "\(merchant) - Purchase", "1 568 kr", false),
-            ("Dec 28, 2025", "Payment", "1 200 kr", true),
-            ("Dec 20, 2025", "\(merchant) - Purchase", "945 kr", false),
-            ("Dec 15, 2025", "\(merchant) - Purchase", "2 340 kr", false)
+            ("Jan 15, 2026", String(format: "%@ - Purchase".localized, merchant), "1 249 kr", false),
+            ("Jan 12, 2026", "Payment".localized, "500 kr", true),
+            ("Jan 8, 2026", String(format: "%@ - Purchase".localized, merchant), "782 kr", false),
+            ("Jan 5, 2026", String(format: "%@ - Purchase".localized, merchant), "1 568 kr", false),
+            ("Dec 28, 2025", "Payment".localized, "1 200 kr", true),
+            ("Dec 20, 2025", String(format: "%@ - Purchase".localized, merchant), "945 kr", false),
+            ("Dec 15, 2025", String(format: "%@ - Purchase".localized, merchant), "2 340 kr", false)
         ]
     }
     
@@ -363,7 +419,7 @@ struct WhatIPayForCard: View {
                     .font(.title3)
                     .foregroundColor(.purple)
                 
-                Text("What I pay for")
+                Text("What I pay for".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
             }
@@ -413,7 +469,7 @@ struct WhatIPayForCard: View {
                     
                     NavigationLink(value: account.toPartPaymentItem()) {
                         HStack {
-                            Text("Invoice account")
+                            Text("Invoice account".localized)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                                 .foregroundColor(.primary)
@@ -438,12 +494,12 @@ struct WhatIPayForCard: View {
                 // Extract period from title (e.g., "Bauhaus - October")
                 let parts = account.title.components(separatedBy: " - ")
                 if parts.count > 1 {
-                    return "This invoice is part of your \(parts[1]) purchase plan with \(merchant). It represents one installment in your payment schedule. You can see all transactions on your invoice account page."
+                    return String(format: "This invoice is part of your %@ purchase plan with %@. It represents one installment in your payment schedule. You can see all transactions on your invoice account page.".localized, parts[1], merchant)
                 }
             }
-            return "This invoice is part of your payment plan with \(merchant). It represents one installment in your payment schedule. You can see all transactions on your invoice account page."
+            return String(format: "This invoice is part of your payment plan with %@. It represents one installment in your payment schedule. You can see all transactions on your invoice account page.".localized, merchant)
         }
-        return "This invoice is for purchases made at \(merchant). It represents the amount you owe for goods or services received."
+        return String(format: "This invoice is for purchases made at %@. It represents the amount you owe for goods or services received.".localized, merchant)
     }
 }
 
@@ -461,7 +517,7 @@ struct PaymentInformationCard: View {
                     .font(.title3)
                     .foregroundColor(isScheduled ? .cyan : .blue)
 
-                Text(isScheduled ? "Scheduled Payment" : "Payment Information")
+                Text(isScheduled ? "Scheduled Payment".localized : "Payment Information".localized)
                     .font(.headline)
                     .fontWeight(.semibold)
             }
@@ -469,11 +525,11 @@ struct PaymentInformationCard: View {
             if isScheduled {
                 VStack(spacing: 8) {
                     HStack(alignment: .top) {
-                        Text("Status")
+                        Text("Status".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text("Auto-pay scheduled")
+                        Text("Auto-pay scheduled".localized)
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
@@ -481,7 +537,7 @@ struct PaymentInformationCard: View {
                     Divider()
 
                     HStack {
-                        Text("Payment Method")
+                        Text("Payment Method".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
@@ -498,7 +554,7 @@ struct PaymentInformationCard: View {
             } else {
                 VStack(spacing: 8) {
                     HStack {
-                        Text("Amount")
+                        Text("Amount".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
@@ -516,7 +572,7 @@ struct PaymentInformationCard: View {
                     }
 
                     HStack {
-                        Text("OCR")
+                        Text("OCR".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
@@ -534,7 +590,7 @@ struct PaymentInformationCard: View {
                     }
 
                     HStack {
-                        Text("Bankgiro")
+                        Text("Bankgiro".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
@@ -559,7 +615,7 @@ struct PaymentInformationCard: View {
                     // Handle PDF open action
                 }) {
                     HStack {
-                        Text("Invoice PDF")
+                        Text("Invoice PDF".localized)
                             .font(.subheadline)
                             .fontWeight(.medium)
                             .foregroundColor(.primary)
@@ -641,7 +697,7 @@ struct InvoiceItemsCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Items")
+            Text("Items".localized)
                 .font(.headline)
                 .fontWeight(.semibold)
 
@@ -657,7 +713,7 @@ struct InvoiceItemsCard: View {
                 Divider()
 
                 HStack {
-                    Text("Total")
+                    Text("Total".localized)
                         .font(.headline)
                         .fontWeight(.semibold)
                     Spacer()
@@ -684,7 +740,7 @@ struct InvoiceItemRow: View {
                 Text(name)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                Text("Qty: \(quantity)")
+                Text(String(format: "Qty: %@".localized, quantity))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -702,35 +758,49 @@ struct PaymentOptionsCard: View {
     let onPayInFull: () -> Void
     let onSnooze: () -> Void
     let onReportProblem: () -> Void
-    
-    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        VStack(spacing: 12) {
-            PaymentOptionRow(
-                icon: "exclamationmark.bubble.fill",
-                title: "Report a problem",
-                description: "Get help with this invoice",
-                color: colorScheme == .dark ? Color(white: 0.25) : Color(uiColor: .systemGray),
-                action: onReportProblem
-            )
-            
-            PaymentOptionRow(
-                icon: "clock.badge.checkmark.fill",
-                title: "Snooze",
-                description: "Postpone payment to a later date",
-                color: colorScheme == .dark ? Color(white: 0.25) : Color(uiColor: .systemGray),
-                action: onSnooze
-            )
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Actions".localized)
+                .font(.subheadline)
+                .fontWeight(.semibold)
 
-            PaymentOptionRow(
-                icon: "arrow.up",
-                title: "Pay Invoice",
-                description: "Pay this month's balance",
-                color: .blue,
-                isDefaultOption: false,
-                action: onPayInFull
-            )
+            VStack(spacing: 0) {
+                PaymentOptionRow(
+                    icon: "exclamationmark.bubble.fill",
+                    title: "Report a problem".localized,
+                    iconColor: .white,
+                    iconBackgroundColor: .orange,
+                    titleColor: .primary,
+                    action: onReportProblem
+                )
+
+                Divider()
+                    .padding(.leading, 58)
+
+                PaymentOptionRow(
+                    icon: "clock.badge.checkmark.fill",
+                    title: "Snooze".localized,
+                    iconColor: .white,
+                    iconBackgroundColor: .indigo,
+                    titleColor: .primary,
+                    action: onSnooze
+                )
+
+                Divider()
+                    .padding(.leading, 58)
+
+                PaymentOptionRow(
+                    icon: "arrow.up.circle",
+                    title: "Pay Invoice".localized,
+                    iconColor: .white,
+                    iconBackgroundColor: .blue,
+                    titleColor: .primary,
+                    action: onPayInFull
+                )
+            }
+            .background(Color(uiColor: .systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
         }
     }
 }
@@ -738,9 +808,9 @@ struct PaymentOptionsCard: View {
 struct PaymentOptionRow: View {
     let icon: String
     let title: String
-    let description: String
-    let color: Color
-    var isDefaultOption: Bool = false
+    let iconColor: Color
+    let iconBackgroundColor: Color
+    let titleColor: Color
     let action: () -> Void
 
     @State private var isPressed = false
@@ -755,15 +825,29 @@ struct PaymentOptionRow: View {
                 action()
             }
         }) {
-            Text(title)
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-                .background(isPressed ? color.opacity(0.85) : color)
-                .clipShape(Capsule())
+            HStack(spacing: 14) {
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(iconColor)
+                    .frame(width: 28, height: 28)
+                    .background(iconBackgroundColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(titleColor)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .contentShape(Rectangle())
+            .background(isPressed ? Color.primary.opacity(0.04) : Color.clear)
                 .scaleEffect(isPressed ? 0.97 : 1.0)
         }
         .buttonStyle(PlainButtonStyle())
@@ -791,6 +875,7 @@ struct PaymentSheet: View {
 
     @State private var showPlanOptions: Bool = false
     @State private var selectedPlan: InstallmentPlan? = nil
+    @State private var selectedGekasAmount: Double = 8_500
     @State private var planSheetHeight: CGFloat = 0
     @State private var displayAmount: Double = 0
     @State private var amountTimer: Timer? = nil
@@ -799,6 +884,7 @@ struct PaymentSheet: View {
     @State private var showCreditRisk: Bool = false
 
     let invoice: InvoiceData
+    let initialGekasAmount: Double?
     @Binding var paidAmount: Double?
     let onPaymentCompleted: () -> Void
     let onSizeChange: (CGFloat) -> Void
@@ -810,6 +896,10 @@ struct PaymentSheet: View {
             .replacingOccurrences(of: " ", with: "")
             .trimmingCharacters(in: .whitespaces)
         return Double(amountString) ?? 0
+    }
+
+    private var isGekasInvoice: Bool {
+        invoice.merchant.localizedCaseInsensitiveContains("Gekås")
     }
 
     private var availablePlans: [InstallmentPlan] {
@@ -828,6 +918,55 @@ struct PaymentSheet: View {
         ]
     }
 
+    private var fullPaymentPlan: InstallmentPlan? {
+        availablePlans.first(where: { $0.months == 0 })
+    }
+
+    private var sixMonthPlan: InstallmentPlan? {
+        availablePlans.first(where: { $0.months == 6 })
+    }
+
+    private var minimumPaymentAmount: Double {
+        if isGekasInvoice {
+            return 425
+        }
+        let stepped = (invoiceBaseAmount * 0.15 / 10).rounded(.up) * 10
+        return min(invoiceBaseAmount, max(500, stepped))
+    }
+
+    private var gekasStatementAmount: Double {
+        8_500
+    }
+
+    private var gekasSixMonthBreakpoint: Double {
+        1_500
+    }
+
+    private var gekasTopUpAmount: Double {
+        9_300
+    }
+
+    private var gekasCreditLimit: Double {
+        20_000
+    }
+
+    private var clampedGekasAmount: Double {
+        min(max(selectedGekasAmount, minimumPaymentAmount), gekasTopUpAmount)
+    }
+
+    private var currentGekasTier: GekasPaymentTier {
+        if clampedGekasAmount >= gekasTopUpAmount {
+            return .topUpCredit
+        }
+        if clampedGekasAmount >= gekasStatementAmount {
+            return .fullStatement
+        }
+        if clampedGekasAmount >= gekasSixMonthBreakpoint {
+            return .sixMonths
+        }
+        return .custom
+    }
+
     private func formatSEK(_ value: Double) -> String {
         let f = NumberFormatter()
         f.numberStyle = .decimal
@@ -837,6 +976,10 @@ struct PaymentSheet: View {
     }
 
     private var targetAmount: Double {
+        if isGekasInvoice {
+            return clampedGekasAmount
+        }
+
         if let selected = selectedPlan, selected.months != 0 {
             return adjustedMonthly(for: selected)
         }
@@ -844,7 +987,10 @@ struct PaymentSheet: View {
     }
 
     private var isPartPaymentSelected: Bool {
-        (selectedPlan?.months ?? 0) != 0
+        if isGekasInvoice {
+            return currentGekasTier != .fullStatement
+        }
+        return (selectedPlan?.months ?? 0) != 0
     }
 
     private var isOverdueInvoice: Bool {
@@ -874,6 +1020,61 @@ struct PaymentSheet: View {
         if selectedPlan == nil {
             selectedPlan = availablePlans.first
         }
+    }
+
+    private func syncGekasChoiceToPlan() {
+        guard isGekasInvoice else { return }
+
+        switch currentGekasTier {
+        case .custom, .fullStatement:
+            selectedPlan = fullPaymentPlan ?? availablePlans.first
+        case .sixMonths, .topUpCredit:
+            selectedPlan = sixMonthPlan ?? fullPaymentPlan ?? availablePlans.first
+        }
+    }
+
+    private var paymentSelectionTitle: String {
+        if isGekasInvoice {
+            switch currentGekasTier {
+            case .custom:
+                return "Custom amount".localized
+            case .sixMonths:
+                return "6 months interest free".localized
+            case .fullStatement:
+                return "Full payment".localized
+            case .topUpCredit:
+                return "Top up credit".localized
+            }
+        }
+
+        let isFull = selectedPlan == nil || selectedPlan?.months == 0
+        return isFull ? "Full payment".localized : (selectedPlan?.title ?? "Full payment".localized)
+    }
+
+    private var paymentSelectionSubtitle: String {
+        if isGekasInvoice {
+            switch currentGekasTier {
+            case .custom:
+                return String(format: "Amounts below %@ move the remaining balance to a 17%% interest plan.".localized, formatSEK(gekasSixMonthBreakpoint))
+            case .sixMonths:
+                return String(format: "Closest plan: 6 months interest free from %@".localized, formatSEK(gekasSixMonthBreakpoint))
+            case .fullStatement:
+                return String(format: "One payment. Statement total %@".localized, formatSEK(gekasStatementAmount))
+            case .topUpCredit:
+                return String(format: "Top up used credit to %@ of your %@ limit".localized, formatSEK(gekasTopUpAmount), formatSEK(gekasCreditLimit))
+            }
+        }
+
+        let isFull = selectedPlan == nil || selectedPlan?.months == 0
+        if isFull {
+            return String(format: "One payment. Total %@".localized, invoice.amount)
+        }
+
+        if let plan = selectedPlan {
+            return String(format: "%lld kr / month · Total %lld kr".localized, Int(plan.monthlyCost), Int(plan.totalCost))
+        }
+
+        return String(format: "One payment. Total %@".localized, invoice.amount)
     }
 
     private func finalizePayment() {
@@ -969,12 +1170,12 @@ struct PaymentSheet: View {
                     Text(formatSEK(displayAmount))
                         .font(.system(size: 42, weight: .bold))
                         .foregroundColor(.blue)
-                        .accessibilityLabel("Amount \(formatSEK(displayAmount))")
+                        .accessibilityLabel(String(format: "Amount %@".localized, formatSEK(displayAmount)))
                     Button(action: {
                         ensureSelectionDefault()
                         showPlanOptions = true
                     }) {
-                        Text("Change Amount")
+                        Text("Change Amount".localized)
                             .font(.caption.weight(.semibold))
                             .foregroundColor(.blue)
                             .padding(.horizontal, 12)
@@ -989,6 +1190,10 @@ struct PaymentSheet: View {
                     _debugLog("PaymentSheet onAppear", hypothesisId: "A")
                     // #endregion
                     ensureSelectionDefault()
+                    if isGekasInvoice {
+                        selectedGekasAmount = min(max(initialGekasAmount ?? gekasStatementAmount, minimumPaymentAmount), gekasTopUpAmount)
+                    }
+                    syncGekasChoiceToPlan()
                     paymentDate = isOverdueInvoice ? Date() : (dueDateValue ?? Date())
                     displayAmount = targetAmount
                 }
@@ -1005,6 +1210,9 @@ struct PaymentSheet: View {
                         pendingTargetAmount = nil
                         animateAmountChange(to: next)
                     }
+                }
+                .onChange(of: selectedGekasAmount) { _, _ in
+                    syncGekasChoiceToPlan()
                 }
                 .onDisappear {
                     // #region agent log
@@ -1029,13 +1237,13 @@ struct PaymentSheet: View {
                             Text("Nordea *894")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                            Text("Checking account")
+                            Text("Checking account".localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
                         HStack(spacing: 4) {
-                            Text("Change")
+                            Text("Change".localized)
                                 .font(.caption.weight(.semibold))
                             Image(systemName: "chevron.forward")
                                 .font(.caption.weight(.semibold))
@@ -1053,36 +1261,29 @@ struct PaymentSheet: View {
                         HStack(alignment: .top) {
                             Image(systemName: "list.bullet.rectangle.fill")
                                 .font(.title3)
-                                .foregroundColor(.purple)
+                                .foregroundColor(.blue)
                                 .frame(width: 36, height: 36)
-                                .background(Color.purple.opacity(0.2))
+                                .background(Color.blue.opacity(0.2))
                                 .clipShape(Circle())
 
                             HStack(alignment: .center) {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    let isFull = (selectedPlan == nil || selectedPlan?.months == 0)
-                                    Text(isFull ? "Full payment" : (selectedPlan?.title ?? "Full payment"))
+                                    Text(paymentSelectionTitle)
                                         .font(.subheadline)
                                         .fontWeight(.semibold)
                                         .foregroundColor(.primary)
-                                    if isFull {
-                                        Text("One payment. Total \(invoice.amount)")
+                                    Text(paymentSelectionSubtitle)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    if !isGekasInvoice, let plan = selectedPlan, insuranceEnabled && plan.months >= 12 {
+                                        Text("Payment insurance included".localized)
                                             .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    } else if let plan = selectedPlan {
-                                        Text("\(Int(plan.monthlyCost)) kr / month · Total \(Int(plan.totalCost)) kr")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                        if insuranceEnabled && plan.months >= 12 {
-                                            Text("Payment insurance included")
-                                                .font(.caption)
-                                                .foregroundColor(.green)
-                                        }
+                                            .foregroundColor(.green)
                                     }
                                 }
                                 Spacer()
                                 HStack(spacing: 4) {
-                                    Text("Part Pay")
+                                    Text(isGekasInvoice ? "Change".localized : "Part Pay".localized)
                                         .font(.caption.weight(.semibold))
                                     Image(systemName: "chevron.forward")
                                         .font(.caption.weight(.semibold))
@@ -1108,10 +1309,10 @@ struct PaymentSheet: View {
                                 .clipShape(Circle())
 
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Pay now")
+                                Text("Pay now".localized)
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundColor(.primary)
-                                Text("Overdue invoice")
+                                Text("Overdue invoice".localized)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -1136,10 +1337,10 @@ struct PaymentSheet: View {
                                     guard let due = defaultDue else { return false }
                                     return paymentDate > due && !Calendar.current.isDate(paymentDate, inSameDayAs: due)
                                 }()
-                                Text(isCustom ? "Custom date" : "On due date")
+                                Text(isCustom ? "Custom date".localized : "On due date".localized)
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundColor(.primary)
-                                Text(isCustom ? (isAfterDue ? "After due" : "Your choice") : "Pay just in time")
+                                Text(isCustom ? (isAfterDue ? "After due".localized : "Your choice".localized) : "Pay just in time".localized)
                                     .font(.caption)
                                     .foregroundColor(isAfterDue ? .orange : .secondary)
                             }
@@ -1147,21 +1348,21 @@ struct PaymentSheet: View {
                             Spacer()
 
                             DatePicker(
-                                "Payment Date",
+                                "Payment Date".localized,
                                 selection: $paymentDate,
                                 in: Date()...,
                                 displayedComponents: [.date]
                             )
                             .datePickerStyle(.compact)
                             .labelsHidden()
-                            .accessibilityLabel("Payment date")
+                            .accessibilityLabel("Payment date".localized)
                         }
                         .padding(16)
                         .background(.ultraThinMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
 
-                    Text("Scheduling a payment is a request to your bank to make a transfer. The request can be declined or fail for several reasons, and you must ensure there are sufficient funds in the selected account at the time of the requested transfer.")
+                    Text("Scheduling a payment is a request to your bank to make a transfer. The request can be declined or fail for several reasons, and you must ensure there are sufficient funds in the selected account at the time of the requested transfer.".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1171,7 +1372,7 @@ struct PaymentSheet: View {
 
                 // Confirm Button
                 Button(action: {
-                    if (selectedPlan?.months ?? 0) != 0 {
+                    if isPartPaymentSelected {
                         showCreditRisk = true
                     } else {
                         finalizePayment()
@@ -1185,7 +1386,7 @@ struct PaymentSheet: View {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.title3)
                         }
-                        Text(isProcessing ? "Processing..." : "Confirm Payment")
+                        Text(isProcessing ? "Processing...".localized : "Confirm Payment".localized)
                             .font(.headline)
                             .fontWeight(.semibold)
                     }
@@ -1230,20 +1431,379 @@ struct PaymentSheet: View {
             )
         }
         .sheet(isPresented: $showPlanOptions) {
-            PlanOptionsListSheet(
-                plans: availablePlans,
-                selectedPlan: selectedPlan,
-                insuranceEnabled: $insuranceEnabled,
-                onSelect: { plan in
-                    selectedPlan = plan
+            if isGekasInvoice {
+                GekasAmountSelectorSheet(
+                    invoiceAmount: gekasStatementAmount,
+                    sixMonthAmount: gekasSixMonthBreakpoint,
+                    topUpAmount: gekasTopUpAmount,
+                    creditLimit: gekasCreditLimit,
+                    selectedAmount: $selectedGekasAmount
+                ) {
+                    showPlanOptions = false
                 }
-            )
-            .presentationDetents([.fraction(0.9), .large])
-            .presentationDragIndicator(.visible)
-            .presentationBackground {
-                AdaptiveSheetBackground()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
+            } else {
+                PlanOptionsListSheet(
+                    plans: availablePlans,
+                    selectedPlan: selectedPlan,
+                    insuranceEnabled: $insuranceEnabled,
+                    onSelect: { plan in
+                        selectedPlan = plan
+                    }
+                )
+                .presentationDetents([.fraction(0.9), .large])
+                .presentationDragIndicator(.visible)
+                .presentationBackground {
+                    AdaptiveSheetBackground()
+                }
             }
         }
+    }
+}
+
+struct GekasAmountSelectorSheet: View {
+    let invoiceAmount: Double
+    let sixMonthAmount: Double
+    let topUpAmount: Double
+    let creditLimit: Double
+    @Binding var selectedAmount: Double
+    let onContinue: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var dialProgress: Double = 0
+    @State private var lastHapticMarker: Int? = nil
+
+    private let accentColor = Color.blue
+    private let markerTolerance: Double = 12
+    private let minimumAmount: Double = 425
+
+    private func formatSEK(_ value: Double) -> String {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.groupingSeparator = " "
+        f.maximumFractionDigits = 0
+        return f.string(from: NSNumber(value: value)) ?? "\(Int(value))"
+    }
+
+    private var markerAmounts: [Double] {
+        [sixMonthAmount, invoiceAmount, topUpAmount]
+    }
+
+    private var dialAmount: Double {
+        (minimumAmount + (dialProgress * (topUpAmount - minimumAmount))).rounded()
+    }
+
+    private var currentTier: GekasPaymentTier {
+        if dialAmount >= topUpAmount {
+            return .topUpCredit
+        }
+        if dialAmount >= invoiceAmount {
+            return .fullStatement
+        }
+        if dialAmount >= sixMonthAmount {
+            return .sixMonths
+        }
+        return .custom
+    }
+
+    private var headline: String {
+        switch currentTier {
+        case .custom:
+            return "17% interest plan".localized
+        case .sixMonths:
+            return "Pay over 6 months".localized
+        case .fullStatement:
+            return "Pay in full".localized
+        case .topUpCredit:
+            return "Top up credit".localized
+        }
+    }
+
+    private var supportingText: String {
+        switch currentTier {
+        case .custom:
+            return String(format: "Any amount below %@ moves the remaining balance to a 17%% interest plan.".localized, formatSEK(sixMonthAmount))
+        case .sixMonths:
+            return "Closest lower plan: 6 months interest free. Keep the remaining credit available after this payment.".localized
+        case .fullStatement:
+            return "Clears the entire statement this cycle. No interest is charged and this is the cheapest way to use revolving credit.".localized
+        case .topUpCredit:
+            return String(format: "Covers used credit up to %@ of your %@ limit.".localized, formatSEK(topUpAmount), formatSEK(creditLimit))
+        }
+    }
+
+    private func progress(for amount: Double) -> Double {
+        let range = topUpAmount - minimumAmount
+        guard range > 0 else { return 0 }
+        return min(max((amount - minimumAmount) / range, 0), 1)
+    }
+
+    private func markerIndex(for amount: Double) -> Int? {
+        for (index, marker) in markerAmounts.enumerated() {
+            if abs(amount - marker) <= markerTolerance {
+                return index
+            }
+        }
+        return nil
+    }
+
+    private func handleThresholdHaptic(for amount: Double) {
+        guard let markerIndex = markerIndex(for: amount) else {
+            lastHapticMarker = nil
+            return
+        }
+
+        guard lastHapticMarker != markerIndex else { return }
+        let impact = UIImpactFeedbackGenerator(style: .rigid)
+        impact.impactOccurred()
+        lastHapticMarker = markerIndex
+    }
+
+    private var badgeTitle: String? {
+        switch currentTier {
+        case .custom:
+            return "17% INTEREST".localized
+        case .sixMonths:
+            return "6 MONTHS".localized
+        case .fullStatement:
+            return "STATEMENT".localized
+        case .topUpCredit:
+            return "ALL USED CREDIT".localized
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    GekasPaymentDial(
+                        progress: $dialProgress,
+                        accentColor: accentColor,
+                        markerProgresses: markerAmounts.map(progress(for:))
+                    )
+                    .frame(height: 280)
+                    .overlay {
+                        VStack(spacing: 8) {
+                            Text("SEK")
+                                .font(.subheadline.weight(.medium))
+                                .foregroundColor(.secondary)
+                            Text(formatSEK(dialAmount))
+                                .font(.system(size: 44, weight: .bold))
+                                .monospacedDigit()
+                                .foregroundStyle(.blue)
+                            if let badgeTitle {
+                                Text(badgeTitle)
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundColor(accentColor)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(.ultraThinMaterial)
+                                    .overlay {
+                                        Capsule()
+                                            .stroke(accentColor.opacity(0.18), lineWidth: 1)
+                                    }
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+
+                    VStack(spacing: 10) {
+                        Text(headline)
+                            .font(.system(size: 24, weight: .bold))
+                            .multilineTextAlignment(.center)
+                        Text(supportingText)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.horizontal, 24)
+
+                    Color.clear
+                        .frame(height: 120)
+                }
+                .padding(.top, 16)
+            }
+            .navigationTitle("Pay credit".localized)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.primary)
+                    }
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    selectedAmount = dialAmount
+                    dismiss()
+                    DispatchQueue.main.async {
+                        onContinue()
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Text(String(format: "Use %@ SEK".localized, formatSEK(dialAmount)))
+                            .font(.headline.weight(.semibold))
+                        Image(systemName: "arrow.right")
+                            .font(.headline.weight(.semibold))
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 18)
+                    .background(accentColor)
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+                .padding(.bottom, 12)
+                .background(.ultraThinMaterial)
+            }
+        }
+        .onAppear {
+            dialProgress = progress(for: selectedAmount)
+        }
+        .onChange(of: dialProgress) { _, newValue in
+            let amount = (minimumAmount + (newValue * (topUpAmount - minimumAmount))).rounded()
+            selectedAmount = amount
+            handleThresholdHaptic(for: amount)
+        }
+    }
+}
+
+struct GekasPaymentDial: View {
+    @Binding var progress: Double
+    let accentColor: Color
+    let markerProgresses: [Double]
+
+    private let startAngle = Angle.degrees(150)
+    private let endAngle = Angle.degrees(390)
+    private let wrappedEndAngleDegrees: Double = 30
+
+    private func angle(for progress: Double) -> Angle {
+        Angle.degrees(startAngle.degrees + (endAngle.degrees - startAngle.degrees) * progress)
+    }
+
+    private func point(on radius: CGFloat, in size: CGSize, for progress: Double) -> CGPoint {
+        let angle = angle(for: progress).radians
+        let center = CGPoint(x: size.width / 2, y: size.height / 2 + 24)
+        return CGPoint(
+            x: center.x + cos(angle) * radius,
+            y: center.y + sin(angle) * radius
+        )
+    }
+
+    private func progress(for degrees: Double) -> Double {
+        let normalizedDegrees = degrees < 0 ? degrees + 360 : degrees
+
+        if normalizedDegrees > wrappedEndAngleDegrees && normalizedDegrees < startAngle.degrees {
+            let distanceToStart = abs(normalizedDegrees - startAngle.degrees)
+            let distanceToEnd = abs(normalizedDegrees - wrappedEndAngleDegrees)
+            return distanceToStart <= distanceToEnd ? 0 : 1
+        }
+
+        let adjustedDegrees = normalizedDegrees < startAngle.degrees ? normalizedDegrees + 360 : normalizedDegrees
+        let normalizedProgress = (adjustedDegrees - startAngle.degrees) / (endAngle.degrees - startAngle.degrees)
+        return min(max(normalizedProgress, 0), 1)
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            let size = geometry.size
+            let radius = min(size.width * 0.34, 122)
+            let knobPoint = point(on: radius, in: size, for: progress)
+            let center = CGPoint(x: size.width / 2, y: size.height / 2 + 24)
+
+            ZStack {
+                ArcShape(startAngle: startAngle, endAngle: endAngle)
+                    .stroke(accentColor.opacity(0.16), style: StrokeStyle(lineWidth: 32, lineCap: .round))
+
+                ArcShape(startAngle: startAngle, endAngle: angle(for: progress))
+                    .stroke(accentColor.opacity(0.55), style: StrokeStyle(lineWidth: 32, lineCap: .round))
+
+                ForEach(markerProgresses, id: \.self) { marker in
+                    Circle()
+                        .fill(marker <= progress ? accentColor.opacity(0.6) : accentColor.opacity(0.18))
+                        .frame(width: 8, height: 8)
+                        .position(point(on: radius, in: size, for: marker))
+                }
+
+                Circle()
+                    .fill(accentColor.opacity(0.24))
+                    .frame(width: 42, height: 42)
+                    .overlay {
+                        Circle()
+                            .stroke(accentColor.opacity(0.45), lineWidth: 1)
+                    }
+                    .position(knobPoint)
+
+            }
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        let dx = value.location.x - center.x
+                        let dy = value.location.y - center.y
+                        var degrees = atan2(dy, dx) * 180 / .pi
+                        if degrees < 0 {
+                            degrees += 360
+                        }
+                        progress = progress(for: degrees)
+                    }
+            )
+        }
+    }
+}
+
+struct CreditWarningCard: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 16) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 42, weight: .semibold))
+                .foregroundColor(.red)
+                .frame(width: 56, height: 56)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Att låna kostar pengar!")
+                    .font(.headline.weight(.bold))
+                    .foregroundColor(.primary)
+
+                Text("Om du inte kan betala tillbaka skulden i tid riskerar du en betalningsanmärkning. Det kan leda till svårigheter att få hyra bostad, teckna abonnemang och få nya lån. För stöd, vänd dig till budget- och skuldrådgivningen i din kommun. Kontaktuppgifter finns på konsumentverket.se")
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(16)
+        .background(Color.red.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+    }
+}
+
+struct ArcShape: Shape {
+    let startAngle: Angle
+    let endAngle: Angle
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let center = CGPoint(x: rect.midX, y: rect.midY + 24)
+        let radius = min(rect.width * 0.34, 122)
+        path.addArc(
+            center: center,
+            radius: radius,
+            startAngle: startAngle,
+            endAngle: endAngle,
+            clockwise: false
+        )
+        return path
     }
 }
 
@@ -1323,7 +1883,7 @@ struct PlanOptionsSheet: View {
 
             ZStack {
                 // Centered title
-                Text("Pay Over Time")
+                Text("Pay Over Time".localized)
                     .font(.headline.weight(.semibold))
             }
             .frame(maxWidth: .infinity)
@@ -1342,13 +1902,13 @@ struct PlanOptionsSheet: View {
             .padding(.bottom, 12)
 
             if plans.isEmpty {
-                Text("No payment plans available right now.")
+                Text("No payment plans available right now.".localized)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             } else {
                 if let plan = currentPlan {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(plan.months == 0 ? "Full payment" : plan.title)
+                        Text(plan.months == 0 ? "Full payment".localized : plan.title)
                             .font(.headline.weight(.semibold))
 
                         let surchargeTotal = plan.totalCost * 0.004
@@ -1357,10 +1917,10 @@ struct PlanOptionsSheet: View {
                         let total = plan.months > 0 ? plan.totalCost + (insuranceEnabled ? surchargeTotal : 0) : plan.totalCost
 
                         if plan.months == 0 {
-                            Text("One payment · Total \(fmt(plan.totalCost)) kr")
+                            Text(String(format: "One payment · Total %@ kr".localized, fmt(plan.totalCost)))
                                 .font(.subheadline)
                                 .foregroundColor(.primary)
-                            Text("No fees or interest")
+                            Text("No fees or interest".localized)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                             if selectedPlan?.months == 0 {
@@ -1369,9 +1929,9 @@ struct PlanOptionsSheet: View {
                                     false
                                 }, set: { _ in })) {
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text("Clear all debt")
+                                        Text("Clear all debt".localized)
                                             .font(.subheadline.weight(.semibold))
-                                        Text("Also pay debt not yet invoiced")
+                                        Text("Also pay debt not yet invoiced".localized)
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
@@ -1380,13 +1940,13 @@ struct PlanOptionsSheet: View {
                                 .disabled(true)
                             }
                         } else {
-                            Text("\(fmt(monthly)) kr / month · Total \(fmt(total)) kr")
+                            Text(String(format: "%@ kr / month · Total %@ kr".localized, fmt(monthly), fmt(total)))
                                 .font(.subheadline)
                                 .foregroundColor(.primary)
                             Text(plan.title)
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.primary)
-                            Text("Interest \(Int(plan.interestRate * 100))% · Fee \(Int(plan.fee)) kr")
+                            Text(String(format: "Interest %lld%% · Fee %lld kr".localized, Int(plan.interestRate * 100), Int(plan.fee)))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -1395,9 +1955,9 @@ struct PlanOptionsSheet: View {
                             Divider().padding(.vertical, 4)
                             Toggle(isOn: $insuranceEnabled) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Add Payment Insurance")
+                                    Text("Add Payment Insurance".localized)
                                         .font(.subheadline.weight(.semibold))
-                                    Text("Adds 0.4% of total to monthly amount")
+                                    Text("Adds 0.4% of total to monthly amount".localized)
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
@@ -1427,7 +1987,7 @@ struct PlanOptionsSheet: View {
                     }
 
                     HStack {
-                        Text(plans.first?.months == 0 ? "Full" : (plans.first?.title ?? ""))
+                        Text(plans.first?.months == 0 ? "Full".localized : (plans.first?.title ?? ""))
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Spacer()
@@ -1438,7 +1998,7 @@ struct PlanOptionsSheet: View {
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Credit warning: Borrowing costs money. Be sure you can repay, as missed payments can lead to fees and debt. Consider your budget carefully before choosing a payment plan.")
+                    Text("Credit warning: Borrowing costs money. Be sure you can repay, as missed payments can lead to fees and debt. Consider your budget carefully before choosing a payment plan.".localized)
                         .font(.footnote)
                         .foregroundColor(.secondary)
                 }
@@ -1454,7 +2014,7 @@ struct PlanOptionsSheet: View {
                         HStack {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.title3)
-                            Text("Confirm Selection")
+                            Text("Confirm Selection".localized)
                                 .font(.headline)
                                 .fontWeight(.semibold)
                         }
@@ -1524,9 +2084,9 @@ struct PlanOptionsListSheet: View {
                                 HStack(alignment: .top, spacing: 12) {
                                     VStack(alignment: .leading, spacing: 4) {
                                         if plan.months == 0 {
-                                            Text("Full payment")
+                                            Text("Full payment".localized)
                                                 .font(.subheadline).fontWeight(.semibold)
-                                            Text("One payment · Total \(fmt(plan.totalCost)) kr")
+                                            Text(String(format: "One payment · Total %@ kr".localized, fmt(plan.totalCost)))
                                                 .font(.caption)
                                                 .foregroundColor(.secondary)
                                             if isSelected {
@@ -1535,9 +2095,9 @@ struct PlanOptionsListSheet: View {
                                                     false
                                                 }, set: { _ in })) {
                                                     VStack(alignment: .leading, spacing: 2) {
-                                                        Text("Clear all debt")
+                                                        Text("Clear all debt".localized)
                                                             .font(.caption.weight(.semibold))
-                                                        Text("Also pay debt not yet invoiced")
+                                                        Text("Also pay debt not yet invoiced".localized)
                                                             .font(.caption)
                                                             .foregroundColor(.secondary)
                                                     }
@@ -1546,13 +2106,13 @@ struct PlanOptionsListSheet: View {
                                                 .disabled(true)
                                             }
                                         } else {
-                                            Text("\(fmt(plan.monthlyCost)) kr / month")
+                                            Text(String(format: "%@ kr / month".localized, fmt(plan.monthlyCost)))
                                                 .font(.subheadline.weight(.semibold))
                                                 .foregroundColor(.primary)
-                                            Text("\(plan.title) · Total \(fmt(plan.totalCost)) kr")
+                                            Text(String(format: "%@ · Total %@ kr".localized, plan.title, fmt(plan.totalCost)))
                                                 .font(.caption)
                                                 .foregroundColor(.secondary)
-                                            Text("Interest \(Int(plan.interestRate * 100))% · Fee \(Int(plan.fee)) kr")
+                                            Text(String(format: "Interest %lld%% · Fee %lld kr".localized, Int(plan.interestRate * 100), Int(plan.fee)))
                                                 .font(.caption2)
                                                 .foregroundColor(.secondary)
                                         }
@@ -1564,9 +2124,9 @@ struct PlanOptionsListSheet: View {
                                     Divider()
                                     Toggle(isOn: $insuranceEnabled) {
                                             VStack(alignment: .leading, spacing: 2) {
-                                                Text("Add Payment Insurance")
+                                                Text("Add Payment Insurance".localized)
                                                     .font(.caption.weight(.semibold))
-                                                Text("Adds 0.4% of total to monthly amount")
+                                                Text("Adds 0.4% of total to monthly amount".localized)
                                                     .font(.caption)
                                                     .foregroundColor(.secondary)
                                             }
@@ -1604,7 +2164,7 @@ struct PlanOptionsListSheet: View {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.title3)
-                        Text("Confirm Selection")
+                        Text("Confirm Selection".localized)
                             .font(.headline.weight(.semibold))
                     }
                     .foregroundColor(.white)
@@ -1617,7 +2177,7 @@ struct PlanOptionsListSheet: View {
             .opacity(1)
             }
             .padding()
-            .navigationTitle("Select Payment Option")
+            .navigationTitle("Select Payment Option".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -1652,13 +2212,13 @@ struct CreditRiskOverlay: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Credit is a risk")
+                    Text("Credit is a risk".localized)
                         .font(.largeTitle.weight(.bold))
                         .padding(.top, 8)
 
                     Text("""
 Credit involves borrowing money that must be repaid with interest and fees. Taking on credit can affect your financial stability, and missed or late payments may lead to additional charges, collection actions, and negative impacts on your creditworthiness. Changes in income, unexpected expenses, or higher interest costs can increase the risk of not meeting payment obligations. Always ensure you understand the total cost, repayment schedule, and consequences of non-payment before proceeding.
-""")
+""".localized)
                         .font(.body)
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.leading)
@@ -1669,13 +2229,13 @@ By proceeding, you acknowledge that:
 • Charges, interest, and fees may apply if payments are late or missed.
 • Your bank or lender may decline or reverse the transaction if conditions are not met.
 • Failing to repay may impact your ability to obtain credit in the future.
-""")
+""".localized)
                         .font(.callout)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.leading)
 
                     Button(action: onAcknowledge) {
-                        Text("I understand")
+                        Text("I understand".localized)
                             .font(.headline.weight(.semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -1736,4 +2296,3 @@ private struct AdaptiveCardBackground: View {
     )
     .preferredColorScheme(.dark)
 }
-

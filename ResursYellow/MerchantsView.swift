@@ -270,7 +270,7 @@ struct MerchantCard: View {
             // Available credit at bottom
             if let amount {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Available credit")
+                    Text("Available credit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(amount.replacingOccurrences(of: "Available credit: ", with: ""))
@@ -345,8 +345,8 @@ struct MerchantsView: View {
                     .allowsHitTesting(false)
                 
                 StickyHeaderView(
-                    title: "Merchants",
-                    subtitle: hasMerchants ? "Connect your favourite stores" : "Get started",
+                    title: "Merchants".localized,
+                    subtitle: hasMerchants ? "Connect your favourite stores".localized : "Get started".localized,
                     trailingButton: "plus",
                     trailingButtonTint: .primary,
                     trailingButtonSize: 44,
@@ -366,11 +366,11 @@ struct MerchantsView: View {
                                 .font(.system(size: 56))
                                 .foregroundColor(.secondary.opacity(0.4))
                             
-                            Text("No merchants connected")
+                            Text("No merchants connected".localized)
                                 .font(.title3.weight(.semibold))
                                 .foregroundColor(.secondary)
                             
-                            Text("Connect your favorite stores to access payment options and exclusive offers.")
+                            Text("Connect your favorite stores to access payment options and exclusive offers.".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary.opacity(0.8))
                                 .multilineTextAlignment(.center)
@@ -379,7 +379,7 @@ struct MerchantsView: View {
                             Button {
                                 showAddMerchant = true
                             } label: {
-                                Text("Explore")
+                                Text("Explore".localized)
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundColor(.secondary)
                                     .padding(.horizontal, 24)
@@ -401,13 +401,13 @@ struct MerchantsView: View {
                             // Shared credit banner when persona uses one credit across all merchants (e.g. Future John)
                             if usesSharedMerchantCredit, let amount = sharedCreditAmount {
                                 VStack(alignment: .leading, spacing: 6) {
-                                    Text("Shared credit")
+                                    Text("Shared credit".localized)
                                         .font(.subheadline.weight(.medium))
                                         .foregroundColor(.secondary)
                                     Text(amount)
                                         .font(.title2.weight(.bold))
                                         .foregroundColor(.primary)
-                                    Text("Available at all connected merchants")
+                                    Text("Available at all connected merchants".localized)
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
@@ -443,7 +443,7 @@ struct MerchantsView: View {
                                         Button(role: .destructive) {
                                             remove(merchant)
                                         } label: {
-                                            Label("Remove", systemImage: "trash")
+                                            Label("Remove".localized, systemImage: "trash")
                                         }
                                     }
                                 }
@@ -511,36 +511,36 @@ private extension MerchantsView {
         switch merchant {
         case "Bauhaus":
             return MerchantCardConfig(
-                subtitle: useShared ? "Payment options, offers and benefits" : "Store Credit and Invoice available",
+                subtitle: useShared ? "Payment options, offers and benefits".localized : "Store Credit and Invoice available".localized,
                 amount: useShared ? nil : "14 500 kr",
-                infoCopy: useShared ? "Store credit, invoice and pay later available with your shared credit." : nil,
+                infoCopy: useShared ? "Store credit, invoice and pay later available with your shared credit.".localized : nil,
                 icon: "hammer.fill",
                 color: .red,
                 titleColor: .primary
             )
         case "Netonnet":
             return MerchantCardConfig(
-                subtitle: useShared ? "Payment options, offers and benefits" : "Store Credit available",
+                subtitle: useShared ? "Payment options, offers and benefits".localized : "Store Credit available".localized,
                 amount: useShared ? nil : "20 000 kr",
-                infoCopy: useShared ? "Store credit and pay later. Use your shared credit in-store or online." : nil,
+                infoCopy: useShared ? "Store credit and pay later. Use your shared credit in-store or online.".localized : nil,
                 icon: "shippingbox.fill",
                 color: .green,
                 titleColor: .primary
             )
         case "Jula":
             return MerchantCardConfig(
-                subtitle: useShared ? "Uses your shared credit" : "Pay later active in-store",
+                subtitle: useShared ? "Uses your shared credit".localized : "Pay later active in-store".localized,
                 amount: useShared ? nil : "9 200 kr",
-                infoCopy: useShared ? "Pay later in-store. Your shared credit applies at checkout." : nil,
+                infoCopy: useShared ? "Pay later in-store. Your shared credit applies at checkout.".localized : nil,
                 icon: "hammer.circle.fill",
                 color: .red,
                 titleColor: .primary
             )
         default:
             return MerchantCardConfig(
-                subtitle: useShared ? "Uses your shared credit" : "Payment options and offers enabled",
+                subtitle: useShared ? "Uses your shared credit".localized : "Payment options and offers enabled".localized,
                 amount: nil,
-                infoCopy: useShared ? "Store credit, invoice and pay later where available." : nil,
+                infoCopy: useShared ? "Store credit, invoice and pay later where available.".localized : nil,
                 icon: "link.circle.fill",
                 color: .green,
                 titleColor: .primary
@@ -558,7 +558,7 @@ private extension MerchantsView {
         case "Jula":
             JulaDetailView()
         default:
-            Text("Details for \(merchant)")
+            Text(String(format: "Details for %@".localized, merchant))
                 .padding()
         }
     }
@@ -568,42 +568,42 @@ private extension MerchantsView {
         let invoices: [PartPaymentInvoice] = isOctober ? [
             PartPaymentInvoice(
                 installment: 1,
-                dueDate: "Oct 15, 2025",
+                dueDate: "Oct 15, 2025".localized,
                 amount: "726 kr",
                 reference: "PP-2025-10-001",
                 status: .paid
             ),
             PartPaymentInvoice(
                 installment: 2,
-                dueDate: "Nov 15, 2025",
+                dueDate: "Nov 15, 2025".localized,
                 amount: "726 kr",
                 reference: "PP-2025-11-001",
                 status: .paid
             ),
             PartPaymentInvoice(
                 installment: 3,
-                dueDate: "Dec 15, 2025",
+                dueDate: "Dec 15, 2025".localized,
                 amount: "726 kr",
                 reference: "PP-2025-12-001",
                 status: .upcoming
             ),
             PartPaymentInvoice(
                 installment: 4,
-                dueDate: "Jan 15, 2026",
+                dueDate: "Jan 15, 2026".localized,
                 amount: "726 kr",
                 reference: "PP-2026-01-001",
                 status: .upcoming
             ),
             PartPaymentInvoice(
                 installment: 5,
-                dueDate: "Feb 15, 2026",
+                dueDate: "Feb 15, 2026".localized,
                 amount: "726 kr",
                 reference: "PP-2026-02-001",
                 status: .upcoming
             ),
             PartPaymentInvoice(
                 installment: 6,
-                dueDate: "Mar 15, 2026",
+                dueDate: "Mar 15, 2026".localized,
                 amount: "726 kr",
                 reference: "PP-2026-03-001",
                 status: .upcoming
@@ -611,35 +611,35 @@ private extension MerchantsView {
         ] : [
             PartPaymentInvoice(
                 installment: 1,
-                dueDate: "Sep 30, 2025",
+                dueDate: "Sep 30, 2025".localized,
                 amount: "300 kr",
                 reference: "PP-2025-09-001",
                 status: .paid
             ),
             PartPaymentInvoice(
                 installment: 2,
-                dueDate: "Oct 30, 2025",
+                dueDate: "Oct 30, 2025".localized,
                 amount: "300 kr",
                 reference: "PP-2025-10-002",
                 status: .paid
             ),
             PartPaymentInvoice(
                 installment: 3,
-                dueDate: "Nov 30, 2025",
+                dueDate: "Nov 30, 2025".localized,
                 amount: "300 kr",
                 reference: "PP-2025-11-002",
                 status: .paid
             ),
             PartPaymentInvoice(
                 installment: 4,
-                dueDate: "Dec 30, 2025",
+                dueDate: "Dec 30, 2025".localized,
                 amount: "300 kr",
                 reference: "PP-2025-12-002",
                 status: .upcoming
             ),
             PartPaymentInvoice(
                 installment: 5,
-                dueDate: "Jan 30, 2026",
+                dueDate: "Jan 30, 2026".localized,
                 amount: "300 kr",
                 reference: "PP-2026-01-002",
                 status: .upcoming
@@ -696,6 +696,7 @@ struct AddMerchantView: View {
         }
         return merchants.filter { merchant in
             merchant.name.localizedCaseInsensitiveContains(searchText) ||
+            merchant.category.localized.localizedCaseInsensitiveContains(searchText) ||
             merchant.category.localizedCaseInsensitiveContains(searchText)
         }
     }
@@ -708,7 +709,7 @@ struct AddMerchantView: View {
                     HStack(spacing: 10) {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.secondary)
-                        TextField("Search merchants", text: $searchText)
+                        TextField("Search merchants".localized, text: $searchText)
                             .textFieldStyle(PlainTextFieldStyle())
                         if !searchText.isEmpty {
                             Button {
@@ -731,10 +732,10 @@ struct AddMerchantView: View {
                             Image(systemName: "magnifyingglass")
                                 .font(.system(size: 40))
                                 .foregroundColor(.secondary.opacity(0.4))
-                            Text("No merchants found")
+                            Text("No merchants found".localized)
                                 .font(.headline)
                                 .foregroundColor(.secondary)
-                            Text("Try a different search term")
+                            Text("Try a different search term".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary.opacity(0.7))
                         }
@@ -758,7 +759,7 @@ struct AddMerchantView: View {
                                         Text(merchant.name)
                                             .font(.headline)
                                             .foregroundColor(.primary)
-                                        Text(merchant.category)
+                                        Text(merchant.category.localized)
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
@@ -777,7 +778,7 @@ struct AddMerchantView: View {
                 .padding(.bottom, 24)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("Add Merchant")
+            .navigationTitle("Add Merchant".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

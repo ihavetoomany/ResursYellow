@@ -39,12 +39,12 @@ class LocalizationService: ObservableObject {
     private var bundle: Bundle?
     
     private init() {
-        // Load saved language or default to English
+        // Load saved language or default to Swedish
         if let savedLanguage = UserDefaults.standard.string(forKey: "app_language"),
            let language = Language(rawValue: savedLanguage) {
             self.currentLanguage = language
         } else {
-            self.currentLanguage = .english
+            self.currentLanguage = .swedish
         }
         loadLocalizedStrings()
     }

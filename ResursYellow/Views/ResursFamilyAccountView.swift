@@ -40,10 +40,10 @@ struct ResursFamilyAccountView: View {
     
     // Benefits for Resurs Family
     private let benefits: [(icon: String, title: String, desc: String)] = [
-        ("calendar.badge.clock", "Flexible Payments", "Choose flexible part payment plans for large purchases."),
-        ("creditcard.fill", "Easy Checkout", "Use your Resurs Family card for quick and secure payments."),
-        ("heart.fill", "Family Sharing", "Share your credit account with family members."),
-        ("shield.checkerboard", "Payment Protection", "Protect your purchases with optional payment insurance.")
+        ("calendar.badge.clock", "Flexible Payments".localized, "Choose flexible part payment plans for large purchases.".localized),
+        ("creditcard.fill", "Easy Checkout".localized, "Use your Resurs Family card for quick and secure payments.".localized),
+        ("heart.fill", "Family Sharing".localized, "Share your credit account with family members.".localized),
+        ("shield.checkerboard", "Payment Protection".localized, "Protect your purchases with optional payment insurance.".localized)
     ]
     
     // Documents for Resurs Family
@@ -86,14 +86,14 @@ struct ResursFamilyAccountView: View {
                 // Purchases Section
                 VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Purchases")
+                            Text("Purchases".localized)
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
                             Button(action: {
                                 // Handle "View all" tap
                             }) {
-                                Text("View all")
+                                Text("View all".localized)
                                     .font(.subheadline)
                                     .foregroundColor(.blue)
                             }
@@ -104,7 +104,7 @@ struct ResursFamilyAccountView: View {
                         VStack(spacing: 12) {
                             PurchaseRow(
                                 title: "Elgiganten",
-                                subtitle: "Today - Stockholm",
+                                subtitle: "Today - Stockholm".localized,
                                 amount: "5 699 kr",
                                 icon: "display.2",
                                 color: .green,
@@ -115,7 +115,7 @@ struct ResursFamilyAccountView: View {
                             
                             PurchaseRow(
                                 title: "ICA Maxi",
-                                subtitle: "Yesterday - Lund",
+                                subtitle: "Yesterday - Lund".localized,
                                 amount: "1 245 kr",
                                 icon: "cart.fill",
                                 color: .brown,
@@ -126,7 +126,7 @@ struct ResursFamilyAccountView: View {
                             
                             PurchaseRow(
                                 title: "Stadium Outlet",
-                                subtitle: "2 days ago - Orebro",
+                                subtitle: "2 days ago - Orebro".localized,
                                 amount: "1 080 kr",
                                 icon: "sportscourt.fill",
                                 color: .purple,
@@ -137,7 +137,7 @@ struct ResursFamilyAccountView: View {
                             
                             PurchaseRow(
                                 title: "Clas Ohlson",
-                                subtitle: "3 days ago - Malmo",
+                                subtitle: "3 days ago - Malmo".localized,
                                 amount: "890 kr",
                                 icon: "lightbulb.fill",
                                 color: .yellow,
@@ -148,7 +148,7 @@ struct ResursFamilyAccountView: View {
                             
                             PurchaseRow(
                                 title: "Åhléns",
-                                subtitle: "1 week ago - Stockholm",
+                                subtitle: "1 week ago - Stockholm".localized,
                                 amount: "2 450 kr",
                                 icon: "bag.fill",
                                 color: .pink,
@@ -164,14 +164,14 @@ struct ResursFamilyAccountView: View {
                 // Invoice Accounts Section
                 VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Accounts")
+                            Text("Accounts".localized)
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
                             Button(action: {
                                 // Handle "View all" tap
                             }) {
-                                Text("View all")
+                                Text("View all".localized)
                                     .font(.subheadline)
                                     .foregroundColor(.blue)
                             }
@@ -194,7 +194,7 @@ struct ResursFamilyAccountView: View {
                 // Credit Cards Section
                 VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("Cards")
+                            Text("Cards".localized)
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             Spacer()
@@ -223,7 +223,7 @@ struct ResursFamilyAccountView: View {
                     
                 // Benefits Section
                 VStack(alignment: .leading, spacing: 16) {
-                        Text("Benefits and services")
+                        Text("Benefits and services".localized)
                             .font(.headline)
                             .fontWeight(.semibold)
                             .padding(.horizontal, 4)
@@ -315,7 +315,7 @@ struct ResursFamilyAccountView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { showSettings = true }) {
-                    Image(systemName: "gearshape.fill")
+                    Image(systemName: "ellipsis")
                         .font(.title3)
                         .foregroundColor(.secondary)
                         .shadow(color: scrollObserver.offset > 10 ? .black.opacity(0.1) : .clear, radius: 8, x: 0, y: 2)
@@ -360,10 +360,10 @@ struct ResursGoldPartPaymentRow: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(payment.title)
+                    Text(payment.title.localized)
                         .font(.subheadline)
                         .fontWeight(.medium)
-                    Text(payment.subtitle)
+                    Text(payment.subtitle.localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -382,14 +382,14 @@ struct ResursGoldPartPaymentRow: View {
                     Text(amountValue)
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                    Text("left to pay")
+                    Text("left to pay".localized)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
                 }
             } else if payment.title == "Main Account" || payment.title == "Part Payment AUG" || payment.title == "Emergency Buffer" {
                 HStack(spacing: 4) {
-                    Text(payment.title == "Emergency Buffer" ? "Savings:" : "Debt:")
+                    Text(payment.title == "Emergency Buffer" ? "Savings:".localized : "Debt:".localized)
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -409,19 +409,19 @@ struct ResursGoldPartPaymentRow: View {
             
             HStack {
                 if payment.title == "Main Account" {
-                    Text(payment.amount == "0 kr" ? "All purchases are paid" : "Options available on next invoice")
+                    Text(payment.amount == "0 kr" ? "All purchases are paid".localized : "Options available on next invoice".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else if payment.title == "Emergency Buffer" {
-                    Text(payment.installmentAmount.isEmpty ? "Reserved for unexpected expenses" : "\(payment.installmentAmount) monthly")
+                    Text(payment.installmentAmount.isEmpty ? "Reserved for unexpected expenses".localized : String(format: "%@ monthly".localized, payment.installmentAmount))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else if payment.title == "Part Payment AUG" {
-                    Text("Part payment ongoing")
+                    Text("Part payment ongoing".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {
-                    Text("\(payment.completedPayments) of \(payment.totalPayments) payments")
+                    Text(String(format: "%d of %d payments".localized, payment.completedPayments, payment.totalPayments))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -449,7 +449,7 @@ struct AccountOverviewCard: View {
         VStack(spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Available Credit")
+                    Text("Available Credit".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     Text("56 005 SEK")
@@ -470,7 +470,7 @@ struct AccountOverviewCard: View {
             
             HStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Limit")
+                    Text("Limit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text("80 000 SEK")
@@ -483,7 +483,7 @@ struct AccountOverviewCard: View {
                 
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Used Credit")
+                        Text("Used Credit".localized)
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Text("23 995 SEK")
@@ -536,7 +536,7 @@ struct CreditCardMini: View {
                 Text(used)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                Text("Used")
+                Text("Used".localized)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

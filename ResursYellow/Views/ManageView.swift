@@ -192,43 +192,16 @@ struct ManageView: View {
                     // Prototype Section
                     ProfileSection(title: localized("Prototype")) {
                         // Persona Picker
-                        HStack(spacing: 16) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.purple.opacity(0.15))
-                                    .frame(width: 40, height: 40)
-                                Image(systemName: "person.2.fill")
-                                    .font(.system(size: 18))
-                                    .foregroundColor(.purple)
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(localized("Switch Persona"))
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-                                Text(localized("Change user"))
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            Picker("", selection: $selectedPersonaId) {
-                                ForEach(Persona.allPersonas) { persona in
-                                    Text(persona.displayName).tag(persona.id)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                            .onChange(of: selectedPersonaId) { oldValue, newValue in
-                                if let persona = Persona.persona(withId: newValue) {
-                                    dataManager.switchPersona(persona)
-                                }
+                        PersonaPickerRow(
+                            title: localized("Switch Persona"),
+                            subtitle: localized("Change user"),
+                            selectedPersonaId: $selectedPersonaId
+                        )
+                        .onChange(of: selectedPersonaId) { _, newValue in
+                            if let persona = Persona.persona(withId: newValue) {
+                                dataManager.switchPersona(persona)
                             }
                         }
-                        .padding(16)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
                         
                         Button {
                             showResetConfirmation = true
@@ -267,22 +240,22 @@ struct ManageView: View {
                         AdaptiveSheetBackground()
                     }
             }
-            .confirmationDialog("Log out", isPresented: $showLogoutConfirmation, titleVisibility: .visible) {
-                Button("Log out", role: .destructive) {
+            .confirmationDialog(localized("Log out"), isPresented: $showLogoutConfirmation, titleVisibility: .visible) {
+                Button(localized("Log out"), role: .destructive) {
                     // Handle logout
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(localized("Cancel"), role: .cancel) {}
             } message: {
-                Text("Are you sure you want to log out?")
+                Text(localized("Are you sure you want to log out?"))
             }
-            .confirmationDialog("Reset Data", isPresented: $showResetConfirmation, titleVisibility: .visible) {
-                Button("Reset", role: .destructive) {
+            .confirmationDialog(localized("Reset Data"), isPresented: $showResetConfirmation, titleVisibility: .visible) {
+                Button(localized("Reset"), role: .destructive) {
                     dataManager.reset()
                     notificationsRead = false
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(localized("Cancel"), role: .cancel) {}
             } message: {
-                Text("This will restore all data to default values. All your changes will be lost. Are you sure?")
+                Text(localized("This will restore all data to default values. All your changes will be lost. Are you sure?"))
             }
         }
     }
@@ -317,7 +290,7 @@ struct ManageView: View {
         case "Accessibility":
             AccessibilitySettingsView()
         default:
-            Text("Coming soon")
+            Text("Coming soon".localized)
                 .navigationTitle(destination)
         }
     }
@@ -360,6 +333,54 @@ struct ContactMethodRow: View {
     }
 }
 
+struct PersonaPickerRow: View {
+    let title: String
+    let subtitle: String
+    @Binding var selectedPersonaId: String
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(systemName: "person.2.fill")
+                .font(.title3)
+                .foregroundColor(.purple)
+                .frame(width: 36, height: 36)
+                .background(Color.purple.opacity(0.2))
+                .clipShape(Circle())
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            Picker("", selection: $selectedPersonaId) {
+                ForEach(Persona.allPersonas) { persona in
+                    Text(persona.displayName).tag(persona.id)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+        }
+        .padding(16)
+        .background {
+            if colorScheme == .light {
+                Color.white
+            } else {
+                Color.clear.background(.regularMaterial)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
 // MARK: - Call Support View
 struct CallSupportView: View {
     @Environment(\.dismiss) private var dismiss
@@ -376,17 +397,17 @@ struct CallSupportView: View {
                         .padding(.top, 8)
 
                     VStack(spacing: 6) {
-                        Text("Customer Support")
+                        Text("Customer Support".localized)
                             .font(.title2)
                             .fontWeight(.bold)
-                        Text("We're here to help")
+                        Text("We're here to help".localized)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
 
                     VStack(spacing: 8) {
                         HStack {
-                            Text("Phone")
+                            Text("Phone".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                             Spacer()
@@ -398,14 +419,14 @@ struct CallSupportView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
 
                         HStack(alignment: .top) {
-                            Text("Hours")
+                            Text("Hours".localized)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                             Spacer()
                             VStack(alignment: .trailing, spacing: 2) {
-                                Text("Mon–Fri: 08:00–18:00")
-                                Text("Sat: 10:00–14:00")
-                                Text("Sun: Closed")
+                                Text("Mon–Fri: 08:00–18:00".localized)
+                                Text("Sat: 10:00–14:00".localized)
+                                Text("Sun: Closed".localized)
                             }
                             .font(.subheadline)
                         }
@@ -422,7 +443,7 @@ struct CallSupportView: View {
                     } label: {
                         HStack {
                             Image(systemName: "phone.fill")
-                            Text("Call Now")
+                            Text("Call Now".localized)
                                 .fontWeight(.semibold)
                         }
                         .foregroundColor(.white)
@@ -435,7 +456,7 @@ struct CallSupportView: View {
                     .padding(.bottom, 24)
                 }
             }
-            .navigationTitle("Call Support")
+            .navigationTitle("Call Support".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -462,4 +483,3 @@ struct CallSupportView: View {
     ManageView()
         .preferredColorScheme(.dark)
 }
-

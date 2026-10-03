@@ -12,6 +12,8 @@ struct ResursYellowApp: App {
     @AppStorage("selectedTheme") private var selectedTheme = "Dark"
     
     init() {
+        RyFont.registerFonts()
+        FAFonts.registerFonts()
         configureTabBarAppearance()
     }
     
@@ -44,10 +46,11 @@ struct ResursYellowApp: App {
         // Add subtle shadow for depth (adapts to light/dark mode)
         appearance.shadowColor = UIColor.label.withAlphaComponent(0.1)
         
-        // Configure selected item appearance
+        // Configure selected item appearance — Resurs green (adapts to light/dark)
+        let resursGreen = UIColor { $0.userInterfaceStyle == .dark ? UIColor(ryHex: "#ABD3C6") : UIColor(ryHex: "#117069") }
         let itemAppearance = UITabBarItemAppearance()
-        itemAppearance.selected.iconColor = UIColor.systemBlue
-        itemAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
+        itemAppearance.selected.iconColor = resursGreen
+        itemAppearance.selected.titleTextAttributes = [.foregroundColor: resursGreen]
         
         // Configure normal (unselected) item appearance
         itemAppearance.normal.iconColor = UIColor.secondaryLabel

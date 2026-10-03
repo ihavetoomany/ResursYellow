@@ -37,6 +37,9 @@ class DateService {
     /// Formats a date using localized formatting
     func formatDate(_ date: Date, style: DateFormatter.Style = .medium) -> String {
         let formatter = DateFormatter()
+        if LocalizationService.shared.currentLanguage == .swedish {
+            formatter.locale = Locale(identifier: "sv_SE")
+        }
         formatter.dateStyle = style
         formatter.timeStyle = .none
         return formatter.string(from: date)
@@ -45,7 +48,17 @@ class DateService {
     /// Formats a date with custom format (e.g., "Nov 20, 2025")
     func formatDate(_ date: Date, format: String) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = format
+        if LocalizationService.shared.currentLanguage == .swedish {
+            formatter.locale = Locale(identifier: "sv_SE")
+            let swedishFormats = [
+                "MMM d, yyyy": "d MMM yyyy",
+                "MMM d": "d MMM",
+                "h:mm a": "HH:mm"
+            ]
+            formatter.dateFormat = swedishFormats[format] ?? format
+        } else {
+            formatter.dateFormat = format
+        }
         return formatter.string(from: date)
     }
     
@@ -56,25 +69,25 @@ class DateService {
         let today = currentDate()
         
         if calendar.isDateInToday(date) {
-            return "Today"
+            return "Today".localized
         } else if calendar.isDateInYesterday(date) {
-            return "Yesterday"
+            return "Yesterday".localized
         } else {
             let daysDiff = calendar.dateComponents([.day], from: date, to: today).day ?? 0
             if daysDiff > 0 {
                 if daysDiff == 1 {
-                    return "1 day ago"
+                    return "1 day ago".localized
                 } else if daysDiff < 7 {
-                    return "\(daysDiff) days ago"
+                    return String(format: "%lld days ago".localized, daysDiff)
                 } else {
                     return formatDate(date, format: "MMM d, yyyy")
                 }
             } else {
                 let futureDays = abs(daysDiff)
                 if futureDays == 1 {
-                    return "Tomorrow"
+                    return "Tomorrow".localized
                 } else if futureDays < 7 {
-                    return "In \(futureDays) days"
+                    return String(format: "In %lld days".localized, futureDays)
                 } else {
                     return formatDate(date, format: "MMM d, yyyy")
                 }
