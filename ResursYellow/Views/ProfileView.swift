@@ -342,7 +342,7 @@ struct ProfileSection<Content: View>: View {
                 .tracking(0.5)
                 .padding(.horizontal, 4)
             
-            VStack(spacing: 8) {
+            VStack(spacing: 12) { // same gap as the Fakturor list
                 content
             }
         }

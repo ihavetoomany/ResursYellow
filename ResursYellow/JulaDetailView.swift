@@ -76,6 +76,7 @@ struct JulaDetailView: View {
             .padding(.horizontal)
             .padding(.vertical, 24)
         }
+        .containerRelativeFrame(.horizontal) // pin content to the viewport width: no sideways drag
             }
             .coordinateSpace(name: "scroll")
         }

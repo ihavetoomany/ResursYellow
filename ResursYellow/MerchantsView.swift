@@ -228,6 +228,11 @@ struct MerchantCard: View {
                             BauhausIconView(color: color)
                         } else if title == "Netonnet" {
                             NetonnetIconView(color: color)
+                        } else if title == "Gekås" {
+                            Image("LogoGekas")
+                                .resizable()
+                                .scaledToFit()
+                                .padding(4)
                         } else {
                             Image(systemName: icon)
                                 .font(.title3.weight(.semibold))
@@ -242,7 +247,7 @@ struct MerchantCard: View {
                 .frame(width: 40, height: 40)
                 .background(
                     useCustomIcon && title == "Bauhaus" ? color :
-                    useCustomIcon && title == "Netonnet" ? Color.white :
+                    useCustomIcon && (title == "Netonnet" || title == "Gekås") ? Color.white :
                     color.opacity(0.18)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -298,7 +303,7 @@ struct MerchantsView: View {
     @StateObject private var dataManager = DataManager.shared
     @Environment(\.colorScheme) var colorScheme
     
-    @State private var connected: [String] = ["Bauhaus", "Netonnet"]
+    @State private var connected: [String] = ["Bauhaus", "Netonnet", "Gekås"]
     
     private var hasMerchants: Bool {
         !dataManager.creditAccounts.isEmpty // Use credit accounts as proxy for having products
@@ -422,20 +427,19 @@ struct MerchantsView: View {
                                 }
                                 .clipShape(RoundedRectangle(cornerRadius: 20))
                             }
-                            VStack(spacing: 10) {
+                            VStack(spacing: 12) { // same gap as the Fakturor list
                                 ForEach(connectedMerchants, id: \.self) { merchant in
                                     let card = cardConfig(for: merchant)
                                     
                                     NavigationLink(value: merchant) {
-                                        MerchantCard(
+                                        // Same card design as the Ekonomi tab
+                                        WalletCard(
+                                            badge: merchantBadge(for: merchant, color: card.color),
                                             title: merchant,
-                                            subtitle: card.subtitle,
-                                            amount: card.amount,
-                                            infoCopy: card.infoCopy,
-                                            icon: card.icon,
-                                            color: card.color,
-                                            titleColor: card.titleColor,
-                                            useCustomIcon: merchant == "Bauhaus" || merchant == "Netonnet"
+                                            typeLabel: merchantType(for: merchant),
+                                            valueLabel: usesSharedMerchantCredit ? "Shared credit".localized : "Available credit".localized,
+                                            value: (card.amount ?? sharedCreditAmount ?? "").replacingOccurrences(of: " kr", with: ""),
+                                            footnote: card.infoCopy ?? card.subtitle
                                         )
                                     }
                                     .buttonStyle(.plain)
@@ -449,7 +453,7 @@ struct MerchantsView: View {
                                 }
                             }
                         }
-                        .padding(.top, 24)
+                        .padding(.top, 12) // same gap below the header as the Ekonomi tab
                     }
                 }
                 .padding(.horizontal)
@@ -505,6 +509,23 @@ private extension MerchantsView {
         let titleColor: Color
     }
     
+    func merchantType(for merchant: String) -> String {
+        switch merchant {
+        case "Gekås": return "Credit card".localized
+        case "Bauhaus", "Netonnet", "Jula": return "Store credit".localized
+        default: return "Store".localized
+        }
+    }
+
+    func merchantBadge(for merchant: String, color: Color) -> WalletBadge {
+        switch merchant {
+        case "Bauhaus": return .view(AnyView(BauhausIconView(color: color).frame(width: 40, height: 40).background(color)))
+        case "Netonnet": return .image("LogoNetonnet")
+        case "Gekås": return .image("LogoGekas")
+        default: return .icon(.store, tint: .secondary, background: RyColor.bgSubtle)
+        }
+    }
+
     func cardConfig(for merchant: String) -> MerchantCardConfig {
         // When persona uses shared credit (e.g. Future John), no per-merchant amount; one credit shared across all.
         let useShared = dataManager.currentPersona.usesSharedMerchantCredit
@@ -525,6 +546,16 @@ private extension MerchantsView {
                 infoCopy: useShared ? "Store credit and pay later. Use your shared credit in-store or online.".localized : nil,
                 icon: "shippingbox.fill",
                 color: .green,
+                titleColor: .primary
+            )
+        case "Gekås":
+            // Moved here from the Ekonomi wallet; same figures as the Onlinebank prototype
+            return MerchantCardConfig(
+                subtitle: useShared ? "Uses your shared credit".localized : String(format: "%lld purchases this month · %@".localized, 3, "2 547 kr"),
+                amount: useShared ? nil : "22 550 kr",
+                infoCopy: useShared ? "Credit card purchases use your shared credit.".localized : nil,
+                icon: "creditcard.fill",
+                color: Color(ryHex: "#2F5FA8"),
                 titleColor: .primary
             )
         case "Jula":

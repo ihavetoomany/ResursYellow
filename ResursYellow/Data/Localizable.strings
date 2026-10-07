@@ -779,3 +779,28 @@
 "Split your purchases with Flex" = "Split your purchases with Flex";
 "Spread the cost of a purchase over monthly payments, after you have bought it." = "Spread the cost of a purchase over monthly payments, after you have bought it.";
 "Choose a purchase" = "Choose a purchase";
+
+/* Wallet (Plånbok) */
+"Recently used" = "Recently used";
+"Available" = "Available";
+"Credit card" = "Credit card";
+"Savings account" = "Savings account";
+"Loan" = "Loan";
+"Total balance" = "Total balance";
+"Remaining debt" = "Remaining debt";
+"%lld purchases this month · %@" = "%lld purchases this month · %@";
+"Make a deposit today!" = "Make a deposit today!";
+"Original loan %@" = "Original loan %@";
+"less spent than last month" = "less spent than last month";
+"See insights" = "See insights";
+"Open a savings account" = "Open a savings account";
+"Save a little every month and watch your money grow." = "Save a little every month and watch your money grow.";
+"Open account" = "Open account";
+"Show all" = "Show all";
+"Savings\naccount" = "Savings\naccount";
+"Close" = "Close";
+"Credit card purchases use your shared credit." = "Credit card purchases use your shared credit.";
+"Store credit" = "Store credit";
+"Store" = "Store";
+"Use your %@ card for quick and secure payments." = "Use your %@ card for quick and secure payments.";
+"Read the terms and conditions for %@" = "Read the terms and conditions for %@";

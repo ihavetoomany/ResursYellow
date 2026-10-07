@@ -21,7 +21,24 @@ private struct AdaptiveCardBackground: View {
     }
 }
 
+/// The Resurs credit products that share this detail screen.
+struct ResursCreditProduct {
+    let title: String
+    let available: String
+    let limit: String
+    let used: String
+    let icon: String
+    let tint: Color
+    /// Family-only extras (family sharing benefit, settings copy)
+    let isFamily: Bool
+
+    static let family = ResursCreditProduct(title: "Resurs Family", available: "56 005 SEK", limit: "80 000 SEK", used: "23 995 SEK", icon: "heart.fill", tint: .blue, isFamily: true)
+    // Figures match the Resurs Gold wallet card (31 500 kr available)
+    static let gold = ResursCreditProduct(title: "Resurs Gold", available: "31 500 SEK", limit: "50 000 SEK", used: "18 500 SEK", icon: "creditcard.fill", tint: RyColor.primaryMain, isFamily: false)
+}
+
 struct ResursFamilyAccountView: View {
+    var product: ResursCreditProduct = .family
     @StateObject private var dataManager = DataManager.shared
     @StateObject private var scrollObserver = ScrollOffsetObserver()
     @State private var showSettings = false
@@ -38,21 +55,26 @@ struct ResursFamilyAccountView: View {
             .map { $0.toPartPaymentItem() }
     }
     
-    // Benefits for Resurs Family
-    private let benefits: [(icon: String, title: String, desc: String)] = [
-        ("calendar.badge.clock", "Flexible Payments".localized, "Choose flexible part payment plans for large purchases.".localized),
-        ("creditcard.fill", "Easy Checkout".localized, "Use your Resurs Family card for quick and secure payments.".localized),
-        ("heart.fill", "Family Sharing".localized, "Share your credit account with family members.".localized),
-        ("shield.checkerboard", "Payment Protection".localized, "Protect your purchases with optional payment insurance.".localized)
-    ]
+    // Benefits (family sharing only for Resurs Family)
+    private var benefits: [(icon: String, title: String, desc: String)] {
+        var list: [(icon: String, title: String, desc: String)] = [
+            ("calendar.badge.clock", "Flexible Payments".localized, "Choose flexible part payment plans for large purchases.".localized),
+            ("creditcard.fill", "Easy Checkout".localized, String(format: "Use your %@ card for quick and secure payments.".localized, product.title))
+        ]
+        if product.isFamily {
+            list.append(("heart.fill", "Family Sharing".localized, "Share your credit account with family members.".localized))
+        }
+        list.append(("shield.checkerboard", "Payment Protection".localized, "Protect your purchases with optional payment insurance.".localized))
+        return list
+    }
     
-    // Documents for Resurs Family
-    private let documents: [(icon: String, titleKey: String, descKey: String)] = [
+    // Documents
+    private var documents: [(icon: String, titleKey: String, descKey: String)] { [
         ("doc.text.fill", "Credit Agreement", "View your credit account terms and conditions"),
-        ("doc.text", "Terms and Conditions", "Read the terms and conditions for Resurs Family"),
+        ("doc.text", "Terms and Conditions", String(format: "Read the terms and conditions for %@".localized, product.title)),
         ("hand.raised.fill", "Privacy Policy", "Review how we handle your personal information"),
         ("doc.on.doc.fill", "Payment Plan Agreement", "View your active payment plan agreements")
-    ]
+    ] }
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -78,7 +100,7 @@ struct ResursFamilyAccountView: View {
                     
                     VStack(spacing: 16) {
                     // Account Overview Card
-                    AccountOverviewCard()
+                    AccountOverviewCard(product: product)
                         .padding(.horizontal)
                         .padding(.top, 4)
                         .padding(.bottom, 16)
@@ -306,10 +328,11 @@ struct ResursFamilyAccountView: View {
                 }
                 .padding(.vertical, 24)
             }
+            .containerRelativeFrame(.horizontal) // pin content to the viewport width: no sideways drag
             }
             .coordinateSpace(name: "scroll")
         }
-        .navigationTitle("Resurs Family")
+        .navigationTitle(product.title)
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(scrollObserver.offset > 10 ? Color(uiColor: .systemBackground) : Color.clear, for: .navigationBar)
         .toolbar {
@@ -324,7 +347,7 @@ struct ResursFamilyAccountView: View {
             }
         }
         .sheet(isPresented: $showSettings) {
-            ServiceSettingsView(serviceName: "Resurs Family", serviceColor: .blue)
+            ServiceSettingsView(serviceName: product.title, serviceColor: product.tint)
                 .presentationBackground {
                     AdaptiveSheetBackground()
                 }
@@ -444,6 +467,7 @@ struct ResursGoldPartPaymentRow: View {
 }
 
 struct AccountOverviewCard: View {
+    var product: ResursCreditProduct = .family
     @Environment(\.colorScheme) var colorScheme
     var body: some View {
         VStack(spacing: 16) {
@@ -452,17 +476,17 @@ struct AccountOverviewCard: View {
                     Text("Available Credit".localized)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    Text("56 005 SEK")
+                    Text(product.available)
                         .font(.system(size: 32, weight: .bold))
                 }
                 
                 Spacer()
                 
-                Image(systemName: "heart.fill")
+                Image(systemName: product.icon)
                     .font(.title)
-                    .foregroundColor(.blue)
+                    .foregroundColor(product.tint)
                     .frame(width: 56, height: 56)
-                    .background(Color.blue.opacity(0.2))
+                    .background(product.tint.opacity(0.2))
                     .clipShape(Circle())
             }
             
@@ -473,7 +497,7 @@ struct AccountOverviewCard: View {
                     Text("Limit".localized)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("80 000 SEK")
+                    Text(product.limit)
                         .font(.headline)
                         .fontWeight(.semibold)
                 }
@@ -486,7 +510,7 @@ struct AccountOverviewCard: View {
                         Text("Used Credit".localized)
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text("23 995 SEK")
+                        Text(product.used)
                             .font(.headline)
                             .fontWeight(.semibold)
                     }

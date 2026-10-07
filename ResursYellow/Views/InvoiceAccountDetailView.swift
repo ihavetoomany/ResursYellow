@@ -68,6 +68,7 @@ struct InvoiceAccountDetailView: View {
                         .padding(.top, 16)
                         .padding(.bottom, 24)
                     }
+                    .containerRelativeFrame(.horizontal) // pin content to the viewport width: no sideways drag
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .scrollToTop)) { _ in
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CrossSellOffer: Identifiable {
     let id: String
-    let icon: String
+    let icon: FAIcon
     let eyebrow: String
     let title: String
     let subtitle: String
@@ -20,7 +20,7 @@ struct CrossSellCarousel: View {
     private let offers: [CrossSellOffer] = [
         CrossSellOffer(
             id: "loan",
-            icon: "house.fill",
+            icon: .house,
             eyebrow: "Loans".localized,
             title: "Borrow for your next project".localized,
             subtitle: "Renovation loan with a personal offer in minutes.".localized,
@@ -30,7 +30,7 @@ struct CrossSellCarousel: View {
         ),
         CrossSellOffer(
             id: "savings",
-            icon: "banknote.fill",
+            icon: .piggyBank, // same mark as the Ekonomi tab
             eyebrow: "Savings".localized,
             title: "Let your money grow".localized,
             subtitle: "Open a savings account with no fixed term and no fees.".localized,
@@ -40,7 +40,7 @@ struct CrossSellCarousel: View {
         ),
         CrossSellOffer(
             id: "flex",
-            icon: "creditcard.fill",
+            icon: .creditCard,
             eyebrow: "Flex".localized,
             title: "Split your purchases with Flex".localized,
             subtitle: "Spread the cost of a purchase over monthly payments, after you have bought it.".localized,
@@ -114,8 +114,7 @@ struct CrossSellCarousel: View {
                 .foregroundColor(offer.accent)
             }
             Spacer(minLength: 0)
-            Image(systemName: offer.icon)
-                .font(.system(size: 22))
+            FAIconView(offer.icon, style: .solid, size: 20)
                 .foregroundColor(offer.accent)
                 .frame(width: 44, height: 44)
                 .background(Circle().fill(offer.accent.opacity(0.15)))

@@ -779,3 +779,28 @@
 "Split your purchases with Flex" = "Dela upp köpen med Flex";
 "Spread the cost of a purchase over monthly payments, after you have bought it." = "Fördela kostnaden för ett köp på månatliga betalningar, i efterhand.";
 "Choose a purchase" = "Välj ett köp";
+
+/* Wallet (Plånbok) */
+"Recently used" = "Senast använda";
+"Available" = "Tillgängligt";
+"Credit card" = "Kreditkort";
+"Savings account" = "Sparkonto";
+"Loan" = "Lån";
+"Total balance" = "Totalt saldo";
+"Remaining debt" = "Återstående skuld";
+"%lld purchases this month · %@" = "%lld köp denna månad · %@";
+"Make a deposit today!" = "Gör en insättning redan idag!";
+"Original loan %@" = "Ursprungligt lån %@";
+"less spent than last month" = "mindre spenderat än förra månaden";
+"See insights" = "Se insikter";
+"Open a savings account" = "Öppna ett sparkonto";
+"Save a little every month and watch your money grow." = "Spara lite varje månad och se dina pengar växa.";
+"Open account" = "Öppna konto";
+"Show all" = "Visa alla";
+"Savings\naccount" = "Spar-\nkonto";
+"Close" = "Stäng";
+"Credit card purchases use your shared credit." = "Kreditkortsköp använder din delade kredit.";
+"Store credit" = "Butikskredit";
+"Store" = "Butik";
+"Use your %@ card for quick and secure payments." = "Använd ditt %@-kort för snabba och säkra betalningar.";
+"Read the terms and conditions for %@" = "Läs villkoren för %@";

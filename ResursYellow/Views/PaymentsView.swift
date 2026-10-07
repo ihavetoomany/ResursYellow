@@ -628,7 +628,7 @@ struct PaymentsView: View {
                                 navigationPath.append(WalletDestination.invoices)
                             } label: {
                                 HStack(spacing: 6) {
-                                    FAIconView(.fileInvoice, style: .solid, size: 14)
+                                    FAIconView(.bullhorn, style: .solid, size: 14)
                                     Text(invoiceSubtitleLabel)
                                         .font(.system(size: 15, weight: .medium))
                                 }
@@ -2097,10 +2097,7 @@ struct PurchaseRow: View {
                 .font(.title3)
                 .foregroundColor(color)
                 .frame(width: 40, height: 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(color.opacity(0.2))
-                )
+                .background(Circle().fill(color.opacity(0.2)))
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)

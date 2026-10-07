@@ -51,66 +51,11 @@ struct ServicesView: View {
                 ) {
                 VStack(spacing: 16) {
                     if hasAccounts {
-                        // Account Cards
-                        VStack(spacing: 16) {
-                            // My Accounts Items
-                            Button {
-                                navigationPath.append("ResursFamily")
-                            } label: {
-                                AccountCard(
-                                    title: "Resurs Family",
-                                    accountType: "Resurs Family",
-                                    accountNumber: "**** 1234",
-                                    balance: "\(dataManager.creditAccounts.first?.availableLabel ?? "0 SEK")",
-                                    icon: "heart.fill",
-                                    color: .blue,
-                                    balanceLabel: "Available credit".localized,
-                                    hideTitle: true
-                                )
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("Resurs Family credit account. Available credit.".localized)
-                            .accessibilityHint("Opens detailed view.".localized)
-                            
-                            Button {
-                                navigationPath.append("SavingsAccount")
-                            } label: {
-                                AccountCard(
-                                    title: "Senior Savings".localized,
-                                    accountType: "Senior Savings".localized,
-                                    accountNumber: "**** 5678",
-                                    balance: "120 450 SEK",
-                                    icon: "star.fill",
-                                    color: .mint,
-                                    balanceLabel: "Savings Balance".localized,
-                                    hideTitle: true
-                                )
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("Senior Savings savings account. 120 450 kronor saved.".localized)
-                            .accessibilityHint("Shows savings account activity.".localized)
-                            
-                            Button {
-                                navigationPath.append("HouseRenovationLoan")
-                            } label: {
-                                AccountCard(
-                                    title: "House Renovation".localized,
-                                    accountType: "House Renovation".localized,
-                                    accountNumber: "**** 9012",
-                                    balance: "255 000 SEK",
-                                    icon: "house.fill",
-                                    color: .orange,
-                                    balanceLabel: "Remaining Balance".localized,
-                                    hideTitle: true
-                                )
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .accessibilityLabel("House Renovation loan. 255 000 kronor remaining balance.".localized)
-                            .accessibilityHint("Opens loan details and payment schedule.".localized)
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 12)
-                        .padding(.bottom, 16)
+                        // Wallet ("Plånbok") — data and layout from the Onlinebank prototype
+                        WalletList(navigationPath: $navigationPath)
+                            .padding(.horizontal)
+                            .padding(.top, 12)
+                            .padding(.bottom, 16)
                     } else {
                         // Empty state
                         VStack(spacing: 20) {
@@ -159,6 +104,8 @@ struct ServicesView: View {
                 switch value {
                 case "ResursFamily":
                     ResursFamilyAccountView()
+                case "ResursGold":
+                    ResursFamilyAccountView(product: .gold)
                 case "SavingsAccount":
                     SavingsAccountDetailView()
                 case "HouseRenovationLoan":
@@ -381,6 +328,7 @@ struct SavingsAccountDetailView: View {
             .padding(.horizontal)
             .padding(.vertical, 24)
         }
+        .containerRelativeFrame(.horizontal) // pin content to the viewport width: no sideways drag
             }
             .coordinateSpace(name: "scroll")
         }

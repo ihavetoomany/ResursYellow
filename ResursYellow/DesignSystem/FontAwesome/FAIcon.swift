@@ -45,13 +45,23 @@ struct FAIcon: Hashable {
     /// Use for tab bar items and other UIKit image slots.
     func uiImage(style: FAStyle, size: CGFloat) -> UIImage {
         let font = uiFont(style: style, size: size)
-        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: UIColor.black]
-        let text = glyph as NSString
-        let bounds = text.size(withAttributes: attrs)
-        let canvas = CGSize(width: ceil(max(bounds.width, size)), height: ceil(max(bounds.height, size)))
-        return UIGraphicsImageRenderer(size: canvas).image { _ in
-            let origin = CGPoint(x: (canvas.width - bounds.width) / 2, y: (canvas.height - bounds.height) / 2)
-            text.draw(at: origin, withAttributes: attrs)
+        let attributed = NSAttributedString(string: glyph, attributes: [.font: font, .foregroundColor: UIColor.black])
+        let line = CTLineCreateWithAttributedString(attributed)
+        // Tight ink bounds (baseline-relative, y up). FA glyphs often reach above the
+        // font's ascender, so the line box would clip them at the top.
+        let ink = CTLineGetImageBounds(line, nil)
+        let side = ceil(max(ink.width, ink.height, size)) + 2
+        let canvas = CGSize(width: side, height: side)
+        return UIGraphicsImageRenderer(size: canvas).image { ctx in
+            let cg = ctx.cgContext
+            cg.translateBy(x: 0, y: canvas.height)
+            cg.scaleBy(x: 1, y: -1)
+            cg.textMatrix = .identity
+            cg.textPosition = CGPoint(
+                x: (canvas.width - ink.width) / 2 - ink.minX,
+                y: (canvas.height - ink.height) / 2 - ink.minY
+            )
+            CTLineDraw(line, cg)
         }.withRenderingMode(.alwaysTemplate)
     }
 
